@@ -1,0 +1,59 @@
+# Build trees
+build/
+build*/
+out/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Testing/
+install_manifest.txt
+compile_commands.json
+CMakeUserPresets.json
+
+# Native build-system output
+*.ninja
+.ninja_deps
+.ninja_log
+Makefile
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.xcodeproj/
+
+# Binaries and debug artifacts
+*.a
+*.app
+*.dll
+*.dSYM/
+*.dylib
+*.exe
+*.ilk
+*.lib
+*.obj
+*.o
+*.pdb
+*.so
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+.tmp/
+tmp/
+temp/
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.user
+
