@@ -9,8 +9,8 @@ Current focus: GitHub CI cppcheck runner fix.
 - [x] Update Windows tool bootstrap to reject unhealthy tool binaries.
 - [x] Update documentation for the changed tool bootstrap behavior.
 - [x] Run the local quality gate.
-- [ ] Publish the fix after explicit git-history approval.
-- [ ] Re-check the GitHub Actions run after publishing.
+- [x] Publish the fix after explicit git-history approval.
+- [x] Re-check the GitHub Actions run after publishing.
 
 ## GitHub CI Feedback Loop Setup
 
