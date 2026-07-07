@@ -1,15 +1,18 @@
-#include "core/build_info.hpp"
-
 #include <iostream>
 #include <string_view>
 
-namespace {
+import moldy.core;
 
-class TestContext {
+namespace
+{
+
+class TestContext
+{
 public:
     void expect(bool condition, std::string_view message)
     {
-        if (!condition) {
+        if (!condition)
+        {
             ++failures_;
             std::cerr << "FAIL: " << message << '\n';
         }
@@ -49,7 +52,8 @@ int main()
     test_compiler_id_is_available(context);
     test_language_standard_is_modern_cpp(context);
 
-    if (context.failures() != 0) {
+    if (context.failures() != 0)
+    {
         std::cerr << context.failures() << " test assertion(s) failed.\n";
         return 1;
     }

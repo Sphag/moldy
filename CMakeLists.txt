@@ -1,9 +1,10 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.28)
 
 project(moldy LANGUAGES CXX)
 
 enable_testing()
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 function(configure_project_target target_name)
@@ -21,14 +22,17 @@ function(configure_project_target target_name)
     endif()
 endfunction()
 
-add_library(core STATIC
-    src/core/build_info.cpp
-)
+add_library(core STATIC)
 add_library(project::core ALIAS core)
 
-target_include_directories(core
+target_sources(core
+    PRIVATE
+        src/core/build_info.cpp
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        FILE_SET CXX_MODULES
+        BASE_DIRS src/core
+        FILES
+            src/core/core.cppm
 )
 
 target_compile_definitions(core
@@ -54,5 +58,3 @@ target_link_libraries(core_tests PRIVATE project::core)
 configure_project_target(core_tests)
 
 add_test(NAME core_tests COMMAND core_tests)
-
-

@@ -1,6 +1,6 @@
 # Current Task
 
-Current focus: project identity, README, MIT licensing, and Git initialization are complete.
+Current focus: C++ tooling, style, and the first project module are in place.
 
 ## Completed
 
@@ -14,12 +14,14 @@ Current focus: project identity, README, MIT licensing, and Git initialization a
 - Added the `core` static library with a tiny build-info API.
 - Added the `smoke` executable linked against `core`.
 - Added a plain C++ `core_tests` executable and registered it with CTest.
-- Updated quality scripts so formatter and linter gaps are explicit.
+- Selected `clang-format`, `clang-tidy`, and `cppcheck` as the C++ quality toolchain.
+- Added formatter, linter, cppcheck suppression, and tool setup configuration.
+- Defined the initial C++ style guide.
+- Converted the current `core` public API from a header to the `moldy.core` C++ module.
+- Updated quality scripts so format and lint checks are enforced.
 
 ## Next Recommended Tasks
 
-- Choose formatter and linter/static-analysis tools.
-- Define the initial C++ style guide.
+- Add CI once the local quality gate is stable across the target developer environments.
 - Decide whether plain executable tests remain sufficient before adding any test framework dependency.
-- Revisit C++ modules after the basic scaffold is stable on target compilers.
-
+- Add more core APIs only when driven by concrete needs.

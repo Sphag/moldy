@@ -1,4 +1,6 @@
-#include "core/build_info.hpp"
+module;
+
+#include <string_view>
 
 #ifndef CORE_BUILD_CONFIGURATION
 #define CORE_BUILD_CONFIGURATION "unknown"
@@ -8,12 +10,16 @@
 #define CORE_COMPILER_ID "unknown"
 #endif
 
-namespace core {
+module moldy.core;
+
+namespace core
+{
 
 std::string_view build_configuration() noexcept
 {
     constexpr std::string_view configuration{CORE_BUILD_CONFIGURATION};
-    if constexpr (configuration.empty()) {
+    if constexpr (configuration.empty())
+    {
         return "unspecified";
     }
 
@@ -23,7 +29,8 @@ std::string_view build_configuration() noexcept
 std::string_view compiler_id() noexcept
 {
     constexpr std::string_view compiler{CORE_COMPILER_ID};
-    if constexpr (compiler.empty()) {
+    if constexpr (compiler.empty())
+    {
         return "unknown";
     }
 

@@ -4,24 +4,33 @@ This document maps the current repository scaffold. Keep it factual and update i
 
 ## Repository Layout
 
-- `CMakeLists.txt`: top-level CMake project, target definitions, compiler settings, and test registration.
-- `src/core/`: platform-neutral `core` library source and public headers.
+- `CMakeLists.txt`: top-level CMake project, target definitions, compiler settings, module file set, and test registration.
+- `src/core/`: platform-neutral `core` library module source.
 - `apps/smoke/`: small executable used to verify that the core library links and reports build information.
 - `tests/core/`: plain C++ executable tests for the current core API.
-- `scripts/`: PowerShell entry points for configure, build, test, check, formatting placeholder, lint placeholder, and benchmark placeholder flows.
-- `docs/`: project workflow, quality, testing, decisions, architecture, and source navigation documents.
+- `scripts/`: PowerShell entry points for configure, build, test, check, format, lint, tool setup, and benchmark placeholder flows.
+- `docs/`: project workflow, quality, style, testing, decisions, architecture, and source navigation documents.
 - `tasks/`: task planning notes.
 - `build*/`: generated build trees. These are not source locations.
 
 ## CMake Project
 
-The top-level CMake project is named `moldy`.
+The top-level CMake project is named `moldy` and requires CMake 3.28 or newer.
 
 ## Core Library
 
-The `core` static library is defined from `src/core/build_info.cpp` and exposes public headers through the `src` include root.
+The `core` static library is defined from:
 
-Current public API:
+- `src/core/core.cppm`: public C++ module interface for `moldy.core`.
+- `src/core/build_info.cpp`: module implementation unit.
+
+Current public API is imported with:
+
+```cpp
+import moldy.core;
+```
+
+Current public functions:
 
 - `core::build_configuration()`: returns the CMake build configuration string, or a fallback when unavailable.
 - `core::compiler_id()`: returns the CMake compiler identifier, or a fallback when unavailable.
@@ -31,11 +40,11 @@ The current API is intentionally limited to build-information reporting. Do not 
 
 ## Applications
 
-The `smoke` executable is defined from `apps/smoke/main.cpp`. It links `project::core` and prints the current compiler, build configuration, and C++ language standard.
+The `smoke` executable is defined from `apps/smoke/main.cpp`. It links `project::core`, imports `moldy.core`, and prints the current compiler, build configuration, and C++ language standard.
 
 ## Tests
 
-The `core_tests` executable is defined from `tests/core/test_main.cpp`. It uses a tiny local assertion harness and is registered with CTest as `core_tests`.
+The `core_tests` executable is defined from `tests/core/test_main.cpp`. It links `project::core`, imports `moldy.core`, uses a tiny local assertion harness, and is registered with CTest as `core_tests`.
 
 Current checks verify that:
 
@@ -49,13 +58,14 @@ Current checks verify that:
 - `scripts/build.ps1`: configures, then builds the project for the requested configuration.
 - `scripts/test.ps1`: configures, builds `core_tests`, then runs CTest with failure output enabled.
 - `scripts/check.ps1`: runs configure, format, lint, build, and test in order.
-- `scripts/format.ps1`: reports placeholder-pass status because no formatter is selected yet.
-- `scripts/lint.ps1`: reports placeholder-pass status because no linter or static-analysis tool is selected yet.
+- `scripts/format.ps1`: checks C++ formatting with `clang-format`; pass `-Fix` to apply formatting.
+- `scripts/lint.ps1`: runs `clang-tidy` and `cppcheck` over source files, excluding generated build trees.
+- `scripts/install-tools.ps1`: checks required tool availability and provides an explicit Windows install path.
 - `scripts/bench.ps1`: reports placeholder-pass status because benchmarks are not configured yet.
 
 ## CMake Targets
 
-- `core`: static library built as C++23.
+- `core`: static library built as C++23 with a public `CXX_MODULES` file set.
 - `project::core`: alias target for consumers of `core`.
 - `smoke`: executable linked against `project::core`.
 - `core_tests`: executable linked against `project::core` and registered as the current CTest test.

@@ -1,6 +1,6 @@
-#include "core/build_info.hpp"
-
 #include <iostream>
+
+import moldy.core;
 
 int main()
 {

@@ -1,10 +1,10 @@
-﻿# Code Quality
+# Code Quality
 
 This project uses strict code quality expectations even before implementation begins.
 
 ## Code Expectations
 
-- Consistent formatting is mandatory once the formatter is selected.
+- Consistent formatting is mandatory.
 - Clear naming is mandatory.
 - Public APIs must be small, intentional, and documented when non-obvious.
 - Public API, configuration behavior, script behavior, test layout, and source layout changes must update the nearest relevant documentation in the same task.
@@ -26,18 +26,28 @@ This project uses strict code quality expectations even before implementation be
 
 ## Formatting Policy
 
-- Use one project-wide formatter once selected.
+- Use `clang-format` with the repository `.clang-format` file.
+- `scripts/format.ps1` is check-only by default.
+- Use `scripts/format.ps1 -Fix` to apply formatting.
 - Do not mix style within the same module.
 - Formatting changes should not be bundled with unrelated logic changes unless explicitly requested.
-- Until a formatter is selected, agents should preserve local style and keep formatting simple.
+
+## Static Analysis Policy
+
+- Use `clang-tidy` with the repository `.clang-tidy` file.
+- Use `cppcheck` with the repository `.cppcheck-suppressions` file.
+- `scripts/lint.ps1` runs both tools and fails on findings. With generators that do not export `compile_commands.json`, `clang-tidy` falls back to module interface analysis and `cppcheck` still scans the source set.
+- Generated build trees are excluded from formatting and linting.
+- Keep suppressions narrow and only for confirmed false positives.
 
 ## Current Quality Scripts
 
 - `scripts/configure.ps1` configures the CMake build directory.
 - `scripts/build.ps1` builds the configured CMake project.
 - `scripts/test.ps1` builds the current test executable and runs CTest.
-- `scripts/format.ps1` reports explicit placeholder-pass status because no formatter is selected yet.
-- `scripts/lint.ps1` reports explicit placeholder-pass status because no linter or static-analysis tool is selected yet.
+- `scripts/format.ps1` checks formatting with `clang-format`; pass `-Fix` to rewrite formatting.
+- `scripts/lint.ps1` runs `clang-tidy` and `cppcheck`.
+- `scripts/install-tools.ps1` checks or installs the selected local C++ quality tools on Windows.
 - `scripts/check.ps1` runs configure, format, lint, build, and test in order.
 
-The formatter and linter placeholder scripts do not perform formatting or static analysis. Selecting and enforcing those tools remains a future decision.
+The selected C++ quality tools are required for the default quality gate. Use `scripts/install-tools.ps1 -Check` to verify local availability.

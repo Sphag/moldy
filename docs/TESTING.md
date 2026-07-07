@@ -25,7 +25,7 @@ Common output locations:
 
 1. Configure the project.
 2. Run format check.
-3. Run lint or static analysis.
+3. Run lint and static analysis.
 4. Build default targets.
 5. Run unit tests.
 6. Build examples when they exist.
@@ -33,7 +33,7 @@ Common output locations:
 
 ## Current Tooling State
 
-Formatter and linter/static-analysis tools are not selected yet. Their scripts report explicit placeholder-pass status and do not claim that formatting or linting was performed.
+The selected quality tools are `clang-format`, `clang-tidy`, and `cppcheck`. `scripts/check.ps1` runs them before build and test steps.
 
 ## Cross-Platform Expectations
 
@@ -41,4 +41,4 @@ Cross-platform behavior should eventually be verified on Windows, macOS, and Lin
 
 ## Completion Standard
 
-Code is not considered complete if it bypasses formatting, linting, or architecture quality expectations without an explicit reason. Until formatter and linter tools are selected, missing tooling must remain explicit in script output and project decisions.
+Code is not considered complete if it bypasses formatting, linting, or architecture quality expectations without an explicit reason.

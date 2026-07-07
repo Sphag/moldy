@@ -22,9 +22,17 @@ Useful individual entry points:
 .\scripts\configure.ps1
 .\scripts\build.ps1
 .\scripts\test.ps1
+.\scripts\format.ps1
+.\scripts\lint.ps1
 ```
 
-Formatter and linter choices are intentionally deferred. Their scripts currently report explicit placeholder-pass status.
+Check whether the required local C++ quality tools are available:
+
+```powershell
+.\scripts\install-tools.ps1 -Check
+```
+
+`clang-format`, `clang-tidy`, and `cppcheck` are the selected local quality tools. `scripts/format.ps1` is check-only by default; pass `-Fix` to rewrite source formatting.
 
 ## Start Here
 
@@ -32,20 +40,20 @@ Formatter and linter choices are intentionally deferred. Their scripts currently
 - [Source Map](docs/SOURCE_MAP.md)
 - [AI Workflow](docs/AI_WORKFLOW.md)
 - [Code Quality](docs/CODE_QUALITY.md)
+- [C++ Style](docs/CPP_STYLE.md)
 - [Testing](docs/TESTING.md)
 - [Roadmap](docs/ROADMAP.md)
 
 ## Repository Map
 
 - `CMakeLists.txt`: top-level CMake project and target definitions.
-- `src/core/`: current platform-neutral `core` library.
+- `src/core/`: current platform-neutral `core` library module.
 - `apps/smoke/`: executable used to verify the library links and reports build information.
 - `tests/core/`: plain C++ executable tests for the current core API.
 - `scripts/`: PowerShell workflow entry points.
-- `docs/`: project brief, decisions, source map, testing, and workflow documents.
+- `docs/`: project brief, decisions, source map, testing, style, and workflow documents.
 - `tasks/`: current and future task notes.
 
 ## Current State
 
 The repository contains a minimal C++23/CMake scaffold. Target platforms are Windows, macOS, and Linux desktop. Current work is infrastructure-first and does not claim completed 2D, 3D, rendering, editor, runtime, or platform-layer features.
-

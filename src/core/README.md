@@ -1,13 +1,13 @@
-﻿# Core Module
+# Core Module
 
-`src/core` contains the current platform-neutral `core` library.
+`src/core` contains the current platform-neutral `core` library module.
 
 ## Current Public API
 
-The public header is `build_info.hpp` and is included as:
+The public C++ module is `moldy.core` and is imported as:
 
 ```cpp
-#include "core/build_info.hpp"
+import moldy.core;
 ```
 
 Available functions:
@@ -16,4 +16,6 @@ Available functions:
 - `core::compiler_id()`: reports the compiler identifier supplied by CMake, with a fallback for missing or empty compiler data.
 - `core::language_standard()`: reports the compiler's `__cplusplus` value.
 
-Keep this README aligned with public headers and current module responsibility. Do not add future subsystem responsibilities here until corresponding source exists.
+The module interface lives in `core.cppm`. The implementation unit is `build_info.cpp`.
+
+Keep this README aligned with the public module interface and current module responsibility. Do not add future subsystem responsibilities here until corresponding source exists.

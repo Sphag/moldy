@@ -109,3 +109,35 @@ Decision: License Moldy under the MIT License.
 Consequences: The repository includes a top-level `LICENSE` file, and public documentation should identify MIT as the project license.
 
 
+
+## 2026-07-07: Select C++ Formatting And Static Analysis Tools
+
+Date: 2026-07-07
+Status: Accepted
+Context: The repository needs enforced C++ formatting and static-analysis checks instead of placeholder scripts.
+Decision: Use `clang-format` for formatting, `clang-tidy` for linting, and `cppcheck` for additional static analysis. Keep suppressions in `.cppcheck-suppressions` and require explicit local tool checks through `scripts/install-tools.ps1`.
+Consequences: `scripts/check.ps1` now depends on the selected tools. Contributors must install LLVM tools and cppcheck locally before running the default quality gate.
+
+## 2026-07-07: Use Unreal-Inspired Native C++ Style
+
+Date: 2026-07-07
+Status: Accepted
+Context: The project needs a readable C++ style before more public APIs are added.
+Decision: Use spaces, Allman braces, PascalCase type names, namespaces for organization, `T` for template type parameters, `I` for abstract interfaces, and `E` for enum types. Do not adopt Unreal reflection macros, property macros, type aliases, or `U`/`A`/`F` prefixes for ordinary repository classes and structs.
+Consequences: Style is documented in `docs/CPP_STYLE.md` and enforced where possible by `clang-format` and `clang-tidy`.
+
+## 2026-07-07: Publish Core As A C++ Module
+
+Date: 2026-07-07
+Status: Accepted
+Context: The current `core` API is small enough to move to a project module before broader API compatibility concerns exist.
+Decision: Replace the include-based `core/build_info.hpp` public API with the `moldy.core` C++ module while keeping the public namespace `core`, target names, and current functions unchanged.
+Consequences: Consumers now use `import moldy.core;`. CMake minimum version is 3.28 to use the `CXX_MODULES` file set. The retired compatibility header is removed.
+
+## 2026-07-07: Defer `import std` For Required Builds
+
+Date: 2026-07-07
+Status: Accepted
+Context: CMake and generator support for standard library module imports is still uneven across required desktop workflows.
+Decision: Do not use `import std` in required builds yet. Module units may include standard library headers in the global module fragment.
+Consequences: `import std` remains a future Ninja-only experiment until the required build generators support it cleanly.

@@ -1,8 +1,11 @@
-#pragma once
+module;
 
 #include <string_view>
 
-namespace core {
+export module moldy.core;
+
+export namespace core
+{
 
 std::string_view build_configuration() noexcept;
 std::string_view compiler_id() noexcept;
