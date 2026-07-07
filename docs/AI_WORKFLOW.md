@@ -19,7 +19,7 @@ Platform-layer changes must consider impact on Windows, macOS, and Linux before 
 
 ## GitHub Collaboration
 
-GitHub Issues are the planned tracker for actionable tasks. Until that migration is complete, keep `tasks/current.md` and `tasks/backlog.md` synchronized with the work being done.
+GitHub Issues track actionable Phase 2 closure items and Phase 3 follow-ups. Until [issue #2](https://github.com/Sphag/moldy/issues/2) slims the local task files, keep `tasks/current.md` and `tasks/backlog.md` synchronized with GitHub issue links and the work being done.
 
 After commits are explicitly approved, prefer branch-based pull requests for review and validation. Agents must still ask before creating commits, branches, pull requests, or other git history changes.
 
