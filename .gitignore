@@ -57,3 +57,6 @@ desktop.ini
 .vscode/
 *.user
 
+# Local AI-agent state
+.codex/
+.agents/
