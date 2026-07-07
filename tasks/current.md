@@ -1,6 +1,16 @@
 # Current Task
 
-Current focus: README onboarding slice.
+Current focus: GitHub CI feedback loop setup.
+
+## GitHub CI Feedback Loop Setup
+
+- [x] Re-check current Git status before editing.
+- [x] Add a GitHub workflow feedback-loop document.
+- [x] Link the feedback-loop document from AI workflow docs.
+- [x] Update source-map documentation for the new workflow document.
+- [x] Check whether GitHub CLI is available locally.
+- [x] Install GitHub CLI locally.
+- [ ] Authenticate GitHub CLI with repository and workflow access.
 
 ## README Onboarding Slice
 
@@ -56,9 +66,11 @@ Current focus: README onboarding slice.
 - Added the initial Windows GitHub Actions CI workflow for pushed branches and pull requests.
 - Documented the planned GitHub Issues and PR-first workflow.
 - Improved README onboarding for first-time readers without overstating implemented features.
+- Added the GitHub CI feedback-loop guide for AI-assisted CI fixes.
 
 ## Next Recommended Tasks
 
+- Authenticate GitHub CLI locally with repository and workflow access.
 - Create GitHub Issues for current and backlog items.
 - Push a branch and verify the first GitHub Actions run.
 - Continue core APIs after the GitHub workflow slice is verified remotely.

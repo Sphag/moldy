@@ -8,6 +8,7 @@
   - Create issues for active items from `tasks/current.md`.
   - Create issues for pending items from `tasks/backlog.md`.
   - Keep local task files as lightweight session notes once GitHub Issues is active.
+- Authenticate GitHub CLI locally for AI-assisted PR and CI investigation.
 - Verify the first GitHub Actions CI run on a pushed branch and adjust only if runner tooling fails.
 - Expand CI to macOS and Linux after runner toolchain feasibility is verified.
 - Decide whether to keep plain executable tests or approve a test framework dependency.

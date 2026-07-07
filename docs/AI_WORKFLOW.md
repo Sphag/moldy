@@ -25,6 +25,8 @@ After commits are explicitly approved, prefer branch-based pull requests for rev
 
 GitHub Actions cannot run on purely local, unpushed commits. Remote CI runs when commits are pushed to a branch and when pull requests are opened or updated. Local verification remains the required pre-push check when feasible.
 
+See [docs/GITHUB_WORKFLOW.md](GITHUB_WORKFLOW.md) for the expected pull request and CI feedback loop.
+
 ## Documentation Maintenance
 
 When a task changes source files, build configuration, scripts, tests, applications, public APIs, or directory structure, update the nearest relevant documentation in the same task.
