@@ -58,6 +58,14 @@ Final reports must include:
 
 Run `scripts/check.ps1` before reporting completion when feasible.
 
+## Pull Request Descriptions
+
+- Use `.github/pull_request_template.md` for pull request descriptions.
+- Keep pull request descriptions compact and scannable.
+- Do not use large Markdown headings such as `#` or `##` in pull request descriptions.
+- Prefer bold inline section labels, short bullets, and checklists.
+- Keep generated pull request bodies formatted with real line breaks; do not collapse sections into one long line.
+
 ## Generated Artifact Cleanup
 
 - Prefer short-lived, task-specific build directories such as `build-check` only while they are needed.

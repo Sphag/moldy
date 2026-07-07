@@ -55,6 +55,12 @@ Expected loop:
 7. Re-run the relevant local check.
 8. Push the follow-up commit after explicit approval.
 
+## Pull Request Descriptions
+
+Use `.github/pull_request_template.md` when opening or updating pull requests. Keep the description compact: use bold inline section labels, short bullets, and checklists. Avoid large Markdown headings such as `#` or `##`, because they make generated pull request bodies visually noisy in GitHub.
+
+Do not collapse generated pull request descriptions into one long line. Preserve real line breaks before sending the body to `gh pr create` or `gh pr edit`.
+
 ## AI-Assisted CI Fix Prompt
 
 Use a prompt like this when GitHub Actions fails:

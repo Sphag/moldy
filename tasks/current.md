@@ -13,6 +13,7 @@ Current focus: Phase 2 closure and Phase 3 core API readiness.
 - [x] Document stable GitHub CLI authentication handling for restricted agent sessions.
 - [x] Create GitHub Issues for Phase 2 closure items and Phase 3 follow-ups.
 - [x] Update local task files with created issue numbers or URLs after issues exist.
+- [x] Add compact pull request description rules and template after PR #7 formatting feedback.
 
 Notes:
 
@@ -109,6 +110,7 @@ Created issues:
 - Verified the latest remote Windows GitHub Actions run on `main` succeeded.
 - Documented stable GitHub CLI auth handling for restricted agent sessions.
 - Created GitHub Issues for Phase 2 closure items and Phase 3 follow-ups.
+- Added a compact pull request description template and agent rules to avoid oversized PR headings.
 
 ## Next Recommended Tasks
 
