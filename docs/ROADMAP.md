@@ -18,11 +18,18 @@ This roadmap is intentionally generic and identity-free.
 
 ## Phase 2: GitHub Collaboration and CI Workflow
 
-- Migrate actionable items from `tasks/current.md` and `tasks/backlog.md` into GitHub Issues.
-- Use a PR-first workflow after commits are explicitly approved.
-- Run GitHub Actions CI for pushed branch commits and pull request updates.
-- Start CI on `windows-latest` with the existing PowerShell quality gate.
-- Improve README onboarding for first-time readers without overstating implemented features.
+Operational:
+
+- GitHub Actions runs the Windows quality gate on pushed branch commits and pull request updates.
+- The workflow uses `windows-latest` with the existing PowerShell quality gate.
+- README onboarding describes the current scaffold and local quality-gate path.
+- The latest verified remote Windows run on `main` succeeded for commit `c520e16`.
+
+Remaining closure:
+
+- Use [GitHub issue #2](https://github.com/Sphag/moldy/issues/2) to slim local task files now that the initial issue set exists.
+- Keep local task files as lightweight session notes after GitHub Issues are active.
+- Continue using a PR-first workflow after commits are explicitly approved.
 
 Planned follow-up:
 
@@ -32,15 +39,11 @@ Planned follow-up:
 
 Current focus:
 
-- Add the first explicit core error/status API.
-- Keep new core APIs small, tested, and dependency-free.
-- Continue updating source-map and architecture docs alongside public API changes.
-
-Planned follow-up:
-
 - Add logging.
 - Add time utilities.
 - Define application lifecycle primitives.
+- Keep new core APIs small, tested, and dependency-free.
+- Continue updating source-map and architecture docs alongside public API changes.
 
 ## Phase 4: Cross-Platform Platform Layer
 

@@ -1,16 +1,13 @@
 # Backlog
 
-- Continue Phase 3 core APIs:
-  - Add logging.
-  - Add time utilities.
-  - Define application lifecycle primitives.
-- Migrate local task tracking into GitHub Issues:
-  - Create issues for active items from `tasks/current.md`.
-  - Create issues for pending items from `tasks/backlog.md`.
-  - Keep local task files as lightweight session notes once GitHub Issues is active.
-- Authenticate GitHub CLI locally for AI-assisted PR and CI investigation.
-- Verify the first GitHub Actions CI run on a pushed branch and adjust only if runner tooling fails.
-- Expand CI to macOS and Linux after runner toolchain feasibility is verified.
+- Track Phase 2 closure and follow-ups in GitHub Issues:
+  - [#1 Remote Windows CI loop verification](https://github.com/Sphag/moldy/issues/1)
+  - [#2 GitHub Issues migration and local task-file slimming](https://github.com/Sphag/moldy/issues/2)
+  - [#3 macOS and Linux CI runner feasibility](https://github.com/Sphag/moldy/issues/3)
+- Continue Phase 3 core APIs through GitHub Issues:
+  - [#4 Core logging primitives](https://github.com/Sphag/moldy/issues/4)
+  - [#5 Core time utilities](https://github.com/Sphag/moldy/issues/5)
+  - [#6 Application lifecycle primitives](https://github.com/Sphag/moldy/issues/6)
 - Decide whether to keep plain executable tests or approve a test framework dependency.
 - Evaluate `import std` later as a Ninja-only experiment until required generators support it cleanly.
 - Decide any future reflection approach separately from the C++23 scaffold.
