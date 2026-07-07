@@ -9,34 +9,123 @@ $tools = @(
     @{
         Name = "clang-format"
         Package = "LLVM.LLVM"
+        KnownPaths = @(
+            "C:\Program Files\LLVM\bin\clang-format.exe"
+        )
     },
     @{
         Name = "clang-tidy"
         Package = "LLVM.LLVM"
+        KnownPaths = @(
+            "C:\Program Files\LLVM\bin\clang-tidy.exe"
+        )
     },
     @{
         Name = "cppcheck"
         Package = "Cppcheck.Cppcheck"
+        KnownPaths = @(
+            "C:\Program Files\Cppcheck\cppcheck.exe"
+        )
     }
 )
 
-function Show-ToolStatus {
-    param([string]$Name)
+function Get-ToolCandidates {
+    param(
+        [string]$Name,
+        [string[]]$KnownPaths
+    )
 
-    $command = Get-Command $Name -ErrorAction SilentlyContinue
-    if ($null -eq $command) {
-        Write-Host "${Name}: missing"
+    $candidatePaths = [System.Collections.Generic.List[string]]::new()
+
+    foreach ($knownPath in $KnownPaths) {
+        if (Test-Path -LiteralPath $knownPath -PathType Leaf) {
+            $candidatePaths.Add($knownPath)
+        }
+    }
+
+    $commands = @(Get-Command $Name -All -ErrorAction SilentlyContinue)
+    foreach ($command in $commands) {
+        if ($null -ne $command.Source -and -not $candidatePaths.Contains($command.Source)) {
+            $candidatePaths.Add($command.Source)
+        }
+    }
+
+    return $candidatePaths.ToArray()
+}
+
+function Test-ToolCandidate {
+    param(
+        [string]$Name,
+        [string]$Path
+    )
+
+    if ($Name -ne "cppcheck") {
+        & $Path --version *> $null
+        return ($LASTEXITCODE -eq 0)
+    }
+
+    $probeDir = Join-Path ([System.IO.Path]::GetTempPath()) "moldy-cppcheck-probe"
+    $probeFile = Join-Path $probeDir "probe.cpp"
+    New-Item -ItemType Directory -Path $probeDir -Force | Out-Null
+    Set-Content -LiteralPath $probeFile -Value "int main() { return 0; }" -NoNewline
+
+    try {
+        & $Path --enable=warning --error-exitcode=1 --language=c++ --std=c++23 $probeFile *> $null
+        return ($LASTEXITCODE -eq 0)
+    }
+    finally {
+        Remove-Item -LiteralPath $probeFile -Force -ErrorAction SilentlyContinue
+        Remove-Item -LiteralPath $probeDir -Force -ErrorAction SilentlyContinue
+    }
+}
+
+function Add-ToolDirectoryToPath {
+    param([string]$ToolPath)
+
+    $toolDirectory = Split-Path -Parent $ToolPath
+    $pathSegments = $env:PATH -split [System.IO.Path]::PathSeparator
+    if ($pathSegments -notcontains $toolDirectory) {
+        $env:PATH = $toolDirectory + [System.IO.Path]::PathSeparator + $env:PATH
+    }
+
+    if ($env:GITHUB_PATH) {
+        Add-Content -LiteralPath $env:GITHUB_PATH -Value $toolDirectory
+    }
+}
+
+function Resolve-HealthyTool {
+    param([hashtable]$Tool)
+
+    $candidates = @(Get-ToolCandidates -Name $Tool.Name -KnownPaths $Tool.KnownPaths)
+    foreach ($candidate in $candidates) {
+        if (Test-ToolCandidate -Name $Tool.Name -Path $candidate) {
+            return $candidate
+        }
+
+        Write-Host "$($Tool.Name): ignoring unhealthy candidate $candidate"
+    }
+
+    return $null
+}
+
+function Show-ToolStatus {
+    param([hashtable]$Tool)
+
+    $healthyPath = Resolve-HealthyTool -Tool $Tool
+    if ($null -eq $healthyPath) {
+        Write-Host "$($Tool.Name): missing or unhealthy"
         return $false
     }
 
-    Write-Host "${Name}: $($command.Source)"
+    Add-ToolDirectoryToPath -ToolPath $healthyPath
+    Write-Host "$($Tool.Name): $healthyPath"
     return $true
 }
 
 if ($Check) {
     $allFound = $true
     foreach ($tool in $tools) {
-        $found = Show-ToolStatus -Name $tool.Name
+        $found = Show-ToolStatus -Tool $tool
         $allFound = $allFound -and $found
     }
 
@@ -63,7 +152,7 @@ if ($InstallWindows) {
     }
 
     foreach ($tool in $tools) {
-        if ($null -eq (Get-Command $tool.Name -ErrorAction SilentlyContinue)) {
+        if ($null -eq (Resolve-HealthyTool -Tool $tool)) {
             Write-Host "Installing $($tool.Package) for $($tool.Name)."
             & $winget.Source install --id $tool.Package --exact --source winget --accept-source-agreements --accept-package-agreements --silent
             if ($LASTEXITCODE -ne 0) {

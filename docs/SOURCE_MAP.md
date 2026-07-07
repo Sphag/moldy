@@ -82,7 +82,7 @@ Current checks verify that:
 - `scripts/check.ps1`: runs configure, format, lint, build, and test in order.
 - `scripts/format.ps1`: checks C++ formatting with `clang-format`; pass `-Fix` to apply formatting.
 - `scripts/lint.ps1`: runs `clang-tidy` and `cppcheck` over source files, excluding generated build trees.
-- `scripts/install-tools.ps1`: checks required tool availability and provides an explicit Windows install path.
+- `scripts/install-tools.ps1`: checks required tool availability and health, rejects broken tool binaries, and provides an explicit Windows install path.
 - `scripts/bench.ps1`: reports placeholder-pass status because benchmarks are not configured yet.
 
 ## CMake Targets

@@ -1,6 +1,16 @@
 # Current Task
 
-Current focus: GitHub CI feedback loop setup.
+Current focus: GitHub CI cppcheck runner fix.
+
+## GitHub CI Cppcheck Runner Fix
+
+- [x] Inspect the failing GitHub Actions run for the latest commit.
+- [x] Identify the failing workflow job and log root cause.
+- [x] Update Windows tool bootstrap to reject unhealthy tool binaries.
+- [x] Update documentation for the changed tool bootstrap behavior.
+- [x] Run the local quality gate.
+- [ ] Publish the fix after explicit git-history approval.
+- [ ] Re-check the GitHub Actions run after publishing.
 
 ## GitHub CI Feedback Loop Setup
 

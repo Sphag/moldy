@@ -83,6 +83,11 @@ View current branch PR metadata:
 gh pr view --json number,url,headRefName,statusCheckRollup
 ```
 
+
+## CI Tool Bootstrap
+
+The Windows job runs `scripts/install-tools.ps1` before the quality gate so runner-provided tool binaries are checked for basic health, not just presence on `PATH`. This matters when a hosted runner image exposes a broken tool earlier in `PATH` than the intended installation.
+
 ## Boundaries
 
 - Agents must ask before creating commits, branches, pull requests, or other git history changes.
