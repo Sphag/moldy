@@ -1,5 +1,9 @@
 # Moldy
 
+<p align="center">
+  <img src="docs/assets/icons/moldy-icon-readme.png" alt="Moldy icon" width="240">
+</p>
+
 Moldy is a C++23/CMake codebase for a cross-platform desktop game engine project.
 
 The current repository state is a small, core-first scaffold: a `core` static library, a smoke executable, a plain C++ test executable, and scripted local workflow entry points. Renderer, editor, asset pipeline, platform layer, and concrete engine systems are not implemented yet.

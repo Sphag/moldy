@@ -60,3 +60,6 @@ desktop.ini
 # Local AI-agent state
 .codex/
 .agents/
+
+# Archived generated image variants
+/docs/assets/icons/archive-ignored/
