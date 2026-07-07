@@ -1,1 +1,4 @@
 # Project suppressions for confirmed cppcheck false positives.
+
+# cppcheck does not track private member use across separate C++ module implementation units.
+unusedStructMember:*src/core/core.cppm

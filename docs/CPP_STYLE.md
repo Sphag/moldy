@@ -20,6 +20,7 @@ This document defines the current C++ style for repository code.
 - Prefix abstract interfaces with `I`.
 - Prefix enum type names with `E`.
 - Prefix template type parameters with `T` when a short parameter name is appropriate.
+- Name concepts with PascalCase, matching other type-like public constraints.
 - Do not use Unreal `U`, `A`, or `F` prefixes for ordinary repository classes and structs.
 
 ## Types
@@ -28,6 +29,13 @@ This document defines the current C++ style for repository code.
 - Use `char`, `wchar_t`, and `char8_t` when those character types are the correct semantic fit.
 - Use fixed-width standard integer types such as `std::uint8_t` and `std::int8_t` when fixed width is required.
 - Do not use Unreal-style aliases such as `TCHAR`, `uint8`, or `int8`.
+
+## Templates And Concepts
+
+- Prefer C++ concepts for meaningful template constraints when the requirement is part of the API contract.
+- Keep concepts small, readable, and close to the constrained template unless they are reused across modules.
+- Do not add concepts for unconstrained implementation details or speculative future requirements.
+- Prefer standard library concepts such as `std::movable` and `std::same_as` over custom traits when they express the requirement directly.
 
 ## Modules And Includes
 

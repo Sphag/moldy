@@ -1,6 +1,25 @@
 # Current Task
 
-Current focus: C++ tooling, style, and the first project module are in place.
+Current focus: Iteration 2, core error handling foundation.
+
+## Iteration 2: Core Error Handling Foundation
+
+- [x] Re-check current Git status and diff before editing.
+- [x] Add the core status/result API.
+- [x] Constrain the current result template API with C++ concepts.
+- [x] Add focused core tests.
+- [x] Update build configuration.
+- [x] Update documentation and backlog.
+- [x] Run format and lint checks successfully.
+- [x] Re-run build and tests outside the restricted sandbox after confirming the generated-file access blocker.
+
+## Iteration 1: Quality Gate Stabilization
+
+- [x] Add explicit repository line ending policy.
+- [x] Restore the format gate to a clean state.
+- [x] Verify selected tooling availability, including `cppcheck`.
+- [x] Run the full local quality gate.
+- [x] Keep documentation and task tracking synchronized.
 
 ## Completed
 
@@ -19,9 +38,13 @@ Current focus: C++ tooling, style, and the first project module are in place.
 - Defined the initial C++ style guide.
 - Converted the current `core` public API from a header to the `moldy.core` C++ module.
 - Updated quality scripts so format and lint checks are enforced.
+- Added explicit repository LF line ending policy.
+- Added `cppcheck` to user PATH after verifying the installed binary location.
+- Adjusted the module interface export block syntax so `cppcheck` can parse the file without changing the exported API.
+- Verified the full local quality gate with `scripts/check.ps1 -BuildDir build-check`.
 
 ## Next Recommended Tasks
 
+- Continue Phase 2 core APIs.
 - Add CI once the local quality gate is stable across the target developer environments.
 - Decide whether plain executable tests remain sufficient before adding any test framework dependency.
-- Add more core APIs only when driven by concrete needs.

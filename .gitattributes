@@ -1,0 +1,67 @@
+# Normalize repository text files to LF.
+* text=auto
+
+# Build configuration and CMake files.
+CMakeLists.txt text eol=lf
+*.cmake text eol=lf
+CMakePresets.json text eol=lf
+
+# C++ source and interface files.
+*.c text eol=lf
+*.cc text eol=lf
+*.cpp text eol=lf
+*.cxx text eol=lf
+*.h text eol=lf
+*.hh text eol=lf
+*.hpp text eol=lf
+*.hxx text eol=lf
+*.ixx text eol=lf
+*.cppm text eol=lf
+
+# Documentation and scripts.
+*.md text eol=lf
+*.ps1 text eol=lf
+*.psm1 text eol=lf
+*.psd1 text eol=lf
+
+# Repository configuration.
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.txt text eol=lf
+.clang-format text eol=lf
+.clang-tidy text eol=lf
+.cppcheck-suppressions text eol=lf
+.gitattributes text eol=lf
+.gitignore text eol=lf
+
+# Generated trees and build artifacts should not be normalized if tracked by mistake.
+build/** -text
+build*/** -text
+out/** -text
+CMakeFiles/** -text
+Testing/** -text
+*.ninja -text
+.ninja_deps -text
+.ninja_log -text
+Makefile -text
+*.sln -text
+*.vcxproj -text
+*.vcxproj.filters -text
+*.vcxproj.user -text
+*.xcodeproj/** -text
+
+# Binary outputs.
+*.a binary
+*.app/** binary
+*.dll binary
+*.dSYM/** binary
+*.dylib binary
+*.exe binary
+*.ilk binary
+*.lib binary
+*.obj binary
+*.o binary
+*.pdb binary
+*.so binary

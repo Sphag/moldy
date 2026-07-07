@@ -57,3 +57,20 @@ Final reports must include:
 - Known risks or follow-up work.
 
 Run `scripts/check.ps1` before reporting completion when feasible.
+
+## Generated Artifact Cleanup
+
+- Prefer short-lived, task-specific build directories such as `build-check` only while they are needed.
+- At task completion, remove generated build directories such as `build/`, `build-*`, and `out/` when they are untracked or ignored and no longer needed.
+- Also remove temporary local directories such as `.tmp/`, `tmp/`, and `temp/` when they are untracked or ignored and no longer needed.
+- Before deleting generated artifacts, inspect a dry-run preview such as `git clean -ndX` or an explicit directory listing.
+- If deletion fails because of the Windows restricted sandbox limitation, do not change CMake configuration, source code, or build scripts as a workaround; ask for an approved elevated command run or instruct the user to clean up from a normal terminal.
+- Never delete staged files, tracked files, source directories, documentation, scripts, or user-created unignored directories as part of routine cleanup.
+
+## Known Local Command Sandbox Limitation
+
+- In restricted Codex sandbox sessions on Windows, commands may be able to create and write files but fail when deleting, replacing, or renaming files.
+- Symptoms include CMake errors such as `Cannot restore timestamp ... Access is denied`, failed removal of generated `.tmp` files, or `clang-format -i` reporting `permission denied` while direct file writes still work.
+- Treat this as a command sandbox limitation after confirming that the same operation succeeds in a normal shell or an approved elevated command run.
+- Do not change CMake configuration, source code, or build scripts only to work around this sandbox behavior.
+- For `scripts/check.ps1`, CMake configure/build/test, or other tools that need delete/rename access, use a normal terminal or ask for an approved elevated command run.

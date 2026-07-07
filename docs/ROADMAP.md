@@ -8,17 +8,25 @@ This roadmap is intentionally generic and identity-free.
 - Add placeholder project planning documents.
 - Add safe quality script entry points.
 
-## Phase 1: CMake Scaffold and Tool Choices
+## Phase 1: CMake Scaffold, Tool Choices, and Local Quality Gate
 
 - Create a minimal C++ and CMake scaffold.
 - Add compiler settings.
 - Choose formatting and linting tools.
 - Document formatting and linting decisions.
+- Verify that `scripts/check.ps1` passes locally.
 
 ## Phase 2: Core Runtime Foundations
 
+Current focus:
+
+- Add the first explicit core error/status API.
+- Keep new core APIs small, tested, and dependency-free.
+- Continue updating source-map and architecture docs alongside public API changes.
+
+Planned follow-up:
+
 - Add logging.
-- Define error handling.
 - Add time utilities.
 - Define application lifecycle primitives.
 

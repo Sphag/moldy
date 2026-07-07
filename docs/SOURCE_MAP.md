@@ -22,7 +22,8 @@ The top-level CMake project is named `moldy` and requires CMake 3.28 or newer.
 The `core` static library is defined from:
 
 - `src/core/core.cppm`: public C++ module interface for `moldy.core`.
-- `src/core/build_info.cpp`: module implementation unit.
+- `src/core/build_info.cpp`: module implementation unit for build-information functions.
+- `src/core/status.cpp`: module implementation unit for `core::Status` behavior.
 
 Current public API is imported with:
 
@@ -30,13 +31,20 @@ Current public API is imported with:
 import moldy.core;
 ```
 
-Current public functions:
+Current public error API:
+
+- `core::EErrorCode`: error categories for current recoverable core failures.
+- `core::Status`: no-value success/error return type.
+- `core::ResultValue`: concept for movable, non-void value types accepted by `core::Result<TValue>`.
+- `core::Result<TValue>`: value-or-error return type for value-producing operations.
+
+Current public build-information functions:
 
 - `core::build_configuration()`: returns the CMake build configuration string, or a fallback when unavailable.
 - `core::compiler_id()`: returns the CMake compiler identifier, or a fallback when unavailable.
 - `core::language_standard()`: returns the `__cplusplus` value observed by the compiler.
 
-The current API is intentionally limited to build-information reporting. Do not document broader engine or runtime responsibilities until they exist in source.
+The current API is intentionally limited to build-information reporting and basic error/result values. Do not document broader engine or runtime responsibilities until they exist in source.
 
 ## Applications
 
@@ -51,6 +59,12 @@ Current checks verify that:
 - The build configuration string is available.
 - The compiler identifier string is available.
 - The reported language standard is at least C++20.
+- `core::Status::success()` reports success with an empty message.
+- Error statuses preserve code and message.
+- `core::Result<TValue>::success(...)` exposes a value and no error.
+- `core::Result<TValue>::failure(...)` exposes an error and no value.
+- `core::Result<TValue>::failure(core::Status::success())` normalizes to an internal error.
+- `core::Result<core::Status>` can store a status payload.
 
 ## Scripts
 

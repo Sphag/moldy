@@ -2,6 +2,10 @@
 
 This is a living document. It describes intended architecture boundaries and records the current shape of the system without adding project identity or project status details.
 
+## Current Modules
+
+- `core`: Platform-neutral foundations. Current public surface includes build-information helpers plus basic explicit error/result values through `core::Status` and `core::Result<TValue>`.
+
 ## Planned High-Level Modules
 
 - `core`: Platform-neutral foundations such as errors, logging, time, and basic utilities.

@@ -32,6 +32,11 @@ This project uses strict code quality expectations even before implementation be
 - Do not mix style within the same module.
 - Formatting changes should not be bundled with unrelated logic changes unless explicitly requested.
 
+## Line Ending Policy
+
+- Tracked source files, CMake files, PowerShell scripts, Markdown documentation, and repository configuration files use LF line endings through `.gitattributes`.
+- Generated build trees and binary outputs are excluded from line ending normalization.
+
 ## Static Analysis Policy
 
 - Use `clang-tidy` with the repository `.clang-tidy` file.
@@ -51,3 +56,15 @@ This project uses strict code quality expectations even before implementation be
 - `scripts/check.ps1` runs configure, format, lint, build, and test in order.
 
 The selected C++ quality tools are required for the default quality gate. Use `scripts/install-tools.ps1 -Check` to verify local availability.
+
+## Known Local Sandbox Limitation
+
+Some AI-agent command sandboxes on Windows can create and write files but cannot delete, replace, or rename them. CMake, MSBuild, Ninja, and `clang-format -i` all rely on those operations for generated files or in-place formatting.
+
+Known symptoms:
+
+- `CMake Error: Cannot restore timestamp ".../CMakeFiles/generate.stamp": Access is denied.`
+- CMake `try_compile` failures that mention generated `.tmp` files that could not be removed.
+- `clang-format -i` failing with `permission denied` even though the same file can be rewritten directly.
+
+When these symptoms appear in a restricted agent session, first verify whether a simple create/delete probe also fails in the workspace. If deletion is blocked, rerun the quality gate from a normal terminal or through an approved elevated command run. Do not treat this as a source, CMake, or toolchain regression unless the same command also fails outside the restricted sandbox.

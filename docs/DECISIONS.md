@@ -141,3 +141,10 @@ Status: Accepted
 Context: CMake and generator support for standard library module imports is still uneven across required desktop workflows.
 Decision: Do not use `import std` in required builds yet. Module units may include standard library headers in the global module fragment.
 Consequences: `import std` remains a future Ninja-only experiment until the required build generators support it cleanly.
+## 2026-07-07: Prefer Explicit Status And Result Returns For Recoverable Errors
+
+Date: 2026-07-07
+Status: Accepted
+Context: Core APIs need a small, dependency-free way to report recoverable failures while keeping control flow explicit.
+Decision: Prefer explicit `core::Status` and `core::Result<TValue>` returns for recoverable errors instead of exceptions as the default public API contract.
+Consequences: Core APIs should reserve exceptions for truly exceptional or dependency-imposed cases, and tests should cover success, failure, and invariant-preserving behavior for status/result values.
