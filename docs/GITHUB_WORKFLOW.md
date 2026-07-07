@@ -8,17 +8,27 @@ This document describes the expected GitHub feedback loop for CI, pull requests,
 - GitHub CLI (`gh`) installed locally.
 - GitHub CLI authenticated with access to this repository and GitHub Actions logs.
 
-Check local GitHub CLI access with:
+Known-good GitHub CLI access for this repository is:
+
+- Host: `github.com`.
+- Account: `Sphag`.
+- Required scopes: `repo` and `workflow`.
+
+Check local GitHub CLI access from a normal terminal with:
 
 ```powershell
 gh auth status
 ```
 
-If the required scopes are missing, refresh authentication with:
+If `gh auth status` fails or reports invalid authentication inside a restricted agent sandbox, retry the same check from a normal terminal or approved command context before refreshing credentials. Restricted sessions may misreport authentication even when the keyring token is valid.
+
+Only refresh authentication if the normal terminal or approved command context still lacks the required account, host, or scopes:
 
 ```powershell
-gh auth refresh -s repo -s workflow
+gh auth refresh -h github.com -s repo -s workflow
 ```
+
+If approved `gh auth status` shows `github.com`, account `Sphag`, and scopes `repo` and `workflow`, do not re-login. Future GitHub write operations may still need an approved command context, but they do not need a fresh token.
 
 ## Local Pre-Push Check
 
@@ -44,6 +54,12 @@ Expected loop:
 6. Fix only the observed root cause.
 7. Re-run the relevant local check.
 8. Push the follow-up commit after explicit approval.
+
+## Pull Request Descriptions
+
+Use `.github/pull_request_template.md` when opening or updating pull requests. Keep the description compact: use bold inline section labels, short bullets, and checklists. Avoid large Markdown headings such as `#` or `##`, because they make generated pull request bodies visually noisy in GitHub.
+
+Do not collapse generated pull request descriptions into one long line. Preserve real line breaks before sending the body to `gh pr create` or `gh pr edit`.
 
 ## AI-Assisted CI Fix Prompt
 
@@ -83,6 +99,24 @@ View current branch PR metadata:
 gh pr view --json number,url,headRefName,statusCheckRollup
 ```
 
+For public repositories, the latest GitHub Actions runs can also be checked without local `gh` authentication:
+
+```powershell
+Invoke-RestMethod -Uri 'https://api.github.com/repos/Sphag/moldy/actions/runs?per_page=5' -Headers @{ 'User-Agent' = 'Codex' }
+```
+
+## Issue Tracking
+
+GitHub Issues should become the canonical backlog after issue write access is available and actionable local tasks have been migrated. Until that migration is complete, `tasks/current.md` and `tasks/backlog.md` remain the local session notes and pending-work summary.
+
+Created issue set:
+
+- [#1 Remote Windows CI loop verification](https://github.com/Sphag/moldy/issues/1).
+- [#2 GitHub Issues migration and local task-file slimming](https://github.com/Sphag/moldy/issues/2).
+- [#3 macOS and Linux CI runner feasibility](https://github.com/Sphag/moldy/issues/3).
+- [#4 Core logging primitives](https://github.com/Sphag/moldy/issues/4).
+- [#5 Core time utilities](https://github.com/Sphag/moldy/issues/5).
+- [#6 Application lifecycle primitives](https://github.com/Sphag/moldy/issues/6).
 
 ## CI Tool Bootstrap
 

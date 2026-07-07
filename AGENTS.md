@@ -58,6 +58,14 @@ Final reports must include:
 
 Run `scripts/check.ps1` before reporting completion when feasible.
 
+## Pull Request Descriptions
+
+- Use `.github/pull_request_template.md` for pull request descriptions.
+- Keep pull request descriptions compact and scannable.
+- Do not use large Markdown headings such as `#` or `##` in pull request descriptions.
+- Prefer bold inline section labels, short bullets, and checklists.
+- Keep generated pull request bodies formatted with real line breaks; do not collapse sections into one long line.
+
 ## Generated Artifact Cleanup
 
 - Prefer short-lived, task-specific build directories such as `build-check` only while they are needed.
@@ -71,6 +79,9 @@ Run `scripts/check.ps1` before reporting completion when feasible.
 
 - In restricted Codex sandbox sessions on Windows, commands may be able to create and write files but fail when deleting, replacing, or renaming files.
 - Symptoms include CMake errors such as `Cannot restore timestamp ... Access is denied`, failed removal of generated `.tmp` files, or `clang-format -i` reporting `permission denied` while direct file writes still work.
+- `gh` commands that contact GitHub may fail or misreport authentication in restricted sessions even when the keyring token works in a normal terminal or approved command context.
+- Before refreshing GitHub CLI authentication or logging in again, verify `gh auth status` from a normal terminal or approved command context.
+- If approved `gh auth status` for `github.com` account `Sphag` shows `repo` and `workflow`, treat GitHub CLI authentication as valid and do not re-login.
 - Treat this as a command sandbox limitation after confirming that the same operation succeeds in a normal shell or an approved elevated command run.
 - Do not change CMake configuration, source code, or build scripts only to work around this sandbox behavior.
 - For `scripts/check.ps1`, CMake configure/build/test, or other tools that need delete/rename access, use a normal terminal or ask for an approved elevated command run.

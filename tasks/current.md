@@ -1,6 +1,36 @@
 # Current Task
 
-Current focus: GitHub CI cppcheck runner fix.
+Current focus: Phase 2 closure and Phase 3 core API readiness.
+
+## Phase 2 Closure
+
+- [x] Re-check current Git status before editing.
+- [x] Confirm the local repository remote points to `Sphag/moldy`.
+- [x] Confirm GitHub CLI is installed locally.
+- [x] Attempt to refresh GitHub CLI authentication with repository and workflow scopes.
+- [x] Verify the latest remote Windows GitHub Actions run for `main`.
+- [x] Resolve the apparent writable GitHub authentication path blocker by approved-context verification.
+- [x] Document stable GitHub CLI authentication handling for restricted agent sessions.
+- [x] Create GitHub Issues for Phase 2 closure items and Phase 3 follow-ups.
+- [x] Update local task files with created issue numbers or URLs after issues exist.
+- [x] Add compact pull request description rules and template after PR #7 formatting feedback.
+
+Notes:
+
+- Restricted agent sessions may report invalid GitHub CLI authentication even when the keyring token works in a normal terminal or approved command context.
+- Approved-context `gh auth status` verified `github.com` account `Sphag` with `repo` and `workflow`; do not re-login unless a normal terminal or approved command context lacks those scopes.
+- GitHub Issues were created through approved `gh issue create` commands.
+- The GitHub connector can read `Sphag/moldy`, but issue creation previously returned `403 Resource not accessible by integration`.
+- The latest public Actions run on `main` succeeded for commit `c520e16`: https://github.com/Sphag/moldy/actions/runs/28897748834
+
+Created issues:
+
+- [#1 Remote Windows CI loop verification](https://github.com/Sphag/moldy/issues/1)
+- [#2 GitHub Issues migration and local task-file slimming](https://github.com/Sphag/moldy/issues/2)
+- [#3 macOS and Linux CI runner feasibility](https://github.com/Sphag/moldy/issues/3)
+- [#4 Core logging primitives](https://github.com/Sphag/moldy/issues/4)
+- [#5 Core time utilities](https://github.com/Sphag/moldy/issues/5)
+- [#6 Application lifecycle primitives](https://github.com/Sphag/moldy/issues/6)
 
 ## GitHub CI Cppcheck Runner Fix
 
@@ -20,7 +50,7 @@ Current focus: GitHub CI cppcheck runner fix.
 - [x] Update source-map documentation for the new workflow document.
 - [x] Check whether GitHub CLI is available locally.
 - [x] Install GitHub CLI locally.
-- [ ] Authenticate GitHub CLI with repository and workflow access.
+- [x] Verify GitHub CLI authentication with repository and workflow access in an approved command context.
 
 ## README Onboarding Slice
 
@@ -77,11 +107,13 @@ Current focus: GitHub CI cppcheck runner fix.
 - Documented the planned GitHub Issues and PR-first workflow.
 - Improved README onboarding for first-time readers without overstating implemented features.
 - Added the GitHub CI feedback-loop guide for AI-assisted CI fixes.
+- Verified the latest remote Windows GitHub Actions run on `main` succeeded.
+- Documented stable GitHub CLI auth handling for restricted agent sessions.
+- Created GitHub Issues for Phase 2 closure items and Phase 3 follow-ups.
+- Added a compact pull request description template and agent rules to avoid oversized PR headings.
 
 ## Next Recommended Tasks
 
-- Authenticate GitHub CLI locally with repository and workflow access.
-- Create GitHub Issues for current and backlog items.
-- Push a branch and verify the first GitHub Actions run.
-- Continue core APIs after the GitHub workflow slice is verified remotely.
+- Use [#2](https://github.com/Sphag/moldy/issues/2) to slim local task files now that GitHub Issues exist.
+- Continue core APIs through [#4](https://github.com/Sphag/moldy/issues/4), [#5](https://github.com/Sphag/moldy/issues/5), and [#6](https://github.com/Sphag/moldy/issues/6).
 - Decide whether plain executable tests remain sufficient before adding any test framework dependency.

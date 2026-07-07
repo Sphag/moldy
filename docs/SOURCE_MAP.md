@@ -9,6 +9,7 @@ This document maps the current repository scaffold. Keep it factual and update i
 - `apps/smoke/`: small executable used to verify that the core library links and reports build information.
 - `tests/core/`: plain C++ executable tests for the current core API.
 - `scripts/`: PowerShell entry points for configure, build, test, check, format, lint, tool setup, and benchmark placeholder flows.
+- `.github/pull_request_template.md`: compact pull request description template for agents and humans.
 - `.github/workflows/`: GitHub Actions workflow definitions for pushed branch and pull request validation.
 - `docs/`: project workflow, GitHub workflow, quality, style, testing, decisions, architecture, and source navigation documents.
 - `tasks/`: task planning notes.
