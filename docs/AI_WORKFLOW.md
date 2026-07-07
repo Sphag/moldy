@@ -17,6 +17,14 @@ Architecture-sensitive work must start with a short design note or plan before i
 
 Platform-layer changes must consider impact on Windows, macOS, and Linux before code is changed.
 
+## GitHub Collaboration
+
+GitHub Issues are the planned tracker for actionable tasks. Until that migration is complete, keep `tasks/current.md` and `tasks/backlog.md` synchronized with the work being done.
+
+After commits are explicitly approved, prefer branch-based pull requests for review and validation. Agents must still ask before creating commits, branches, pull requests, or other git history changes.
+
+GitHub Actions cannot run on purely local, unpushed commits. Remote CI runs when commits are pushed to a branch and when pull requests are opened or updated. Local verification remains the required pre-push check when feasible.
+
 ## Documentation Maintenance
 
 When a task changes source files, build configuration, scripts, tests, applications, public APIs, or directory structure, update the nearest relevant documentation in the same task.

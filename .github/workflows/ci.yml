@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+jobs:
+  windows:
+    name: Windows quality gate
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Install Windows tools
+        shell: pwsh
+        run: ./scripts/install-tools.ps1 -InstallWindows
+
+      - name: Verify tools
+        shell: pwsh
+        run: ./scripts/install-tools.ps1 -Check
+
+      - name: Run quality gate
+        shell: pwsh
+        run: ./scripts/check.ps1 -BuildDir build-ci -Configuration Debug

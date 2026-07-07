@@ -1,6 +1,13 @@
 # Current Task
 
-Current focus: Iteration 2, core error handling foundation.
+Current focus: GitHub CI and PR workflow infrastructure.
+
+## GitHub CI and PR Workflow Infrastructure
+
+- [x] Add a GitHub workflow roadmap phase.
+- [x] Add the first Windows GitHub Actions CI workflow.
+- [x] Document that GitHub Actions runs only for pushed commits and pull request updates.
+- [x] Move remaining GitHub migration and CI expansion work into the backlog.
 
 ## Iteration 2: Core Error Handling Foundation
 
@@ -42,9 +49,13 @@ Current focus: Iteration 2, core error handling foundation.
 - Added `cppcheck` to user PATH after verifying the installed binary location.
 - Adjusted the module interface export block syntax so `cppcheck` can parse the file without changing the exported API.
 - Verified the full local quality gate with `scripts/check.ps1 -BuildDir build-check`.
+- Added the initial Windows GitHub Actions CI workflow for pushed branches and pull requests.
+- Documented the planned GitHub Issues and PR-first workflow.
 
 ## Next Recommended Tasks
 
-- Continue Phase 2 core APIs.
-- Add CI once the local quality gate is stable across the target developer environments.
+- Create GitHub Issues for current and backlog items.
+- Push a branch and verify the first GitHub Actions run.
+- Improve README onboarding for first-time readers.
+- Continue core APIs after the GitHub workflow slice is verified remotely.
 - Decide whether plain executable tests remain sufficient before adding any test framework dependency.

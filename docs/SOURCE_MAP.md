@@ -9,9 +9,16 @@ This document maps the current repository scaffold. Keep it factual and update i
 - `apps/smoke/`: small executable used to verify that the core library links and reports build information.
 - `tests/core/`: plain C++ executable tests for the current core API.
 - `scripts/`: PowerShell entry points for configure, build, test, check, format, lint, tool setup, and benchmark placeholder flows.
+- `.github/workflows/`: GitHub Actions workflow definitions for pushed branch and pull request validation.
 - `docs/`: project workflow, quality, style, testing, decisions, architecture, and source navigation documents.
 - `tasks/`: task planning notes.
 - `build*/`: generated build trees. These are not source locations.
+
+## GitHub Actions
+
+- `.github/workflows/ci.yml`: runs the PowerShell quality gate on `windows-latest` for pushed branches and pull request updates.
+
+The first workflow intentionally mirrors the local `scripts/check.ps1` gate. macOS and Linux jobs are deferred until runner toolchain feasibility is verified.
 
 ## CMake Project
 
