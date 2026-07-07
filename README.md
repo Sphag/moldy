@@ -8,41 +8,86 @@ Moldy is a C++23/CMake codebase for a cross-platform desktop game engine project
 
 The current repository state is a small, core-first scaffold: a `core` static library, a smoke executable, a plain C++ test executable, and scripted local workflow entry points. Renderer, editor, asset pipeline, platform layer, and concrete engine systems are not implemented yet.
 
+## Current State
+
+This repository currently provides infrastructure for building and checking a small C++23 scaffold:
+
+- `core`: a platform-neutral static library with the current `moldy.core` C++ module API.
+- `smoke`: a minimal executable that links the core library and reports build information.
+- `core_tests`: a plain C++ executable registered with CTest.
+- `scripts/`: PowerShell entry points for configure, build, test, format, lint, and full local checks.
+
+The repository does not yet contain renderer, editor, asset pipeline, platform layer, runtime system, or concrete 2D/3D engine implementation.
+
 ## License
 
 Moldy is licensed under the MIT License. See [LICENSE](LICENSE) for the full license text.
 
-## Build And Test
+## Prerequisites
 
-Run the default local quality gate from the repository root:
+- CMake 3.28 or newer.
+- A C++23-capable compiler and CMake generator with support for the repository's C++ module setup.
+- PowerShell for the local workflow scripts.
+- `clang-format`, `clang-tidy`, and `cppcheck` for the default quality gate.
 
-```powershell
-.\scripts\check.ps1
-```
-
-Useful individual entry points:
-
-```powershell
-.\scripts\configure.ps1
-.\scripts\build.ps1
-.\scripts\test.ps1
-.\scripts\format.ps1
-.\scripts\lint.ps1
-```
-
-Check whether the required local C++ quality tools are available:
+Check whether the selected local quality tools are available:
 
 ```powershell
 .\scripts\install-tools.ps1 -Check
 ```
 
+On Windows, missing selected tools can be installed with explicit opt-in:
+
+```powershell
+.\scripts\install-tools.ps1 -InstallWindows
+```
+
+## Quick Start
+
+From a fresh checkout, run the default local quality gate from the repository root:
+
+```powershell
+.\scripts\install-tools.ps1 -Check
+.\scripts\check.ps1 -BuildDir build-check
+```
+
+`scripts/check.ps1` configures the project, checks formatting, runs lint/static analysis, builds the configured targets, and runs tests.
+
+To run the main steps individually:
+
+```powershell
+.\scripts\configure.ps1 -BuildDir build-check -Configuration Debug
+.\scripts\build.ps1 -BuildDir build-check -Configuration Debug
+.\scripts\test.ps1 -BuildDir build-check -Configuration Debug
+```
+
+Useful focused checks:
+
+```powershell
+.\scripts\format.ps1 -BuildDir build-check
+.\scripts\lint.ps1 -BuildDir build-check
+```
+
 `clang-format`, `clang-tidy`, and `cppcheck` are the selected local quality tools. `scripts/format.ps1` is check-only by default; pass `-Fix` to rewrite source formatting.
+
+## Generated Files
+
+Build outputs are generated under directories such as `build/`, `build-check/`, or other `build-*` directories. They are not source files and should stay out of commits.
+
+Before cleaning generated artifacts, preview ignored files:
+
+```powershell
+git clean -ndX
+```
+
+Remove only generated, ignored build or temporary directories that are no longer needed. Do not delete tracked files, source directories, documentation, scripts, or user-created unignored directories as part of routine cleanup.
 
 ## Start Here
 
 - [Project Brief](docs/PROJECT_BRIEF.md)
 - [Source Map](docs/SOURCE_MAP.md)
 - [AI Workflow](docs/AI_WORKFLOW.md)
+- [Scripts](scripts/README.md)
 - [Code Quality](docs/CODE_QUALITY.md)
 - [C++ Style](docs/CPP_STYLE.md)
 - [Testing](docs/TESTING.md)
@@ -57,7 +102,3 @@ Check whether the required local C++ quality tools are available:
 - `scripts/`: PowerShell workflow entry points.
 - `docs/`: project brief, decisions, source map, testing, style, and workflow documents.
 - `tasks/`: current and future task notes.
-
-## Current State
-
-The repository contains a minimal C++23/CMake scaffold. Target platforms are Windows, macOS, and Linux desktop. Current work is infrastructure-first and does not claim completed 2D, 3D, rendering, editor, runtime, or platform-layer features.

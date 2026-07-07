@@ -1,13 +1,17 @@
 # Current Task
 
-Current focus: GitHub CI and PR workflow infrastructure.
+Current focus: README onboarding slice.
 
-## GitHub CI and PR Workflow Infrastructure
+## README Onboarding Slice
 
-- [x] Add a GitHub workflow roadmap phase.
-- [x] Add the first Windows GitHub Actions CI workflow.
-- [x] Document that GitHub Actions runs only for pushed commits and pull request updates.
-- [x] Move remaining GitHub migration and CI expansion work into the backlog.
+- [x] Re-check current Git status before editing.
+- [x] Clarify the current scaffold state in `README.md`.
+- [x] Add first-run prerequisites and tool-check guidance.
+- [x] Document the fresh-checkout quality gate path.
+- [x] Document individual configure, build, and test commands.
+- [x] Explain generated build directories and normal cleanup expectations.
+- [x] Keep README links focused on the most relevant docs.
+- [x] Update backlog tracking for the completed README onboarding item.
 
 ## Iteration 2: Core Error Handling Foundation
 
@@ -51,11 +55,11 @@ Current focus: GitHub CI and PR workflow infrastructure.
 - Verified the full local quality gate with `scripts/check.ps1 -BuildDir build-check`.
 - Added the initial Windows GitHub Actions CI workflow for pushed branches and pull requests.
 - Documented the planned GitHub Issues and PR-first workflow.
+- Improved README onboarding for first-time readers without overstating implemented features.
 
 ## Next Recommended Tasks
 
 - Create GitHub Issues for current and backlog items.
 - Push a branch and verify the first GitHub Actions run.
-- Improve README onboarding for first-time readers.
 - Continue core APIs after the GitHub workflow slice is verified remotely.
 - Decide whether plain executable tests remain sufficient before adding any test framework dependency.

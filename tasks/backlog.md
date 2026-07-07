@@ -10,7 +10,6 @@
   - Keep local task files as lightweight session notes once GitHub Issues is active.
 - Verify the first GitHub Actions CI run on a pushed branch and adjust only if runner tooling fails.
 - Expand CI to macOS and Linux after runner toolchain feasibility is verified.
-- Improve README onboarding for first-time readers without overstating implemented features.
 - Decide whether to keep plain executable tests or approve a test framework dependency.
 - Evaluate `import std` later as a Ninja-only experiment until required generators support it cleanly.
 - Decide any future reflection approach separately from the C++23 scaffold.
