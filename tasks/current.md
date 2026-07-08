@@ -1,9 +1,10 @@
 # Current Task
 
-Current focus: Phase 3 core primitives for logging, time, and application lifecycle.
+Current focus: Phase 3 core primitives after Phase 2 issue cleanup.
 
-## Phase 3 Core Runtime Primitives
+## Active Session
 
+- [x] PR [#8](https://github.com/Sphag/moldy/pull/8) merged issue-cleanup documentation for [#1](https://github.com/Sphag/moldy/issues/1), [#2](https://github.com/Sphag/moldy/issues/2), and [#3](https://github.com/Sphag/moldy/issues/3).
 - [x] Add minimal dependency-free logging primitives for [#4](https://github.com/Sphag/moldy/issues/4).
 - [x] Add steady-clock time helpers for [#5](https://github.com/Sphag/moldy/issues/5).
 - [x] Add application lifecycle state primitives for [#6](https://github.com/Sphag/moldy/issues/6).
@@ -12,13 +13,17 @@ Current focus: Phase 3 core primitives for logging, time, and application lifecy
 - [x] Run the local quality gate with `scripts/check.ps1 -BuildDir build-check`.
 - [x] Prepare PR `core/phase3-primitives` to close #4, #5, and #6.
 
-## Active Issue Links
+## Canonical Backlog
 
-- [#1 Remote Windows CI loop verification](https://github.com/Sphag/moldy/issues/1)
-- [#2 GitHub Issues migration and local task-file slimming](https://github.com/Sphag/moldy/issues/2)
-- [#3 macOS and Linux CI runner feasibility](https://github.com/Sphag/moldy/issues/3)
+GitHub Issues are the canonical backlog. Keep this file as a lightweight session note only.
 
-## Notes
+PR [#9](https://github.com/Sphag/moldy/pull/9) covers the remaining active issue links:
 
-- No renderer, platform layer, ECS, assets, editor, event loop, OS integration, or third-party dependency was added for this slice.
-- Issues #4, #5, and #6 should close through the `core/phase3-primitives` pull request.
+- [#4 Core logging primitives](https://github.com/Sphag/moldy/issues/4)
+- [#5 Core time utilities](https://github.com/Sphag/moldy/issues/5)
+- [#6 Application lifecycle primitives](https://github.com/Sphag/moldy/issues/6)
+
+## Session Notes
+
+- Local task files should summarize current focus, recent completion, and active issue links instead of duplicating issue descriptions.
+- No renderer, platform layer, ECS, assets, editor, event loop, OS integration, or third-party dependency was added for the core primitives slice.

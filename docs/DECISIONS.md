@@ -141,6 +141,7 @@ Status: Accepted
 Context: CMake and generator support for standard library module imports is still uneven across required desktop workflows.
 Decision: Do not use `import std` in required builds yet. Module units may include standard library headers in the global module fragment.
 Consequences: `import std` remains a future Ninja-only experiment until the required build generators support it cleanly.
+
 ## 2026-07-07: Prefer Explicit Status And Result Returns For Recoverable Errors
 
 Date: 2026-07-07
@@ -156,3 +157,11 @@ Status: Accepted
 Context: Phase 3 needs basic logging, time, and lifecycle primitives before broader engine systems exist.
 Decision: Add only dependency-free core primitives: owning log records and severity names, steady-clock helpers, and an explicit application lifecycle state machine. Do not add global loggers, sinks, file output, formatting policy, async logging, wall-clock handling, timers, scheduling, platform abstractions, event loops, renderer, ECS, assets, editor, or OS integration in this slice.
 Consequences: The core API gains small testable building blocks while broader runtime and platform responsibilities remain future decisions.
+
+## 2026-07-08: Keep Non-Windows CI Deferred Until Tool Bootstrap Is Cross-Platform
+
+Date: 2026-07-08
+Status: Accepted
+Context: The project targets Windows, macOS, and Linux desktop, but the current GitHub Actions quality gate bootstraps tools through Windows-specific scripts and runner assumptions.
+Decision: Keep the required CI workflow Windows-only for now. Add macOS and Linux jobs only after a cross-platform tool installation strategy exists for CMake, LLVM tools, and cppcheck.
+Consequences: Non-Windows CI remains a feasible follow-up, not a current required gate. Documentation must not imply macOS or Linux CI coverage until those jobs exist.
