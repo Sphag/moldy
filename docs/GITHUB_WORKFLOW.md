@@ -107,7 +107,9 @@ Invoke-RestMethod -Uri 'https://api.github.com/repos/Sphag/moldy/actions/runs?pe
 
 ## Issue Tracking
 
-GitHub Issues should become the canonical backlog after issue write access is available and actionable local tasks have been migrated. Until that migration is complete, `tasks/current.md` and `tasks/backlog.md` remain the local session notes and pending-work summary.
+GitHub Issues are the canonical backlog for actionable work. `tasks/current.md` and `tasks/backlog.md` are lightweight local session notes for current focus, recently completed work, and links to active issues.
+
+The Phase 2 issue migration is complete. Do not duplicate full issue descriptions in local task files; update the issue instead and link to it from local notes when useful.
 
 Created issue set:
 
@@ -121,6 +123,14 @@ Created issue set:
 ## CI Tool Bootstrap
 
 The Windows job runs `scripts/install-tools.ps1` before the quality gate so runner-provided tool binaries are checked for basic health, not just presence on `PATH`. This matters when a hosted runner image exposes a broken tool earlier in `PATH` than the intended installation.
+
+PR [#7](https://github.com/Sphag/moldy/pull/7) verified the PR-based Windows CI loop. Before merge on 2026-07-07, both `Windows quality gate` check runs completed successfully for the pull request.
+
+## macOS And Linux CI Feasibility
+
+macOS and Linux CI are feasible future additions, but they are intentionally deferred. The current tool bootstrap is Windows-specific: `.github/workflows/ci.yml` runs `scripts/install-tools.ps1 -InstallWindows`, relies on `winget` behavior for installation, and assumes a Windows runner for the required quality gate.
+
+Before macOS or Linux jobs become required, define a cross-platform tool installation strategy for CMake, LLVM tools, and cppcheck. That strategy should avoid copying Windows runner assumptions into non-Windows jobs.
 
 ## Boundaries
 

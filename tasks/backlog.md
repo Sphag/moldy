@@ -1,13 +1,15 @@
 # Backlog
 
-- Track Phase 2 closure and follow-ups in GitHub Issues:
-  - [#1 Remote Windows CI loop verification](https://github.com/Sphag/moldy/issues/1)
-  - [#2 GitHub Issues migration and local task-file slimming](https://github.com/Sphag/moldy/issues/2)
-  - [#3 macOS and Linux CI runner feasibility](https://github.com/Sphag/moldy/issues/3)
-- Continue Phase 3 core APIs through GitHub Issues:
-  - [#4 Core logging primitives](https://github.com/Sphag/moldy/issues/4)
-  - [#5 Core time utilities](https://github.com/Sphag/moldy/issues/5)
-  - [#6 Application lifecycle primitives](https://github.com/Sphag/moldy/issues/6)
+GitHub Issues are the canonical backlog for actionable work. This file is a lightweight local index for the current development session.
+
+## Active Issues
+
+- [#4 Core logging primitives](https://github.com/Sphag/moldy/issues/4)
+- [#5 Core time utilities](https://github.com/Sphag/moldy/issues/5)
+- [#6 Application lifecycle primitives](https://github.com/Sphag/moldy/issues/6)
+
+## Follow-Ups Without Dedicated Issues
+
 - Decide whether to keep plain executable tests or approve a test framework dependency.
 - Evaluate `import std` later as a Ninja-only experiment until required generators support it cleanly.
 - Decide any future reflection approach separately from the C++23 scaffold.
