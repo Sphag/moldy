@@ -27,7 +27,7 @@ Available logging primitives:
 - `core::ConsoleLogSink`: synchronous standard-output or standard-error sink.
 - `core::FileLogSink`: synchronous file sink.
 - `core::InMemoryLogSink`: test-oriented sink that stores records for inspection.
-- `core::Logger`: synchronous logger with minimum-level filtering, mutex-protected sink management, and fan-out dispatch.
+- `core::Logger`: synchronous logger with minimum-level filtering, mutex-protected sink management, and fan-out dispatch that invokes sink callbacks outside the logger mutex.
 - `core::initialize_logging(...)`, `core::reset_logging()`, `core::current_logger()`, and `core::is_logging_initialized()`: explicit global logger registry lifecycle.
 - `core::log_message(...)`: global logging entry point used by macros; it is a no-op success before logger initialization.
 - `core::ScopedLoggingOverride`: scoped test override for the process-wide logger.

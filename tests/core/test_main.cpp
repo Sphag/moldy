@@ -52,6 +52,32 @@ private:
     int attempts_{0};
 };
 
+class ReentrantSink final : public core::ILogSink
+{
+public:
+    explicit ReentrantSink(core::Logger& logger) : logger_(logger) {}
+
+    [[nodiscard]] core::Status write(const core::LogRecord&) override
+    {
+        ++writes_;
+        if (writes_ == 1)
+        {
+            return logger_.log(core::ELogLevel::Info, "reentrant", "nested");
+        }
+
+        return core::Status::success();
+    }
+
+    [[nodiscard]] int writes() const noexcept
+    {
+        return writes_;
+    }
+
+private:
+    core::Logger& logger_;
+    int writes_{0};
+};
+
 int passing_assert_value()
 {
     return core::language_standard() >= 202002L ? 3 : 4;
@@ -225,6 +251,26 @@ void test_logger_fans_out_and_preserves_sink_failures(TestContext& context)
     context.expect(!logStatus.ok(), "logger should surface the first sink failure");
     context.expect(failingSink->attempts() == 1, "failing custom sink should be called");
     context.expect(memorySink->size() == 1, "healthy sink should still receive records after another sink fails");
+}
+
+void test_logger_allows_reentrant_sink_logging(TestContext& context)
+{
+    core::Logger logger;
+    const std::shared_ptr<ReentrantSink> reentrantSink = std::make_shared<ReentrantSink>(logger);
+    const std::shared_ptr<core::InMemoryLogSink> memorySink = std::make_shared<core::InMemoryLogSink>();
+
+    (void)logger.add_sink(reentrantSink);
+    (void)logger.add_sink(memorySink);
+
+    const core::Status logStatus = logger.log(core::ELogLevel::Info, "reentrant", "outer");
+    const std::vector<core::LogRecord> records = memorySink->records();
+
+    context.expect(logStatus.ok(), "reentrant sink logging should complete without deadlock");
+    context.expect(reentrantSink->writes() == 2, "reentrant sink should receive outer and nested records");
+    context.expect(records.size() == 2, "healthy sink should receive outer and nested records");
+    context.expect(records.size() == 2 && records[0].message() == "nested",
+                   "nested reentrant record should be dispatched");
+    context.expect(records.size() == 2 && records[1].message() == "outer", "outer record should continue dispatching");
 }
 
 void test_global_logging_is_noop_before_initialization(TestContext& context)
@@ -441,6 +487,7 @@ int main()
     test_logger_records_to_memory_sink(context);
     test_logger_filters_by_minimum_level(context);
     test_logger_fans_out_and_preserves_sink_failures(context);
+    test_logger_allows_reentrant_sink_logging(context);
     test_global_logging_is_noop_before_initialization(context);
     test_global_logging_macros_reach_initialized_logger(context);
     test_scoped_logging_override_restores_previous_logger(context);

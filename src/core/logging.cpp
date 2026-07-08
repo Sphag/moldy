@@ -291,16 +291,27 @@ std::size_t Logger::sink_count() const
 
 Status Logger::log(LogRecord record)
 {
-    std::lock_guard lock{mutex_};
+    std::vector<std::shared_ptr<ILogSink>> sinks;
 
-    if (log_level_rank(record.level()) < log_level_rank(minimum_level_))
+    {
+        std::lock_guard lock{mutex_};
+
+        if (log_level_rank(record.level()) < log_level_rank(minimum_level_))
+        {
+            return Status::success();
+        }
+
+        sinks = sinks_;
+    }
+
+    if (sinks.empty())
     {
         return Status::success();
     }
 
     Status firstFailure = Status::success();
 
-    for (const std::shared_ptr<ILogSink>& sink : sinks_)
+    for (const std::shared_ptr<ILogSink>& sink : sinks)
     {
         const Status status = sink->write(record);
         if (!status.ok() && firstFailure.ok())
