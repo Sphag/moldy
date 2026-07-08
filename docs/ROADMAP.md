@@ -39,11 +39,15 @@ Planned follow-up:
 
 Current focus:
 
-- Add logging.
-- Add time utilities.
+- Add core diagnostics runtime foundations: logging, assertions, and steady timestamps.
+- Treat `RelWithDebInfo` as the optimized-with-asserts check configuration.
 - Define application lifecycle primitives.
 - Keep new core APIs small, tested, and dependency-free.
 - Continue updating source-map and architecture docs alongside public API changes.
+
+Planned follow-up:
+
+- Plan async logging queue requirements before implementing queueing or background worker behavior.
 
 ## Phase 4: Cross-Platform Platform Layer
 

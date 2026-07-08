@@ -37,9 +37,17 @@ target_sources(core
         BASE_DIRS src/core
         FILES
             src/core/core.cppm
+    PUBLIC
+        FILE_SET HEADERS
+        BASE_DIRS src/core/include
+        FILES
+            src/core/include/moldy/core_macros.hpp
 )
 
 target_compile_definitions(core
+    PUBLIC
+        $<$<CONFIG:Debug>:MOLDY_ENABLE_ASSERTS>
+        $<$<CONFIG:RelWithDebInfo>:MOLDY_ENABLE_ASSERTS>
     PRIVATE
         CORE_BUILD_CONFIGURATION="$<CONFIG>"
         CORE_COMPILER_ID="${CMAKE_CXX_COMPILER_ID}"

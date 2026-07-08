@@ -35,6 +35,14 @@ Common output locations:
 
 The selected quality tools are `clang-format`, `clang-tidy`, and `cppcheck`. `scripts/check.ps1` runs them before build and test steps.
 
+Core assertions are enabled in `Debug` and `RelWithDebInfo`. `RelWithDebInfo` is the optimized-with-asserts check path:
+
+```powershell
+.\scripts\check.ps1 -BuildDir build-check-relwithdebinfo -Configuration RelWithDebInfo
+```
+
+Failing assertion tests are not run in-process because correct failure behavior terminates the process. Current tests cover passing assertion macros and the compiled-out `Release` macro path where feasible.
+
 ## Cross-Platform Expectations
 
 Cross-platform behavior should eventually be verified on Windows, macOS, and Linux desktop.

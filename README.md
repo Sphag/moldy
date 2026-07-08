@@ -53,6 +53,12 @@ From a fresh checkout, run the default local quality gate from the repository ro
 
 `scripts/check.ps1` configures the project, checks formatting, runs lint/static analysis, builds the configured targets, and runs tests.
 
+For an optimized build that keeps core assertions enabled, run:
+
+```powershell
+.\scripts\check.ps1 -BuildDir build-check-relwithdebinfo -Configuration RelWithDebInfo
+```
+
 To run the main steps individually:
 
 ```powershell
@@ -89,6 +95,7 @@ Remove only generated, ignored build or temporary directories that are no longer
 - [AI Workflow](docs/AI_WORKFLOW.md)
 - [Scripts](scripts/README.md)
 - [Code Quality](docs/CODE_QUALITY.md)
+- [Core Diagnostics Runtime](docs/CORE_DIAGNOSTICS.md)
 - [C++ Style](docs/CPP_STYLE.md)
 - [Testing](docs/TESTING.md)
 - [Roadmap](docs/ROADMAP.md)

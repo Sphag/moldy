@@ -11,7 +11,7 @@ This document maps the current repository scaffold. Keep it factual and update i
 - `scripts/`: PowerShell entry points for configure, build, test, check, format, lint, tool setup, and benchmark placeholder flows.
 - `.github/pull_request_template.md`: compact pull request description template for agents and humans.
 - `.github/workflows/`: GitHub Actions workflow definitions for pushed branch and pull request validation.
-- `docs/`: project workflow, GitHub workflow, quality, style, testing, decisions, architecture, and source navigation documents.
+- `docs/`: project workflow, GitHub workflow, quality, style, testing, decisions, architecture, core diagnostics, and source navigation documents.
 - `tasks/`: task planning notes.
 - `build*/`: generated build trees. These are not source locations.
 
@@ -31,9 +31,10 @@ The top-level CMake project is named `moldy` and requires CMake 3.28 or newer.
 The `core` static library is defined from:
 
 - `src/core/core.cppm`: public C++ module interface for `moldy.core`.
+- `src/core/include/moldy/core_macros.hpp`: public logging and assertion macro header.
 - `src/core/build_info.cpp`: module implementation unit for build-information functions.
 - `src/core/lifecycle.cpp`: module implementation unit for `core::ApplicationLifecycle` behavior.
-- `src/core/logging.cpp`: module implementation unit for logging primitives.
+- `src/core/logging.cpp`: module implementation unit for logging primitives, sink dispatch, global logger registry, and assertion failure handling.
 - `src/core/status.cpp`: module implementation unit for `core::Status` behavior.
 - `src/core/time.cpp`: module implementation unit for steady-clock helpers.
 
@@ -53,8 +54,19 @@ Current public error API:
 Current public logging API:
 
 - `core::ELogLevel`: stable log severity enum.
-- `core::LogRecord`: owning log record with level, category, and message accessors.
+- `core::LogSourceLocation`: owning source-location metadata captured by macros.
+- `core::LogRecord`: owning log record with level, category, message, steady timestamp, and source-location accessors.
 - `core::log_level_name(...)`: returns stable lowercase severity names.
+- `core::ILogSink`: synchronous sink interface for built-in and custom sinks.
+- `core::ConsoleLogSink`: standard output or standard error sink.
+- `core::FileLogSink`: file sink with open-status and write-status reporting.
+- `core::InMemoryLogSink`: test-oriented sink that stores records.
+- `core::Logger`: synchronous logger with minimum-level filtering, mutex-protected sink management, and fan-out dispatch.
+- `core::initialize_logging(...)`, `core::reset_logging()`, `core::current_logger()`, and `core::is_logging_initialized()`: explicit global logger registry lifecycle.
+- `core::log_message(...)`: global logging entry point that no-ops safely before initialization.
+- `core::ScopedLoggingOverride`: scoped test override for the global logger.
+- `MOLDY_LOG_TRACE(...)`, `MOLDY_LOG_DEBUG(...)`, `MOLDY_LOG_INFO(...)`, `MOLDY_LOG_WARNING(...)`, `MOLDY_LOG_ERROR(...)`, and `MOLDY_LOG_CRITICAL(...)`: source-location-capturing logging macros from `<moldy/core_macros.hpp>`.
+- `MOLDY_ASSERT(...)`, `MOLDY_ASSERT_MSG(...)`, and `MOLDY_ASSERT_FAIL(...)`: assertion macros from `<moldy/core_macros.hpp>`.
 
 Current public time API:
 
@@ -96,7 +108,11 @@ Current checks verify that:
 - `core::Result<TValue>::failure(core::Status::success())` normalizes to an internal error.
 - `core::Result<core::Status>` can store a status payload.
 - Log levels return stable lowercase names.
-- `core::LogRecord` preserves level, category, and message, including empty strings.
+- `core::LogRecord` preserves level, category, message, steady timestamp, and source location, including empty strings.
+- `core::Logger` records to in-memory sinks, filters by minimum level, fans out to multiple sinks, and continues dispatching after sink failures while returning the first failure.
+- Global logging is safe before initialization, macros reach initialized sinks, and scoped overrides restore previous logger state.
+- `core::FileLogSink` writes formatted records to a file path.
+- Passing assertion macros do not terminate, and disabled assertion macros compile out where feasible.
 - Steady-clock helpers return non-negative elapsed durations for captured and synthetic older starts.
 - `core::ApplicationLifecycle` accepts valid state transitions and rejects invalid transitions without mutating state.
 
@@ -124,5 +140,7 @@ The `core` target receives these private compile definitions from CMake:
 
 - `CORE_BUILD_CONFIGURATION`: generated from `$<CONFIG>`.
 - `CORE_COMPILER_ID`: generated from `CMAKE_CXX_COMPILER_ID`.
+
+The `core` target also publishes `MOLDY_ENABLE_ASSERTS` for `Debug` and `RelWithDebInfo`. `RelWithDebInfo` is the optimized-with-asserts configuration used for focused diagnostics checks.
 
 Runtime outputs are directed to `${CMAKE_BINARY_DIR}/bin`. Multi-config generators place configuration-specific executables under paths such as `build/bin/Debug/` or `build/bin/Release/`.

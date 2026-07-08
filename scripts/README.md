@@ -13,6 +13,12 @@ PowerShell scripts in this directory are the repository's current local workflow
 
 Scripts accept relative build directories from the repository root unless their parameters document otherwise. Keep this file current when script behavior, parameters, or expected checks change.
 
+Use `RelWithDebInfo` for optimized local checks that keep core assertions enabled:
+
+```powershell
+.\scripts\check.ps1 -BuildDir build-check-relwithdebinfo -Configuration RelWithDebInfo
+```
+
 ## Tool Setup
 
 Check required local tools with:
