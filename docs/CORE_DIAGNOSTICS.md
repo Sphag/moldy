@@ -100,7 +100,7 @@ The global logger registry is process-wide and explicit:
 
 `core::Logger` owns no sinks directly. It stores shared pointers to `core::ILogSink` implementations and dispatches each accepted record to every configured sink.
 
-Sink management and dispatch snapshots are mutex-protected. `core::Logger` invokes sink callbacks after releasing its own mutex so custom sinks may log reentrantly or trigger assertion logging without deadlocking the logger. `core::InMemoryLogSink` and `core::FileLogSink` also protect their own mutable state.
+Sink management and dispatch snapshots are mutex-protected. `core::Logger` invokes sink callbacks after releasing its own mutex so custom sinks may log reentrantly or trigger assertion logging without deadlocking the logger. Built-in sinks also protect their own mutable state or output stream writes.
 
 Supported sinks:
 

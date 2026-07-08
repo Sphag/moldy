@@ -168,6 +168,8 @@ ConsoleLogSink::ConsoleLogSink(EConsoleStream stream) : stream_(stream) {}
 
 Status ConsoleLogSink::write(const LogRecord& record)
 {
+    std::lock_guard lock{mutex_};
+
     std::ostream& output = stream_ == EConsoleStream::StandardOutput ? std::cout : std::cerr;
     output << format_log_record(record) << '\n';
 

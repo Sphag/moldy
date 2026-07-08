@@ -186,6 +186,7 @@ export {
         [[nodiscard]] Status write(const LogRecord& record) override;
 
     private:
+        mutable std::mutex mutex_;
         EConsoleStream stream_{EConsoleStream::StandardError};
     };
 

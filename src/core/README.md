@@ -24,7 +24,7 @@ Available logging primitives:
 - `core::LogRecord`: owning log record that preserves level, category, message, steady timestamp, and source-location data.
 - `core::log_level_name(...)`: returns stable lowercase names for log levels.
 - `core::ILogSink`: interface for custom synchronous log sinks.
-- `core::ConsoleLogSink`: synchronous standard-output or standard-error sink.
+- `core::ConsoleLogSink`: synchronous standard-output or standard-error sink with sink-level write serialization.
 - `core::FileLogSink`: synchronous file sink.
 - `core::InMemoryLogSink`: test-oriented sink that stores records for inspection.
 - `core::Logger`: synchronous logger with minimum-level filtering, mutex-protected sink management, and fan-out dispatch that invokes sink callbacks outside the logger mutex.
