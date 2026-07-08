@@ -101,12 +101,12 @@ export {
         {
         };
 
-        Result(SuccessTag, TValue value) : value_(std::move(value)), error_() {}
+        Result(SuccessTag, TValue value) : value_(std::move(value)) {}
 
-        Result(FailureTag, Status error) : value_(), error_(std::move(error)) {}
+        Result(FailureTag, Status error) : error_(std::move(error)) {}
 
-        std::optional<TValue> value_;
-        std::optional<Status> error_;
+        std::optional<TValue> value_{};
+        std::optional<Status> error_{};
     };
 
     enum class ELogLevel : std::uint8_t
