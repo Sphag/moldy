@@ -148,3 +148,11 @@ Status: Accepted
 Context: Core APIs need a small, dependency-free way to report recoverable failures while keeping control flow explicit.
 Decision: Prefer explicit `core::Status` and `core::Result<TValue>` returns for recoverable errors instead of exceptions as the default public API contract.
 Consequences: Core APIs should reserve exceptions for truly exceptional or dependency-imposed cases, and tests should cover success, failure, and invariant-preserving behavior for status/result values.
+
+## 2026-07-08: Keep Non-Windows CI Deferred Until Tool Bootstrap Is Cross-Platform
+
+Date: 2026-07-08
+Status: Accepted
+Context: The project targets Windows, macOS, and Linux desktop, but the current GitHub Actions quality gate bootstraps tools through Windows-specific scripts and runner assumptions.
+Decision: Keep the required CI workflow Windows-only for now. Add macOS and Linux jobs only after a cross-platform tool installation strategy exists for CMake, LLVM tools, and cppcheck.
+Consequences: Non-Windows CI remains a feasible follow-up, not a current required gate. Documentation must not imply macOS or Linux CI coverage until those jobs exist.
