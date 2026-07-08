@@ -2,11 +2,10 @@
 
 GitHub Issues are the canonical backlog for actionable work. This file is a lightweight local index for the current development session.
 
-## Active Issues
+## PR-Scoped Completion
 
-- [#4 Core logging primitives](https://github.com/Sphag/moldy/issues/4)
-- [#5 Core time utilities](https://github.com/Sphag/moldy/issues/5)
-- [#6 Application lifecycle primitives](https://github.com/Sphag/moldy/issues/6)
+- PR [#8](https://github.com/Sphag/moldy/pull/8) merged Phase 2 issue cleanup for #1, #2, and #3.
+- PR [#9](https://github.com/Sphag/moldy/pull/9) addresses Phase 3 core primitives for #4, #5, and #6.
 
 ## Follow-Ups Without Dedicated Issues
 
