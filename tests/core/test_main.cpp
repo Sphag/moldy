@@ -52,6 +52,11 @@ private:
     int attempts_{0};
 };
 
+int passing_assert_value()
+{
+    return core::language_standard() >= 202002L ? 3 : 4;
+}
+
 void test_build_configuration_is_available(TestContext& context)
 {
     context.expect(!core::build_configuration().empty(), "build configuration should not be empty");
@@ -306,7 +311,7 @@ void test_file_log_sink_writes_records(TestContext& context)
 
 void test_assert_macros_allow_passing_assertions(TestContext& context)
 {
-    int value = 3;
+    const int value = passing_assert_value();
 
     MOLDY_ASSERT(value == 3);
     MOLDY_ASSERT_MSG(value != 4, "value should remain unchanged");

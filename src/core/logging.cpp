@@ -362,7 +362,7 @@ ScopedLoggingOverride::~ScopedLoggingOverride()
     initialize_logging(std::move(previous_logger_));
 }
 
-void handle_assertion_failure(std::string expression, std::string message, LogSourceLocation sourceLocation)
+void handle_assertion_failure(std::string_view expression, std::string_view message, LogSourceLocation sourceLocation)
 {
     const std::string recordMessage = assertion_message(expression, message);
     (void)log_message(ELogLevel::Critical, "assert", recordMessage, std::move(sourceLocation));

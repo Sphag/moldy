@@ -266,7 +266,7 @@ export {
     [[nodiscard]] SteadyTimePoint steady_now() noexcept;
     [[nodiscard]] Duration elapsed_since(SteadyTimePoint start) noexcept;
 
-    [[noreturn]] void handle_assertion_failure(std::string expression, std::string message,
+    [[noreturn]] void handle_assertion_failure(std::string_view expression, std::string_view message,
                                                LogSourceLocation sourceLocation);
 
     enum class EApplicationState : std::uint8_t
