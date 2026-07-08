@@ -4,7 +4,7 @@
   - [#1 Remote Windows CI loop verification](https://github.com/Sphag/moldy/issues/1)
   - [#2 GitHub Issues migration and local task-file slimming](https://github.com/Sphag/moldy/issues/2)
   - [#3 macOS and Linux CI runner feasibility](https://github.com/Sphag/moldy/issues/3)
-- Continue Phase 3 core APIs through GitHub Issues:
+- Phase 3 core primitive issues are addressed by the `core/phase3-primitives` pull request:
   - [#4 Core logging primitives](https://github.com/Sphag/moldy/issues/4)
   - [#5 Core time utilities](https://github.com/Sphag/moldy/issues/5)
   - [#6 Application lifecycle primitives](https://github.com/Sphag/moldy/issues/6)

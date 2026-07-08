@@ -1,5 +1,6 @@
 module;
 
+#include <chrono>
 #include <concepts>
 #include <cstdint>
 #include <memory>
@@ -102,6 +103,60 @@ export {
 
         std::optional<TValue> value_;
         std::optional<Status> error_;
+    };
+
+    enum class ELogLevel : std::uint8_t
+    {
+        Trace,
+        Debug,
+        Info,
+        Warning,
+        Error,
+        Critical
+    };
+
+    class LogRecord
+    {
+    public:
+        LogRecord(ELogLevel level, std::string category, std::string message);
+
+        [[nodiscard]] ELogLevel level() const noexcept;
+        [[nodiscard]] std::string_view category() const noexcept;
+        [[nodiscard]] std::string_view message() const noexcept;
+
+    private:
+        ELogLevel level_{ELogLevel::Info};
+        std::string category_;
+        std::string message_;
+    };
+
+    [[nodiscard]] std::string_view log_level_name(ELogLevel level) noexcept;
+
+    using SteadyTimePoint = std::chrono::steady_clock::time_point;
+    using Duration = std::chrono::nanoseconds;
+
+    [[nodiscard]] SteadyTimePoint steady_now() noexcept;
+    [[nodiscard]] Duration elapsed_since(SteadyTimePoint start) noexcept;
+
+    enum class EApplicationState : std::uint8_t
+    {
+        Created,
+        Running,
+        StopRequested,
+        Stopped
+    };
+
+    class ApplicationLifecycle
+    {
+    public:
+        [[nodiscard]] EApplicationState state() const noexcept;
+
+        [[nodiscard]] Status start();
+        [[nodiscard]] Status request_stop();
+        [[nodiscard]] Status stop();
+
+    private:
+        EApplicationState state_{EApplicationState::Created};
     };
 
     std::string_view build_configuration() noexcept;

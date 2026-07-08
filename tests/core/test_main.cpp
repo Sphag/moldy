@@ -1,3 +1,4 @@
+#include <chrono>
 #include <iostream>
 #include <string_view>
 
@@ -106,6 +107,132 @@ void test_status_result_can_store_status_payload(TestContext& context)
     context.expect(result.error_if() == nullptr, "status payload result should not expose an error");
 }
 
+void test_log_level_names_are_stable(TestContext& context)
+{
+    context.expect(core::log_level_name(core::ELogLevel::Trace) == "trace", "trace log level name should be stable");
+    context.expect(core::log_level_name(core::ELogLevel::Debug) == "debug", "debug log level name should be stable");
+    context.expect(core::log_level_name(core::ELogLevel::Info) == "info", "info log level name should be stable");
+    context.expect(core::log_level_name(core::ELogLevel::Warning) == "warning",
+                   "warning log level name should be stable");
+    context.expect(core::log_level_name(core::ELogLevel::Error) == "error", "error log level name should be stable");
+    context.expect(core::log_level_name(core::ELogLevel::Critical) == "critical",
+                   "critical log level name should be stable");
+}
+
+void test_log_record_preserves_fields(TestContext& context)
+{
+    const core::LogRecord record{core::ELogLevel::Warning, "runtime", "shutdown requested"};
+
+    context.expect(record.level() == core::ELogLevel::Warning, "log record should preserve level");
+    context.expect(record.category() == "runtime", "log record should preserve category");
+    context.expect(record.message() == "shutdown requested", "log record should preserve message");
+}
+
+void test_log_record_allows_empty_fields(TestContext& context)
+{
+    const core::LogRecord record{core::ELogLevel::Info, "", ""};
+
+    context.expect(record.level() == core::ELogLevel::Info, "empty log record should preserve level");
+    context.expect(record.category().empty(), "log record should allow an empty category");
+    context.expect(record.message().empty(), "log record should allow an empty message");
+}
+
+void test_steady_time_helpers(TestContext& context)
+{
+    const core::SteadyTimePoint now = core::steady_now();
+    const core::Duration elapsed = core::elapsed_since(now);
+
+    context.expect(now.time_since_epoch() >= core::Duration::zero(), "steady_now should return a valid time point");
+    context.expect(elapsed >= core::Duration::zero(), "elapsed_since should be non-negative for a captured start");
+
+    const core::SteadyTimePoint older = now - std::chrono::milliseconds(5);
+    const core::Duration syntheticElapsed = core::elapsed_since(older);
+
+    context.expect(syntheticElapsed >= std::chrono::milliseconds(5),
+                   "elapsed_since should report positive duration for an older synthetic start");
+}
+
+void test_lifecycle_initial_state_is_created(TestContext& context)
+{
+    const core::ApplicationLifecycle lifecycle;
+
+    context.expect(lifecycle.state() == core::EApplicationState::Created,
+                   "application lifecycle should start in Created state");
+}
+
+void test_lifecycle_valid_stop_requested_path(TestContext& context)
+{
+    core::ApplicationLifecycle lifecycle;
+
+    const core::Status startStatus = lifecycle.start();
+    context.expect(startStatus.ok(), "start from Created should succeed");
+    context.expect(lifecycle.state() == core::EApplicationState::Running, "start should transition to Running");
+
+    const core::Status requestStopStatus = lifecycle.request_stop();
+    context.expect(requestStopStatus.ok(), "request_stop from Running should succeed");
+    context.expect(lifecycle.state() == core::EApplicationState::StopRequested,
+                   "request_stop should transition to StopRequested");
+
+    const core::Status stopStatus = lifecycle.stop();
+    context.expect(stopStatus.ok(), "stop from StopRequested should succeed");
+    context.expect(lifecycle.state() == core::EApplicationState::Stopped, "stop should transition to Stopped");
+}
+
+void test_lifecycle_stop_from_running_succeeds(TestContext& context)
+{
+    core::ApplicationLifecycle lifecycle;
+
+    const core::Status startStatus = lifecycle.start();
+    const core::Status stopStatus = lifecycle.stop();
+
+    context.expect(startStatus.ok(), "start from Created should succeed before direct stop");
+    context.expect(stopStatus.ok(), "stop from Running should succeed");
+    context.expect(lifecycle.state() == core::EApplicationState::Stopped, "direct stop should transition to Stopped");
+}
+
+void test_lifecycle_invalid_transitions_preserve_state(TestContext& context)
+{
+    core::ApplicationLifecycle lifecycle;
+
+    const core::Status requestBeforeStart = lifecycle.request_stop();
+    context.expect(!requestBeforeStart.ok(), "request_stop from Created should fail");
+    context.expect(requestBeforeStart.code() == core::EErrorCode::InvalidArgument,
+                   "request_stop from Created should return InvalidArgument");
+    context.expect(lifecycle.state() == core::EApplicationState::Created,
+                   "request_stop from Created should preserve state");
+
+    const core::Status stopBeforeStart = lifecycle.stop();
+    context.expect(!stopBeforeStart.ok(), "stop from Created should fail");
+    context.expect(stopBeforeStart.code() == core::EErrorCode::InvalidArgument,
+                   "stop from Created should return InvalidArgument");
+    context.expect(lifecycle.state() == core::EApplicationState::Created, "stop from Created should preserve state");
+
+    const core::Status startStatus = lifecycle.start();
+    const core::Status startAgain = lifecycle.start();
+    context.expect(startStatus.ok(), "first start should succeed");
+    context.expect(!startAgain.ok(), "start from Running should fail");
+    context.expect(startAgain.code() == core::EErrorCode::InvalidArgument,
+                   "start from Running should return InvalidArgument");
+    context.expect(lifecycle.state() == core::EApplicationState::Running, "start from Running should preserve state");
+
+    const core::Status requestStopStatus = lifecycle.request_stop();
+    const core::Status requestStopAgain = lifecycle.request_stop();
+    context.expect(requestStopStatus.ok(), "first request_stop should succeed");
+    context.expect(!requestStopAgain.ok(), "request_stop from StopRequested should fail");
+    context.expect(requestStopAgain.code() == core::EErrorCode::InvalidArgument,
+                   "request_stop from StopRequested should return InvalidArgument");
+    context.expect(lifecycle.state() == core::EApplicationState::StopRequested,
+                   "request_stop from StopRequested should preserve state");
+
+    const core::Status stopStatus = lifecycle.stop();
+    const core::Status stopAgain = lifecycle.stop();
+    context.expect(stopStatus.ok(), "first stop should succeed");
+    context.expect(!stopAgain.ok(), "stop from Stopped should fail");
+    context.expect(stopAgain.code() == core::EErrorCode::InvalidArgument,
+                   "stop from Stopped should return InvalidArgument");
+    context.expect(lifecycle.state() == core::EApplicationState::Stopped, "stop from Stopped should preserve state");
+}
+
 } // namespace
 
 int main()
@@ -121,6 +248,14 @@ int main()
     test_failure_result_exposes_error(context);
     test_failure_result_normalizes_ok_status(context);
     test_status_result_can_store_status_payload(context);
+    test_log_level_names_are_stable(context);
+    test_log_record_preserves_fields(context);
+    test_log_record_allows_empty_fields(context);
+    test_steady_time_helpers(context);
+    test_lifecycle_initial_state_is_created(context);
+    test_lifecycle_valid_stop_requested_path(context);
+    test_lifecycle_stop_from_running_succeeds(context);
+    test_lifecycle_invalid_transitions_preserve_state(context);
 
     if (context.failures() != 0)
     {

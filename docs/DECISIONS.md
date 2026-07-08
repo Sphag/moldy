@@ -148,3 +148,11 @@ Status: Accepted
 Context: Core APIs need a small, dependency-free way to report recoverable failures while keeping control flow explicit.
 Decision: Prefer explicit `core::Status` and `core::Result<TValue>` returns for recoverable errors instead of exceptions as the default public API contract.
 Consequences: Core APIs should reserve exceptions for truly exceptional or dependency-imposed cases, and tests should cover success, failure, and invariant-preserving behavior for status/result values.
+
+## 2026-07-08: Keep Initial Runtime Primitives In Core Minimal And Dependency-Free
+
+Date: 2026-07-08
+Status: Accepted
+Context: Phase 3 needs basic logging, time, and lifecycle primitives before broader engine systems exist.
+Decision: Add only dependency-free core primitives: owning log records and severity names, steady-clock helpers, and an explicit application lifecycle state machine. Do not add global loggers, sinks, file output, formatting policy, async logging, wall-clock handling, timers, scheduling, platform abstractions, event loops, renderer, ECS, assets, editor, or OS integration in this slice.
+Consequences: The core API gains small testable building blocks while broader runtime and platform responsibilities remain future decisions.

@@ -28,7 +28,10 @@ add_library(project::core ALIAS core)
 target_sources(core
     PRIVATE
         src/core/build_info.cpp
+        src/core/lifecycle.cpp
+        src/core/logging.cpp
         src/core/status.cpp
+        src/core/time.cpp
     PUBLIC
         FILE_SET CXX_MODULES
         BASE_DIRS src/core

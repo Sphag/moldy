@@ -32,7 +32,10 @@ The `core` static library is defined from:
 
 - `src/core/core.cppm`: public C++ module interface for `moldy.core`.
 - `src/core/build_info.cpp`: module implementation unit for build-information functions.
+- `src/core/lifecycle.cpp`: module implementation unit for `core::ApplicationLifecycle` behavior.
+- `src/core/logging.cpp`: module implementation unit for logging primitives.
 - `src/core/status.cpp`: module implementation unit for `core::Status` behavior.
+- `src/core/time.cpp`: module implementation unit for steady-clock helpers.
 
 Current public API is imported with:
 
@@ -47,13 +50,31 @@ Current public error API:
 - `core::ResultValue`: concept for movable, non-void value types accepted by `core::Result<TValue>`.
 - `core::Result<TValue>`: value-or-error return type for value-producing operations.
 
+Current public logging API:
+
+- `core::ELogLevel`: stable log severity enum.
+- `core::LogRecord`: owning log record with level, category, and message accessors.
+- `core::log_level_name(...)`: returns stable lowercase severity names.
+
+Current public time API:
+
+- `core::SteadyTimePoint`: steady-clock time-point alias.
+- `core::Duration`: nanosecond duration alias.
+- `core::steady_now()`: returns the current steady-clock time point.
+- `core::elapsed_since(...)`: returns elapsed steady-clock duration from a start point.
+
+Current public lifecycle API:
+
+- `core::EApplicationState`: `Created`, `Running`, `StopRequested`, and `Stopped` lifecycle states.
+- `core::ApplicationLifecycle`: dependency-free lifecycle state machine with explicit status returns for invalid transitions.
+
 Current public build-information functions:
 
 - `core::build_configuration()`: returns the CMake build configuration string, or a fallback when unavailable.
 - `core::compiler_id()`: returns the CMake compiler identifier, or a fallback when unavailable.
 - `core::language_standard()`: returns the `__cplusplus` value observed by the compiler.
 
-The current API is intentionally limited to build-information reporting and basic error/result values. Do not document broader engine or runtime responsibilities until they exist in source.
+The current API is intentionally limited to build information, error/result values, and minimal logging, time, and lifecycle primitives. Do not document broader engine or runtime responsibilities until they exist in source.
 
 ## Applications
 
@@ -74,6 +95,10 @@ Current checks verify that:
 - `core::Result<TValue>::failure(...)` exposes an error and no value.
 - `core::Result<TValue>::failure(core::Status::success())` normalizes to an internal error.
 - `core::Result<core::Status>` can store a status payload.
+- Log levels return stable lowercase names.
+- `core::LogRecord` preserves level, category, and message, including empty strings.
+- Steady-clock helpers return non-negative elapsed durations for captured and synthetic older starts.
+- `core::ApplicationLifecycle` accepts valid state transitions and rejects invalid transitions without mutating state.
 
 ## Scripts
 

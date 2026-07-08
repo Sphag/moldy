@@ -4,13 +4,13 @@ This is a living document. It describes intended architecture boundaries and rec
 
 ## Current Modules
 
-- `core`: Platform-neutral foundations. Current public surface includes build-information helpers plus basic explicit error/result values through `core::Status` and `core::Result<TValue>`.
+- `core`: Platform-neutral foundations. Current public surface includes build-information helpers, explicit error/result values, logging records and levels, steady-clock helpers, and a minimal application lifecycle state machine.
 
 ## Planned High-Level Modules
 
 - `core`: Platform-neutral foundations such as errors, logging, time, and basic utilities.
 - `platform`: Operating-system integration for windows, input, filesystems, timers, and related desktop services.
-- `runtime`: Application lifecycle and runtime coordination.
+- `runtime`: Future runtime coordination beyond the current minimal `core::ApplicationLifecycle` state primitive.
 - `examples`: Small executable examples and sandboxes.
 - `tools`: Developer tools, asset tools, and supporting command-line utilities.
 
