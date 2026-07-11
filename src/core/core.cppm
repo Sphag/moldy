@@ -20,8 +20,10 @@ module;
 
 export module moldy.core;
 
-export
-{
+// clang-format 18 and the CI formatter disagree on export-block brace placement.
+// clang-format off
+export {
+    // clang-format on
     namespace core
     {
 
