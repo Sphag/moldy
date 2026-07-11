@@ -5,7 +5,7 @@ PowerShell scripts in this directory are the repository's current local workflow
 - `configure.ps1`: configures the CMake build directory.
 - `build.ps1`: configures, then builds the requested configuration.
 - `test.ps1`: configures, builds `core_tests`, then runs CTest.
-- `check.ps1`: runs configure, format, lint, build, and test in order.
+- `check.ps1`: runs configure, format, and lint once, then builds and tests `Debug` and `Release` by default. Pass `-Configuration` with one or more values to select a different set.
 - `format.ps1`: checks C++ formatting with `clang-format`; pass `-Fix` to apply formatting.
 - `lint.ps1`: runs `clang-tidy` and `cppcheck`, excluding generated build trees. Generators with `compile_commands.json` get full clang-tidy coverage; Visual Studio-style generators use module-interface fallback coverage.
 - `install-tools.ps1`: checks selected local C++ quality tools, rejects unhealthy tool binaries, and provides an explicit Windows install path.
@@ -17,6 +17,12 @@ Use `RelWithDebInfo` for optimized local checks that keep core assertions enable
 
 ```powershell
 .\scripts\check.ps1 -BuildDir build-check-relwithdebinfo -Configuration RelWithDebInfo
+```
+
+To extend the default configuration set instead of replacing it:
+
+```powershell
+.\scripts\check.ps1 -BuildDir build-check -Configuration Debug,Release,RelWithDebInfo
 ```
 
 ## Tool Setup

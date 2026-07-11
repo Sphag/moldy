@@ -53,7 +53,7 @@ This project uses strict code quality expectations even before implementation be
 - `scripts/format.ps1` checks formatting with `clang-format`; pass `-Fix` to rewrite formatting.
 - `scripts/lint.ps1` runs `clang-tidy` and `cppcheck`.
 - `scripts/install-tools.ps1` checks or installs the selected local C++ quality tools on Windows and rejects unhealthy binaries that cannot run the repository probes.
-- `scripts/check.ps1` runs configure, format, lint, build, and test in order.
+- `scripts/check.ps1` runs configure, format, and lint once, then builds and tests Debug and Release by default.
 
 The selected C++ quality tools are required for the default quality gate. Use `scripts/install-tools.ps1 -Check` to verify local availability and basic tool health before running the full gate.
 

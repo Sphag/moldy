@@ -48,10 +48,10 @@ import moldy.core;
 Public assertion macros:
 
 - `MOLDY_ASSERT(expr)`
-- `MOLDY_ASSERT_MSG(expr, message)`
-- `MOLDY_ASSERT_FAIL(message)`
+- `MOLDY_ASSERT_MSG(expr, format, ...)`
+- `MOLDY_ASSERT_FAIL(format, ...)`
 
-When assertions are enabled, failed assertions report the expression, optional message, and source location through `core::handle_assertion_failure(...)`. The handler attempts to log a critical record through the initialized global logger, then traps or aborts the process.
+When assertions are enabled, failed assertions report the expression, optional printf-style formatted message, and source location through the assertion handler. The handler attempts to log a critical record through the initialized global logger, then traps or aborts the process. Supported compilers validate literal format strings against their arguments.
 
 When assertions are disabled, all assertion macros compile out and do not evaluate their arguments.
 
@@ -66,6 +66,9 @@ The module keeps direct APIs for tests and non-macro callers:
 - `core::ConsoleLogSink`
 - `core::FileLogSink`
 - `core::InMemoryLogSink`
+- `core::BoundedInMemoryLogSink`
+- `core::RingBufferLogSink`
+- `core::ExternalBufferLogSink`
 - `core::initialize_logging(...)`
 - `core::reset_logging()`
 - `core::current_logger()`
@@ -75,18 +78,18 @@ The module keeps direct APIs for tests and non-macro callers:
 
 The macro header provides:
 
-- `MOLDY_LOG_TRACE(category, message)`
-- `MOLDY_LOG_DEBUG(category, message)`
-- `MOLDY_LOG_INFO(category, message)`
-- `MOLDY_LOG_WARNING(category, message)`
-- `MOLDY_LOG_ERROR(category, message)`
-- `MOLDY_LOG_CRITICAL(category, message)`
+- `MOLDY_LOG_TRACE(category, format, ...)`
+- `MOLDY_LOG_DEBUG(category, format, ...)`
+- `MOLDY_LOG_INFO(category, format, ...)`
+- `MOLDY_LOG_WARNING(category, format, ...)`
+- `MOLDY_LOG_ERROR(category, format, ...)`
+- `MOLDY_LOG_CRITICAL(category, format, ...)`
 
-Logging through `core::log_message(...)` or logging macros before initialization is a no-op success. This keeps early startup and tests safe before diagnostics are explicitly configured.
+Logging through `core::log_message(...)` or logging macros before initialization is an error. Assert-enabled builds also stop at an assertion so unexpected startup ordering can be debugged.
 
 ## Logger Lifecycle
 
-The global logger registry is process-wide and explicit:
+The global logger registry is process-wide, explicit, and intentionally not synchronized. Initialization, reset, and scoped replacement are startup, shutdown, or test operations that must be performed by one thread:
 
 1. Create a `std::shared_ptr<core::Logger>`.
 2. Configure its minimum level and sinks.
@@ -100,16 +103,19 @@ The global logger registry is process-wide and explicit:
 
 `core::Logger` owns no sinks directly. It stores shared pointers to `core::ILogSink` implementations and dispatches each accepted record to every configured sink.
 
-Sink management and dispatch snapshots are mutex-protected. `core::Logger` invokes sink callbacks after releasing its own mutex so custom sinks may log reentrantly or trigger assertion logging without deadlocking the logger. Built-in sinks also protect their own mutable state or output stream writes.
+Sink management and dispatch snapshots are mutex-protected. `core::Logger` invokes sink callbacks after releasing its own mutex so custom sinks may log reentrantly without deadlocking the logger. Every sink exposes a stable diagnostic name. After all sinks have been attempted, failures are aggregated by sink name; assert-enabled builds stop at one assertion, while other builds return the first failure status. Assertion reporting suppresses recursive failure assertions.
 
 Supported sinks:
 
 - `core::ConsoleLogSink`: writes formatted records to standard output or standard error.
 - `core::FileLogSink`: writes formatted records to a file path.
-- `core::InMemoryLogSink`: stores records for tests and inspection.
-- Custom sinks: implement `core::ILogSink::write(...)`.
+- `core::InMemoryLogSink`: stores an unbounded sequence of records.
+- `core::BoundedInMemoryLogSink`: stores the first configured number of records and returns an error when full.
+- `core::RingBufferLogSink`: retains the latest configured number of records in chronological order.
+- `core::ExternalBufferLogSink`: writes into caller-owned `std::span<core::LogRecord>` storage and returns an error when full; the storage must outlive the sink, while record inspection returns a synchronized copy.
+- Custom sinks: implement `core::ILogSink::name()` and `core::ILogSink::write(...)`.
 
-`core::Logger::log(...)` continues dispatching when one sink fails. It returns the first sink failure status after all sinks have been attempted.
+`core::LogRecord::formatted_message()` produces the text shared by console and file sinks.
 
 ## Timestamp Policy
 

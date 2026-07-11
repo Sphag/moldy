@@ -26,16 +26,16 @@ Available logging primitives:
 - `core::ILogSink`: interface for custom synchronous log sinks.
 - `core::ConsoleLogSink`: synchronous standard-output or standard-error sink with sink-level write serialization.
 - `core::FileLogSink`: synchronous file sink.
-- `core::InMemoryLogSink`: test-oriented sink that stores records for inspection.
+- `core::InMemoryLogSink`: unbounded test-oriented sink, with bounded, ring-buffer, and caller-owned-buffer variants for fixed-capacity storage.
 - `core::Logger`: synchronous logger with minimum-level filtering, mutex-protected sink management, and fan-out dispatch that invokes sink callbacks outside the logger mutex.
 - `core::initialize_logging(...)`, `core::reset_logging()`, `core::current_logger()`, and `core::is_logging_initialized()`: explicit global logger registry lifecycle.
-- `core::log_message(...)`: global logging entry point used by macros; it is a no-op success before logger initialization.
+- `core::log_message(...)`: global logging entry point used by macros; missing initialization is an error and an assertion in assert-enabled builds.
 - `core::ScopedLoggingOverride`: scoped test override for the process-wide logger.
 
 Available macro primitives:
 
-- `MOLDY_LOG_TRACE(category, message)` through `MOLDY_LOG_CRITICAL(category, message)`: source-location-capturing logging macros from `<moldy/core_macros.hpp>`.
-- `MOLDY_ASSERT(expr)`, `MOLDY_ASSERT_MSG(expr, message)`, and `MOLDY_ASSERT_FAIL(message)`: assertion macros from `<moldy/core_macros.hpp>`.
+- `MOLDY_LOG_TRACE(category, format, ...)` through `MOLDY_LOG_CRITICAL(category, format, ...)`: printf-style, source-location-capturing logging macros from `<moldy/core_macros.hpp>`.
+- `MOLDY_ASSERT(expr)`, `MOLDY_ASSERT_MSG(expr, format, ...)`, and `MOLDY_ASSERT_FAIL(format, ...)`: assertion macros from `<moldy/core_macros.hpp>`.
 
 Assertions are enabled in `Debug` and `RelWithDebInfo` through `MOLDY_ENABLE_ASSERTS`; `Release` compiles assertion macros out. Failed active assertions report expression/message/source location, attempt to log through initialized core logging, then trap or abort.
 

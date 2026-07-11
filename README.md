@@ -51,7 +51,7 @@ From a fresh checkout, run the default local quality gate from the repository ro
 .\scripts\check.ps1 -BuildDir build-check
 ```
 
-`scripts/check.ps1` configures the project, checks formatting, runs lint/static analysis, builds the configured targets, and runs tests.
+`scripts/check.ps1` configures the project, checks formatting, runs lint/static analysis, then builds and tests both Debug and Release by default.
 
 For an optimized build that keeps core assertions enabled, run:
 
