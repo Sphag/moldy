@@ -16,6 +16,10 @@ GitHub Issues are the canonical backlog for actionable work. This file is a ligh
 - [#14 Add steady timestamps to core log records](https://github.com/Sphag/moldy/issues/14).
 - [#15 Plan async logging queue](https://github.com/Sphag/moldy/issues/15).
 
+## Tooling Follow-Ups
+
+- [#17 Pin and enforce the supported development toolchain](https://github.com/Sphag/moldy/issues/17).
+
 ## Follow-Ups Without Dedicated Issues
 
 - Decide whether to keep plain executable tests or approve a test framework dependency.
