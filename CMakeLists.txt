@@ -16,7 +16,7 @@ function(configure_project_target target_name)
     )
 
     if(MSVC)
-        target_compile_options(${target_name} PRIVATE /W4 /permissive- /Zc:__cplusplus)
+        target_compile_options(${target_name} PRIVATE /W4 /permissive- /Zc:__cplusplus /Zc:preprocessor)
     else()
         target_compile_options(${target_name} PRIVATE -Wall -Wextra -Wpedantic)
     endif()

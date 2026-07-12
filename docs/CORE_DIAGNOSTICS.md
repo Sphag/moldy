@@ -29,6 +29,8 @@ Assertions are enabled when `MOLDY_ENABLE_ASSERTS` is defined. The CMake project
 
 `Release` does not define `MOLDY_ENABLE_ASSERTS`, so assertion macros compile out.
 
+MSVC targets use the conforming preprocessor (`/Zc:preprocessor`) so the C++20 `__VA_OPT__` forwarding used by the printf-style macros behaves consistently with Clang and GCC.
+
 ## Assertion API
 
 The public macro header is:
