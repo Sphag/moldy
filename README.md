@@ -93,8 +93,11 @@ Remove only generated, ignored build or temporary directories that are no longer
 ## Start Here
 
 - [Project Brief](docs/PROJECT_BRIEF.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Decisions](docs/DECISIONS.md)
 - [Source Map](docs/SOURCE_MAP.md)
 - [AI Workflow](docs/AI_WORKFLOW.md)
+- [GitHub Workflow](docs/GITHUB_WORKFLOW.md)
 - [Scripts](scripts/README.md)
 - [Code Quality](docs/CODE_QUALITY.md)
 - [Core Diagnostics Runtime](docs/CORE_DIAGNOSTICS.md)
