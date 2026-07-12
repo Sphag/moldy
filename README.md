@@ -25,10 +25,12 @@ Moldy is licensed under the MIT License. See [LICENSE](LICENSE) for the full lic
 
 ## Prerequisites
 
-- CMake 3.28 or newer.
+- CMake 3.28 or newer is the project-file minimum. Supported development environments use CMake 4.3.4 through 4.4.0.
 - A C++23-capable compiler and CMake generator with support for the repository's C++ module setup.
 - PowerShell for the local workflow scripts.
 - `clang-format`, `clang-tidy`, and `cppcheck` for the default quality gate.
+
+The complete supported toolchain policy is stored in `config/toolchain.psd1`. Exact constraints are pinned versions; range constraints include both endpoints. On Windows, MSVC 19.34.0.0 (Visual Studio 2022 17.4) is the minimum supported compiler toolset.
 
 Check whether the selected local quality tools are available:
 

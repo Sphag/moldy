@@ -57,6 +57,14 @@ This project uses strict code quality expectations even before implementation be
 
 The selected C++ quality tools are required for the default quality gate. Use `scripts/install-tools.ps1 -Check` to verify local availability and basic tool health before running the full gate.
 
+## Supported Toolchain Policy
+
+`config/toolchain.psd1` is the single source of supported development-tool versions. An `Exact` constraint accepts only its `Version`; a `Range` constraint includes both `MinVersion` and `MaxVersion`. The current policy pins LLVM 19.1.7 and cppcheck, and defines tested ranges for CMake, Ninja, and MSVC. LLVM 19 is required because supported recent MSVC toolsets ship STL headers that reject older Clang-based analysis binaries.
+
+CMake 3.28 remains the minimum version that can interpret the project files. It is not the supported development range, which is recorded separately in the manifest. The supported MSVC range starts at 19.34.0.0, corresponding to Visual Studio 2022 17.4 and the compiler baseline used for CMake C++ module scanning.
+
+When changing supported versions, update the manifest and its documentation together. Confirm the local quality gate and Windows CI before accepting the change, and do not widen a range beyond versions that have passed those checks. Installed-tool version enforcement is intentionally handled separately from this policy definition.
+
 ## Known Local Sandbox Limitation
 
 Some AI-agent command sandboxes on Windows can create and write files but cannot delete, replace, or rename them. CMake, MSBuild, Ninja, and `clang-format -i` all rely on those operations for generated files or in-place formatting.
