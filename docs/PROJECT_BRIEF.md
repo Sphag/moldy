@@ -43,11 +43,12 @@ MIT License.
 ## Open Decisions
 
 - 2D vs 3D direction
-- Rendering backend
-- Entity component system approach
+- Future rendering backend criteria after the first D3D12 viewport
+- Dependency versions, licensing, and acquisition for planned adapters
+- Non-Windows platform implementation details
 - Physics approach
+- Audio approach
 - Asset pipeline
-- Editor scope
 - Scripting approach
 - Networking scope
 

@@ -1,33 +1,13 @@
 # Current Task
 
-Current focus: Phase 3 core diagnostics runtime after the initial minimal primitives slice.
+GitHub Issues are the canonical source for scope, dependencies, acceptance criteria, and progress.
 
-## Active Session
+## Active Track
 
-- [x] PR [#8](https://github.com/Sphag/moldy/pull/8) merged issue-cleanup documentation for [#1](https://github.com/Sphag/moldy/issues/1), [#2](https://github.com/Sphag/moldy/issues/2), and [#3](https://github.com/Sphag/moldy/issues/3).
-- [x] PR [#9](https://github.com/Sphag/moldy/pull/9) addressed initial Phase 3 minimal primitives for [#4](https://github.com/Sphag/moldy/issues/4), [#5](https://github.com/Sphag/moldy/issues/5), and [#6](https://github.com/Sphag/moldy/issues/6).
-- [ ] [#10 Document core diagnostics runtime spec](https://github.com/Sphag/moldy/issues/10).
-- [ ] [#11 Add core assertion macros and assertion-enabled RelWithDebInfo checks](https://github.com/Sphag/moldy/issues/11).
-- [ ] [#12 Add global core logger registry and logging macros](https://github.com/Sphag/moldy/issues/12).
-- [ ] [#13 Add composable core logging sinks](https://github.com/Sphag/moldy/issues/13).
-- [ ] [#14 Add steady timestamps to core log records](https://github.com/Sphag/moldy/issues/14).
-- [ ] [#15 Plan async logging queue](https://github.com/Sphag/moldy/issues/15).
+- [Track 0: Core Math, Memory, and Debuggability Foundations (#23)](https://github.com/Sphag/moldy/issues/23)
+- [Supported development toolchain umbrella (#17)](https://github.com/Sphag/moldy/issues/17) remains the first active nested subtrack.
+- [Async logging queue plan (#15)](https://github.com/Sphag/moldy/issues/15) remains planning-only and precedes trace or crash work that depends on asynchronous behavior.
 
-## Canonical Backlog
+## Next Dependency Gate
 
-GitHub Issues are the canonical backlog. Keep this file as a lightweight session note only.
-
-The current diagnostics backlog issues are:
-
-- [#10 Document core diagnostics runtime spec](https://github.com/Sphag/moldy/issues/10).
-- [#11 Add core assertion macros and assertion-enabled RelWithDebInfo checks](https://github.com/Sphag/moldy/issues/11).
-- [#12 Add global core logger registry and logging macros](https://github.com/Sphag/moldy/issues/12).
-- [#13 Add composable core logging sinks](https://github.com/Sphag/moldy/issues/13).
-- [#14 Add steady timestamps to core log records](https://github.com/Sphag/moldy/issues/14).
-- [#15 Plan async logging queue](https://github.com/Sphag/moldy/issues/15).
-
-## Session Notes
-
-- Local task files should summarize current focus, recent completion, and active issue links instead of duplicating issue descriptions.
-- No renderer, platform layer, ECS, assets, editor, event loop, OS integration, async logging queue, or third-party dependency belongs in the current diagnostics slice.
-- GitHub issue creation for the current diagnostics backlog is complete in [#10](https://github.com/Sphag/moldy/issues/10) through [#15](https://github.com/Sphag/moldy/issues/15).
+Track 1 may start after the math sequence #27-#31, allocator contracts #32, and base trace contracts #36 are complete. Use the ordered checklist and dependency links in #23 rather than copying task details here.

@@ -1,69 +1,58 @@
 # Roadmap
 
-This roadmap is intentionally generic and identity-free.
+GitHub Issues are the canonical roadmap and backlog. This document describes the track outcomes, dependency gates, and execution order without duplicating task issue descriptions.
 
-## Phase 0: AI Workflow and Project Infrastructure
+## Track 0: Core Math, Memory, and Debuggability Foundations
 
-- Establish AI-agent operating rules.
-- Add placeholder project planning documents.
-- Add safe quality script entry points.
+- Track issue: [#23](https://github.com/Sphag/moldy/issues/23)
+- Milestone: `Core Foundations`
+- Label: `track:core-foundations`
 
-## Phase 1: CMake Scaffold, Tool Choices, and Local Quality Gate
+Outcome: establish the math, allocation, tracing, crash, sanitizer, and GPU diagnostic contracts needed by later tracks.
 
-- Create a minimal C++ and CMake scaffold.
-- Add compiler settings.
-- Choose formatting and linting tools.
-- Document formatting and linting decisions.
-- Verify that `scripts/check.ps1` passes locally.
+Existing active work precedes new track tasks:
 
-## Phase 2: GitHub Collaboration and CI Workflow
+1. [#17 Pin and enforce the supported development toolchain](https://github.com/Sphag/moldy/issues/17) remains a nested umbrella. Its ordered #18-#21 checklist is maintained only in #17.
+2. [#15 Plan async logging queue](https://github.com/Sphag/moldy/issues/15) remains planning-only. Any implementation requires a separate issue.
 
-Operational:
+Track 1 may begin after the math sequence #27-#31 in [Track 0](https://github.com/Sphag/moldy/issues/23), allocator contracts [#32](https://github.com/Sphag/moldy/issues/32), and base trace contracts [#36](https://github.com/Sphag/moldy/issues/36) are complete. Memory tracking, richer tracing, crash tooling, sanitizers, GPU diagnostics, and editor diagnostic panels may then proceed in parallel according to their issue dependencies.
 
-- GitHub Actions runs the Windows quality gate on pushed branch commits and pull request updates.
-- The workflow uses `windows-latest` with the existing PowerShell quality gate.
-- README onboarding describes the current scaffold and local quality-gate path.
-- The latest verified remote Windows run on `main` succeeded for commit `c520e16`.
+Closed issues #1-#6 and #10-#14 are retained in the milestone and listed as completed groundwork in #23. They provide provenance but do not determine the order of new tasks.
 
-Remaining closure:
+## Track 1: First Rendered Editor Viewport
 
-- Use [GitHub issue #2](https://github.com/Sphag/moldy/issues/2) to slim local task files now that the initial issue set exists.
-- Keep local task files as lightweight session notes after GitHub Issues are active.
-- Continue using a PR-first workflow after commits are explicitly approved.
+- Track issue: [#24](https://github.com/Sphag/moldy/issues/24)
+- Milestone: `Rendered Editor Viewport`
+- Label: `track:rendered-editor-viewport`
 
-Planned follow-up:
+Outcome: deliver a Win32 editor host that renders deterministic static geometry and Dear ImGui through explicit RHI and D3D12 adapters. The track includes host and input handling, RHI contracts, device and queue setup, resource and descriptor management, shader compilation, graphics pipelines, editor adapters, and WARP coverage.
 
-- Expand CI to macOS and Linux after runner toolchain feasibility is verified.
+This is a Windows-first implementation track, not a change to the Windows, macOS, and Linux desktop target. Backend-neutral contracts must remain separate from Win32 and D3D12 adapters.
 
-## Phase 3: Core Runtime Foundations
+## Track 2: Editable and Persistent Scene
 
-Current focus:
+- Track issue: [#25](https://github.com/Sphag/moldy/issues/25)
+- Milestone: `Editable Persistent Scene`
+- Label: `track:editable-persistent-scene`
 
-- Add core diagnostics runtime foundations: logging, assertions, and steady timestamps.
-- Treat `RelWithDebInfo` as the optimized-with-asserts check configuration.
-- Define application lifecycle primitives.
-- Keep new core APIs small, tested, and dependency-free.
-- Continue updating source-map and architecture docs alongside public API changes.
+Outcome: deliver an editable scene that can be saved as versioned JSON source, compiled into a deterministic binary cache, reconstructed transactionally, migrated, and round-tripped. EnTT, nlohmann/json, and ImGuizmo remain isolated behind project-owned adapters and require normal dependency approval before implementation.
 
-Planned follow-up:
+Track 2 builds on the editor viewport, math types, allocation contracts, and trace contracts. Individual task dependencies in #25 control safe overlap with unfinished Track 1 work.
 
-- Plan async logging queue requirements before implementing queueing or background worker behavior.
+## Track 3: Advanced Graphics Foundations
 
-## Phase 4: Cross-Platform Platform Layer
+- Track issue: [#26](https://github.com/Sphag/moldy/issues/26)
+- Milestone: `Advanced Graphics Foundations`
+- Label: `track:advanced-graphics-foundations`
 
-- Add window abstraction.
-- Add input abstraction.
-- Add filesystem abstraction.
-- Add timer abstraction.
+Outcome: deliver validated resource-state, compute, multi-queue, descriptor, shader, render-graph, transient-resource, parallel-recording, and GPU-profiling contracts. WARP contract coverage and evidence-based future-backend criteria close the track.
 
-## Phase 5: First Runnable Sandbox
+Track 3 extends the RHI and viewport contracts from Track 1. It does not authorize a second rendering backend; the final task defines the evidence and portability criteria for a separate future decision.
 
-- Build the first sandbox executable.
-- Run on at least one desktop platform.
-- Keep platform assumptions explicit.
+## Roadmap Rules
 
-## Phase 6: Rendering Direction
-
-- Choose 2D or 3D direction.
-- Choose renderer direction.
-- Record decisions before implementation.
+- The ordered checklist in each track issue is the progress source of truth.
+- Every task issue has exactly one `track:*` label, one corresponding milestone, and relevant independent `area:*` labels.
+- Closed groundwork remains closed and stays in the milestone so historical progress is visible.
+- Nested umbrellas own their child checklists. Parent tracks link the umbrella once and do not duplicate its children.
+- Task descriptions, acceptance criteria, and dependency links live in their GitHub issues, not in local roadmap or task files.
