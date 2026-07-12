@@ -34,6 +34,10 @@ if ($Configuration.Count -eq 0) {
 
 Write-Host "Running project checks for $($Configuration -join ', ')..."
 
+Invoke-CheckStep -Name "toolchain policy" -Action {
+    & (Join-Path $scriptDir "test-toolchain-policy.ps1")
+}
+
 Invoke-CheckStep -Name "configure" -Action {
     & (Join-Path $scriptDir "configure.ps1") -BuildDir $BuildDir -Configuration $Configuration[0]
 }

@@ -33,7 +33,7 @@ Common output locations:
 
 ## Current Tooling State
 
-The selected quality tools are `clang-format`, `clang-tidy`, and `cppcheck`. `scripts/check.ps1` runs them once, then builds and tests both `Debug` and `Release` by default. This covers assertion-enabled behavior and the compiled-out assertion paths in the normal quality gate.
+The selected quality tools are `clang-format`, `clang-tidy`, and `cppcheck`. `scripts/check.ps1` first runs the focused toolchain-policy tests, runs the selected quality tools once, then builds and tests both `Debug` and `Release` by default. This covers policy validation, assertion-enabled behavior, and the compiled-out assertion paths in the normal quality gate.
 
 Pass one or more explicit configurations to narrow or extend a run:
 

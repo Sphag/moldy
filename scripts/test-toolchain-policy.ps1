@@ -68,3 +68,5 @@ Write-Host "Toolchain policy tests: $script:passed passed, $script:failed failed
 if ($script:failed -ne 0) {
     exit 1
 }
+
+exit 0

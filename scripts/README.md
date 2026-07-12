@@ -5,7 +5,7 @@ PowerShell scripts in this directory are the repository's current local workflow
 - `configure.ps1`: configures the CMake build directory.
 - `build.ps1`: configures, then builds the requested configuration.
 - `test.ps1`: configures, builds `core_tests`, then runs CTest.
-- `check.ps1`: runs configure, format, and lint once, then builds and tests `Debug` and `Release` by default. Pass `-Configuration` with one or more values to select a different set.
+- `check.ps1`: validates the toolchain policy, then runs configure, format, and lint once before building and testing `Debug` and `Release` by default. Pass `-Configuration` with one or more values to select a different set.
 - `format.ps1`: checks C++ formatting with `clang-format`; pass `-Fix` to apply formatting.
 - `lint.ps1`: runs `clang-tidy` and `cppcheck`, excluding generated build trees. Generators with `compile_commands.json` get full clang-tidy coverage; Visual Studio-style generators use module-interface fallback coverage.
 - `install-tools.ps1`: checks selected local C++ quality tools, rejects unhealthy tool binaries, and provides an explicit Windows install path.
@@ -58,4 +58,4 @@ Run the focused schema tests with:
 .\scripts\test-toolchain-policy.ps1
 ```
 
-The helper validates schema version 1, required tool entries, exact/range field rules, parseable versions, and ordered inclusive range bounds. Installed binary version checks are not part of this helper.
+The helper validates schema version 1, required tool entries, exact/range field rules, parseable versions, and ordered inclusive range bounds. `scripts/check.ps1` runs these focused tests before configure, so the local and CI quality gates continuously cover the policy validator. Installed binary version checks are not part of this helper.
