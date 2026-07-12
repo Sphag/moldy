@@ -158,6 +158,14 @@ Context: Phase 3 needs basic logging, time, and lifecycle primitives before broa
 Decision: Add only dependency-free core primitives: owning log records and severity names, steady-clock helpers, and an explicit application lifecycle state machine. Do not add global loggers, sinks, file output, formatting policy, async logging, wall-clock handling, timers, scheduling, platform abstractions, event loops, renderer, ECS, assets, editor, or OS integration in this slice.
 Consequences: The core API gains small testable building blocks while broader runtime and platform responsibilities remain future decisions.
 
+## 2026-07-08: Expand Core Diagnostics Beyond Minimal Primitives
+
+Date: 2026-07-08
+Status: Accepted
+Context: The next core runtime slice needs practical diagnostics for development builds without adding platform or engine systems.
+Decision: Supersede the minimal logging/time/assert boundary with a broader dependency-free diagnostics slice: assertion macros, assertion-enabled `RelWithDebInfo`, synchronous global logging initialization, macro logging, mutex-protected sink dispatch, console/file/in-memory/custom sinks, scoped test overrides, and steady log-record timestamps. Keep async logging, wall-clock timestamps, platform integration, renderer, and broader engine systems out of this slice.
+Consequences: Core diagnostics become usable by applications and tests while remaining synchronous, explicit, and platform-neutral. `RelWithDebInfo` is the optimized-with-asserts check path.
+
 ## 2026-07-08: Keep Non-Windows CI Deferred Until Tool Bootstrap Is Cross-Platform
 
 Date: 2026-07-08

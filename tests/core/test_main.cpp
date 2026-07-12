@@ -1,8 +1,16 @@
+#include <array>
 #include <chrono>
+#include <fstream>
 #include <iostream>
+#include <memory>
+#include <span>
+#include <string>
 #include <string_view>
+#include <vector>
 
 import moldy.core;
+
+#include <moldy/core_macros.hpp>
 
 namespace
 {
@@ -27,6 +35,67 @@ public:
 private:
     int failures_{0};
 };
+
+#if !defined(MOLDY_ENABLE_ASSERTS)
+class FailingSink final : public core::ILogSink
+{
+public:
+    [[nodiscard]] std::string_view name() const noexcept override
+    {
+        return "failing-test";
+    }
+
+    [[nodiscard]] core::Status write(const core::LogRecord&) override
+    {
+        ++attempts_;
+        return core::Status::error(core::EErrorCode::Internal, "intentional sink failure");
+    }
+
+    [[nodiscard]] int attempts() const noexcept
+    {
+        return attempts_;
+    }
+
+private:
+    int attempts_{0};
+};
+#endif
+
+class ReentrantSink final : public core::ILogSink
+{
+public:
+    explicit ReentrantSink(core::Logger& logger) : logger_(logger) {}
+
+    [[nodiscard]] std::string_view name() const noexcept override
+    {
+        return "reentrant-test";
+    }
+
+    [[nodiscard]] core::Status write(const core::LogRecord&) override
+    {
+        ++writes_;
+        if (writes_ == 1)
+        {
+            return logger_.log(core::ELogLevel::Info, "reentrant", "nested");
+        }
+
+        return core::Status::success();
+    }
+
+    [[nodiscard]] int writes() const noexcept
+    {
+        return writes_;
+    }
+
+private:
+    core::Logger& logger_;
+    int writes_{0};
+};
+
+int passing_assert_value()
+{
+    return core::language_standard() >= 202002L ? 3 : 4;
+}
 
 void test_build_configuration_is_available(TestContext& context)
 {
@@ -121,11 +190,18 @@ void test_log_level_names_are_stable(TestContext& context)
 
 void test_log_record_preserves_fields(TestContext& context)
 {
-    const core::LogRecord record{core::ELogLevel::Warning, "runtime", "shutdown requested"};
+    const core::SteadyTimePoint timestamp = core::steady_now();
+    const core::LogSourceLocation sourceLocation{"test.cpp", 42, "test_function"};
+    const core::LogRecord record{core::ELogLevel::Warning, "runtime", "shutdown requested", timestamp, sourceLocation};
 
     context.expect(record.level() == core::ELogLevel::Warning, "log record should preserve level");
     context.expect(record.category() == "runtime", "log record should preserve category");
     context.expect(record.message() == "shutdown requested", "log record should preserve message");
+    context.expect(record.timestamp() == timestamp, "log record should preserve steady timestamp");
+    context.expect(record.source_location().file() == "test.cpp", "log record should preserve source file");
+    context.expect(record.source_location().line() == 42, "log record should preserve source line");
+    context.expect(record.source_location().function() == "test_function",
+                   "log record should preserve source function");
 }
 
 void test_log_record_allows_empty_fields(TestContext& context)
@@ -135,6 +211,234 @@ void test_log_record_allows_empty_fields(TestContext& context)
     context.expect(record.level() == core::ELogLevel::Info, "empty log record should preserve level");
     context.expect(record.category().empty(), "log record should allow an empty category");
     context.expect(record.message().empty(), "log record should allow an empty message");
+    context.expect(record.timestamp().time_since_epoch() >= core::Duration::zero(),
+                   "default log record should capture a steady timestamp");
+    context.expect(record.source_location().empty(), "default log record should have an empty source location");
+}
+
+void test_log_record_formats_for_text_sinks(TestContext& context)
+{
+    const core::LogRecord record{core::ELogLevel::Warning, "runtime", "shutdown", core::SteadyTimePoint{},
+                                 core::LogSourceLocation{"test.cpp", 42, "test"}};
+    const std::string formatted = record.formatted_message();
+
+    context.expect(formatted.find("[warning][runtime] shutdown") != std::string::npos,
+                   "formatted log record should include level, category, and message");
+    context.expect(formatted.find("test.cpp:42 test") != std::string::npos,
+                   "formatted log record should include source location");
+}
+
+void test_memory_sink_variants(TestContext& context)
+{
+    const core::LogRecord first{core::ELogLevel::Info, "memory", "first"};
+    const core::LogRecord second{core::ELogLevel::Info, "memory", "second"};
+    const core::LogRecord third{core::ELogLevel::Info, "memory", "third"};
+
+    core::BoundedInMemoryLogSink bounded{2};
+    context.expect(bounded.write(first).ok(), "bounded sink should accept records within capacity");
+    context.expect(bounded.write(second).ok(), "bounded sink should fill its capacity");
+    context.expect(!bounded.write(third).ok(), "bounded sink should reject records after reaching capacity");
+    context.expect(bounded.records().front().message() == "first", "bounded sink should preserve earliest records");
+
+    core::RingBufferLogSink ring{2};
+    context.expect(ring.write(first).ok() && ring.write(second).ok() && ring.write(third).ok(),
+                   "ring sink should accept records while overwriting old entries");
+    const std::vector<core::LogRecord> ringRecords = ring.records();
+    context.expect(ringRecords.size() == 2 && ringRecords[0].message() == "second" &&
+                       ringRecords[1].message() == "third",
+                   "ring sink should expose retained records in chronological order");
+
+    std::array<core::LogRecord, 2> storage{first, first};
+    core::ExternalBufferLogSink external{storage};
+    context.expect(external.write(second).ok() && external.write(third).ok(),
+                   "external sink should write into caller-owned storage");
+    context.expect(!external.write(first).ok(), "external sink should reject records after filling the buffer");
+    const std::vector<core::LogRecord> externalRecords = external.records();
+    context.expect(externalRecords.size() == 2 && externalRecords[0].message() == "second" &&
+                       externalRecords[1].message() == "third",
+                   "external sink should expose the written portion of caller-owned storage");
+    external.clear();
+    context.expect(external.write(first).ok(), "external sink should accept records after clear");
+    context.expect(externalRecords.size() == 2 && externalRecords[0].message() == "second",
+                   "external sink record snapshots should remain stable after later writes");
+
+    context.expect(bounded.name() == "memory-bounded" && ring.name() == "memory-ring" &&
+                       external.name() == "memory-external",
+                   "memory sinks should expose stable diagnostic names");
+}
+
+void test_logger_records_to_memory_sink(TestContext& context)
+{
+    core::Logger logger;
+    const std::shared_ptr<core::InMemoryLogSink> memorySink = std::make_shared<core::InMemoryLogSink>();
+
+    const core::Status addStatus = logger.add_sink(memorySink);
+    const core::Status logStatus = logger.log(core::ELogLevel::Info, "runtime", "started");
+    const std::vector<core::LogRecord> records = memorySink->records();
+
+    context.expect(addStatus.ok(), "logger should accept a valid sink");
+    context.expect(logStatus.ok(), "logger should report successful dispatch");
+    context.expect(logger.sink_count() == 1, "logger should report configured sink count");
+    context.expect(records.size() == 1, "in-memory sink should receive a record");
+    context.expect(!records.empty() && records.front().message() == "started",
+                   "in-memory sink should preserve dispatched message");
+}
+
+void test_logger_filters_by_minimum_level(TestContext& context)
+{
+    core::Logger logger{core::ELogLevel::Warning};
+    const std::shared_ptr<core::InMemoryLogSink> memorySink = std::make_shared<core::InMemoryLogSink>();
+
+    (void)logger.add_sink(memorySink);
+    const core::Status infoStatus = logger.log(core::ELogLevel::Info, "runtime", "filtered");
+    const core::Status errorStatus = logger.log(core::ELogLevel::Error, "runtime", "recorded");
+    const std::vector<core::LogRecord> records = memorySink->records();
+
+    context.expect(infoStatus.ok(), "filtered log call should still report success");
+    context.expect(errorStatus.ok(), "enabled log call should report success");
+    context.expect(!logger.should_log(core::ELogLevel::Info), "logger should reject levels below minimum");
+    context.expect(logger.should_log(core::ELogLevel::Error), "logger should accept levels at or above minimum");
+    context.expect(records.size() == 1, "only enabled records should reach sinks");
+    context.expect(!records.empty() && records.front().message() == "recorded",
+                   "enabled record should preserve message");
+}
+
+#if !defined(MOLDY_ENABLE_ASSERTS)
+void test_logger_fans_out_and_preserves_sink_failures(TestContext& context)
+{
+    core::Logger logger;
+    const std::shared_ptr<FailingSink> failingSink = std::make_shared<FailingSink>();
+    const std::shared_ptr<core::InMemoryLogSink> memorySink = std::make_shared<core::InMemoryLogSink>();
+
+    (void)logger.add_sink(failingSink);
+    (void)logger.add_sink(memorySink);
+    const core::Status logStatus = logger.log(core::ELogLevel::Critical, "runtime", "fanout");
+
+    context.expect(!logStatus.ok(), "logger should surface the first sink failure");
+    context.expect(failingSink->attempts() == 1, "failing custom sink should be called");
+    context.expect(memorySink->size() == 1, "healthy sink should still receive records after another sink fails");
+}
+#endif
+
+void test_logger_allows_reentrant_sink_logging(TestContext& context)
+{
+    core::Logger logger;
+    const std::shared_ptr<ReentrantSink> reentrantSink = std::make_shared<ReentrantSink>(logger);
+    const std::shared_ptr<core::InMemoryLogSink> memorySink = std::make_shared<core::InMemoryLogSink>();
+
+    (void)logger.add_sink(reentrantSink);
+    (void)logger.add_sink(memorySink);
+
+    const core::Status logStatus = logger.log(core::ELogLevel::Info, "reentrant", "outer");
+    const std::vector<core::LogRecord> records = memorySink->records();
+
+    context.expect(logStatus.ok(), "reentrant sink logging should complete without deadlock");
+    context.expect(reentrantSink->writes() == 2, "reentrant sink should receive outer and nested records");
+    context.expect(records.size() == 2, "healthy sink should receive outer and nested records");
+    context.expect(records.size() == 2 && records[0].message() == "nested",
+                   "nested reentrant record should be dispatched");
+    context.expect(records.size() == 2 && records[1].message() == "outer", "outer record should continue dispatching");
+}
+
+void test_global_logging_reports_missing_initialization(TestContext& context)
+{
+    core::reset_logging();
+
+#if defined(MOLDY_ENABLE_ASSERTS)
+    context.expect(!core::is_logging_initialized(), "logging should be uninitialized after reset");
+#else
+    const core::Status directStatus = core::log_message(core::ELogLevel::Info, "runtime", "dropped");
+    const core::Status macroStatus = MOLDY_LOG_INFO("runtime", "also %s", "dropped");
+
+    context.expect(!core::is_logging_initialized(), "logging should be uninitialized after reset");
+    context.expect(!directStatus.ok(), "direct global logging before initialization should report an error");
+    context.expect(!macroStatus.ok(), "macro logging before initialization should report an error");
+#endif
+}
+
+void test_global_logging_macros_reach_initialized_logger(TestContext& context)
+{
+    core::reset_logging();
+
+    const std::shared_ptr<core::Logger> logger = std::make_shared<core::Logger>();
+    const std::shared_ptr<core::InMemoryLogSink> memorySink = std::make_shared<core::InMemoryLogSink>();
+    (void)logger->add_sink(memorySink);
+
+    {
+        core::ScopedLoggingOverride override{logger};
+        const core::Status status = MOLDY_LOG_WARNING("macro", "%s %d", "captured", 7);
+        const std::vector<core::LogRecord> records = memorySink->records();
+
+        context.expect(status.ok(), "macro logging should report successful dispatch");
+        context.expect(records.size() == 1, "initialized macro logging should reach configured sinks");
+        context.expect(!records.empty() && records.front().category() == "macro",
+                       "macro logging should preserve category");
+        context.expect(!records.empty() && records.front().message() == "captured 7",
+                       "macro logging should format message arguments");
+        context.expect(!records.empty() && !records.front().source_location().empty(),
+                       "macro logging should capture source location");
+    }
+
+    core::reset_logging();
+}
+
+void test_scoped_logging_override_restores_previous_logger(TestContext& context)
+{
+    core::reset_logging();
+
+    const std::shared_ptr<core::Logger> firstLogger = std::make_shared<core::Logger>();
+    const std::shared_ptr<core::Logger> secondLogger = std::make_shared<core::Logger>();
+    const std::shared_ptr<core::InMemoryLogSink> firstSink = std::make_shared<core::InMemoryLogSink>();
+    const std::shared_ptr<core::InMemoryLogSink> secondSink = std::make_shared<core::InMemoryLogSink>();
+    (void)firstLogger->add_sink(firstSink);
+    (void)secondLogger->add_sink(secondSink);
+
+    core::initialize_logging(firstLogger);
+
+    {
+        core::ScopedLoggingOverride override{secondLogger};
+        (void)core::log_message(core::ELogLevel::Info, "runtime", "inside override");
+    }
+
+    (void)core::log_message(core::ELogLevel::Info, "runtime", "after override");
+
+    context.expect(firstSink->size() == 1, "scoped override should restore previous logger");
+    context.expect(secondSink->size() == 1, "scoped override should route logs inside the scope");
+
+    core::reset_logging();
+}
+
+void test_file_log_sink_writes_records(TestContext& context)
+{
+    const std::string_view path = "core_file_sink_test.log";
+    core::FileLogSink fileSink{std::string{path}, false};
+
+    const core::Status openStatus = fileSink.open_status();
+    const core::Status writeStatus = fileSink.write(core::LogRecord{core::ELogLevel::Error, "file", "persisted"});
+
+    std::ifstream input{std::string{path}};
+    std::string content;
+    std::getline(input, content);
+
+    context.expect(openStatus.ok(), "file sink should open a writable test log path");
+    context.expect(writeStatus.ok(), "file sink should write a log record");
+    context.expect(content.find("[error][file] persisted") != std::string::npos,
+                   "file sink should write level, category, and message");
+}
+
+void test_assert_macros_allow_passing_assertions(TestContext& context)
+{
+    const int value = passing_assert_value();
+
+    MOLDY_ASSERT(value == 3);
+    MOLDY_ASSERT_MSG(value != 4, "value should remain %s", "unchanged");
+
+    context.expect(value == 3, "passing assert macros should not change state");
+
+#if !defined(MOLDY_ENABLE_ASSERTS)
+    MOLDY_ASSERT_FAIL("compiled out in non-assert builds");
+    context.expect(true, "assert fail macro should compile out when assertions are disabled");
+#endif
 }
 
 void test_steady_time_helpers(TestContext& context)
@@ -251,6 +555,19 @@ int main()
     test_log_level_names_are_stable(context);
     test_log_record_preserves_fields(context);
     test_log_record_allows_empty_fields(context);
+    test_log_record_formats_for_text_sinks(context);
+    test_memory_sink_variants(context);
+    test_logger_records_to_memory_sink(context);
+    test_logger_filters_by_minimum_level(context);
+#if !defined(MOLDY_ENABLE_ASSERTS)
+    test_logger_fans_out_and_preserves_sink_failures(context);
+#endif
+    test_logger_allows_reentrant_sink_logging(context);
+    test_global_logging_reports_missing_initialization(context);
+    test_global_logging_macros_reach_initialized_logger(context);
+    test_scoped_logging_override_restores_previous_logger(context);
+    test_file_log_sink_writes_records(context);
+    test_assert_macros_allow_passing_assertions(context);
     test_steady_time_helpers(context);
     test_lifecycle_initial_state_is_created(context);
     test_lifecycle_valid_stop_requested_path(context);

@@ -16,7 +16,7 @@ function(configure_project_target target_name)
     )
 
     if(MSVC)
-        target_compile_options(${target_name} PRIVATE /W4 /permissive- /Zc:__cplusplus)
+        target_compile_options(${target_name} PRIVATE /W4 /permissive- /Zc:__cplusplus /Zc:preprocessor)
     else()
         target_compile_options(${target_name} PRIVATE -Wall -Wextra -Wpedantic)
     endif()
@@ -37,9 +37,17 @@ target_sources(core
         BASE_DIRS src/core
         FILES
             src/core/core.cppm
+    PUBLIC
+        FILE_SET HEADERS
+        BASE_DIRS src/core/include
+        FILES
+            src/core/include/moldy/core_macros.hpp
 )
 
 target_compile_definitions(core
+    PUBLIC
+        $<$<CONFIG:Debug>:MOLDY_ENABLE_ASSERTS>
+        $<$<CONFIG:RelWithDebInfo>:MOLDY_ENABLE_ASSERTS>
     PRIVATE
         CORE_BUILD_CONFIGURATION="$<CONFIG>"
         CORE_COMPILER_ID="${CMAKE_CXX_COMPILER_ID}"

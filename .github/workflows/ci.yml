@@ -25,4 +25,4 @@ jobs:
 
       - name: Run quality gate
         shell: pwsh
-        run: ./scripts/check.ps1 -BuildDir build-ci -Configuration Debug
+        run: ./scripts/check.ps1 -BuildDir build-ci

@@ -1,6 +1,6 @@
 param(
     [string]$BuildDir = "build",
-    [string]$Configuration = "Debug"
+    [string[]]$Configuration = @("Debug", "Release")
 )
 
 $ErrorActionPreference = "Stop"
@@ -27,10 +27,15 @@ function Invoke-CheckStep {
     }
 }
 
-Write-Host "Running project checks for $Configuration..."
+if ($Configuration.Count -eq 0) {
+    Write-Host "At least one build configuration is required."
+    exit 1
+}
+
+Write-Host "Running project checks for $($Configuration -join ', ')..."
 
 Invoke-CheckStep -Name "configure" -Action {
-    & (Join-Path $scriptDir "configure.ps1") -BuildDir $BuildDir -Configuration $Configuration
+    & (Join-Path $scriptDir "configure.ps1") -BuildDir $BuildDir -Configuration $Configuration[0]
 }
 
 Invoke-CheckStep -Name "format" -Action {
@@ -41,12 +46,14 @@ Invoke-CheckStep -Name "lint" -Action {
     & (Join-Path $scriptDir "lint.ps1") -BuildDir $BuildDir
 }
 
-Invoke-CheckStep -Name "build" -Action {
-    & (Join-Path $scriptDir "build.ps1") -BuildDir $BuildDir -Configuration $Configuration
-}
+foreach ($currentConfiguration in $Configuration) {
+    Invoke-CheckStep -Name "build ($currentConfiguration)" -Action {
+        & (Join-Path $scriptDir "build.ps1") -BuildDir $BuildDir -Configuration $currentConfiguration
+    }
 
-Invoke-CheckStep -Name "test" -Action {
-    & (Join-Path $scriptDir "test.ps1") -BuildDir $BuildDir -Configuration $Configuration
+    Invoke-CheckStep -Name "test ($currentConfiguration)" -Action {
+        & (Join-Path $scriptDir "test.ps1") -BuildDir $BuildDir -Configuration $currentConfiguration
+    }
 }
 
 Write-Host ""

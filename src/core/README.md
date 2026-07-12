@@ -20,8 +20,24 @@ Available error types:
 Available logging primitives:
 
 - `core::ELogLevel`: stable severity values from `Trace` through `Critical`.
-- `core::LogRecord`: owning log record that preserves level, category, and message data.
+- `core::LogSourceLocation`: owning source-location data captured by logging and assertion macros.
+- `core::LogRecord`: owning log record that preserves level, category, message, steady timestamp, and source-location data.
 - `core::log_level_name(...)`: returns stable lowercase names for log levels.
+- `core::ILogSink`: interface for custom synchronous log sinks.
+- `core::ConsoleLogSink`: synchronous standard-output or standard-error sink with sink-level write serialization.
+- `core::FileLogSink`: synchronous file sink.
+- `core::InMemoryLogSink`: unbounded test-oriented sink, with bounded, ring-buffer, and caller-owned-buffer variants for fixed-capacity storage.
+- `core::Logger`: synchronous logger with minimum-level filtering, mutex-protected sink management, and fan-out dispatch that invokes sink callbacks outside the logger mutex.
+- `core::initialize_logging(...)`, `core::reset_logging()`, `core::current_logger()`, and `core::is_logging_initialized()`: explicit global logger registry lifecycle.
+- `core::log_message(...)`: global logging entry point used by macros; missing initialization is an error and an assertion in assert-enabled builds.
+- `core::ScopedLoggingOverride`: scoped test override for the process-wide logger.
+
+Available macro primitives:
+
+- `MOLDY_LOG_TRACE(category, format, ...)` through `MOLDY_LOG_CRITICAL(category, format, ...)`: printf-style, source-location-capturing logging macros from `<moldy/core_macros.hpp>`.
+- `MOLDY_ASSERT(expr)`, `MOLDY_ASSERT_MSG(expr, format, ...)`, and `MOLDY_ASSERT_FAIL(format, ...)`: assertion macros from `<moldy/core_macros.hpp>`.
+
+Assertions are enabled in `Debug` and `RelWithDebInfo` through `MOLDY_ENABLE_ASSERTS`; `Release` compiles assertion macros out. Failed active assertions report expression/message/source location, attempt to log through initialized core logging, then trap or abort.
 
 Available time primitives:
 
@@ -41,6 +57,6 @@ Available build-information functions:
 - `core::compiler_id()`: reports the compiler identifier supplied by CMake, with a fallback for missing or empty compiler data.
 - `core::language_standard()`: reports the compiler's `__cplusplus` value.
 
-The module interface lives in `core.cppm`. Current implementation units are `build_info.cpp`, `lifecycle.cpp`, `logging.cpp`, `status.cpp`, and `time.cpp`.
+The module interface lives in `core.cppm`. The macro header lives at `include/moldy/core_macros.hpp`. Current implementation units are `build_info.cpp`, `lifecycle.cpp`, `logging.cpp`, `status.cpp`, and `time.cpp`.
 
 Keep this README aligned with the public module interface and current module responsibility. Do not add renderer, platform layer, event loop, ECS, asset, editor, or OS-integration responsibilities here until corresponding source exists.

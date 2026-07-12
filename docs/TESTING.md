@@ -33,7 +33,22 @@ Common output locations:
 
 ## Current Tooling State
 
-The selected quality tools are `clang-format`, `clang-tidy`, and `cppcheck`. `scripts/check.ps1` runs them before build and test steps.
+The selected quality tools are `clang-format`, `clang-tidy`, and `cppcheck`. `scripts/check.ps1` runs them once, then builds and tests both `Debug` and `Release` by default. This covers assertion-enabled behavior and the compiled-out assertion paths in the normal quality gate.
+
+Pass one or more explicit configurations to narrow or extend a run:
+
+```powershell
+.\scripts\check.ps1 -BuildDir build-check -Configuration Debug
+.\scripts\check.ps1 -BuildDir build-check -Configuration Debug,Release,RelWithDebInfo
+```
+
+Core assertions are enabled in `Debug` and `RelWithDebInfo`. `RelWithDebInfo` is the optimized-with-asserts check path:
+
+```powershell
+.\scripts\check.ps1 -BuildDir build-check-relwithdebinfo -Configuration RelWithDebInfo
+```
+
+Failing assertion tests are not run in-process because correct failure behavior terminates the process. The default Debug and Release checks cover passing assertion macros, assert-enabled diagnostics, and compiled-out macro/error-return paths where feasible.
 
 ## Cross-Platform Expectations
 
