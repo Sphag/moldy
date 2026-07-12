@@ -18,23 +18,34 @@ function Invoke-PolicyTest {
     $testPath = Join-Path $testDirectory (($Name -replace "[^a-zA-Z0-9]", "-") + ".psd1")
     Set-Content -LiteralPath $testPath -Value $Manifest -Encoding UTF8
 
+    $validationError = $null
     try {
         $null = Import-ToolchainPolicy -Path $testPath
-        if ($ExpectedMessage) {
-            throw "Expected validation failure containing '$ExpectedMessage'."
-        }
-        Write-Host "PASS: $Name"
-        $script:passed++
     }
     catch {
-        if (-not $ExpectedMessage -or $_.Exception.Message -notlike "*$ExpectedMessage*") {
-            Write-Host "FAIL: $Name - $($_.Exception.Message)"
+        $validationError = $_
+    }
+
+    if ($ExpectedMessage) {
+        if ($null -eq $validationError) {
+            Write-Host "FAIL: $Name - invalid manifest was accepted."
             $script:failed++
             return
         }
-        Write-Host "PASS: $Name"
-        $script:passed++
+        if ($validationError.Exception.Message -notlike "*$ExpectedMessage*") {
+            Write-Host "FAIL: $Name - $($validationError.Exception.Message)"
+            $script:failed++
+            return
+        }
     }
+    elseif ($null -ne $validationError) {
+        Write-Host "FAIL: $Name - $($validationError.Exception.Message)"
+        $script:failed++
+        return
+    }
+
+    Write-Host "PASS: $Name"
+    $script:passed++
 }
 
 New-Item -ItemType Directory -Path $testDirectory | Out-Null
