@@ -53,9 +53,17 @@ This project uses strict code quality expectations even before implementation be
 - `scripts/format.ps1` checks formatting with `clang-format`; pass `-Fix` to rewrite formatting.
 - `scripts/lint.ps1` runs `clang-tidy` and `cppcheck`.
 - `scripts/install-tools.ps1` checks or installs the selected local C++ quality tools on Windows and rejects unhealthy binaries that cannot run the repository probes.
-- `scripts/check.ps1` runs configure, format, and lint once, then builds and tests Debug and Release by default.
+- `scripts/check.ps1` validates the toolchain policy, then runs configure, format, and lint once before building and testing Debug and Release by default.
 
 The selected C++ quality tools are required for the default quality gate. Use `scripts/install-tools.ps1 -Check` to verify local availability and basic tool health before running the full gate.
+
+## Supported Toolchain Policy
+
+`config/toolchain.psd1` is the single source of supported development-tool versions. An `Exact` constraint accepts only its `Version`; a `Range` constraint includes both `MinVersion` and `MaxVersion`. The current policy pins LLVM 19.1.7 and cppcheck, and defines tested ranges for CMake, Ninja, and MSVC. LLVM 19 is required because supported recent MSVC toolsets ship STL headers that reject older Clang-based analysis binaries.
+
+CMake 3.28 remains the minimum version that can interpret the project files. It is not the supported development range, which is recorded separately in the manifest. The supported MSVC range starts at 19.34.0.0, corresponding to Visual Studio 2022 17.4 and the compiler baseline used for CMake C++ module scanning.
+
+When changing supported versions, update the manifest and its documentation together. Confirm the local quality gate and Windows CI before accepting the change, and do not widen a range beyond versions that have passed those checks. Installed-tool version enforcement is intentionally handled separately from this policy definition.
 
 ## Known Local Sandbox Limitation
 

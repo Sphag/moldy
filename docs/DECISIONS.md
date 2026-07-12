@@ -173,3 +173,11 @@ Status: Accepted
 Context: The project targets Windows, macOS, and Linux desktop, but the current GitHub Actions quality gate bootstraps tools through Windows-specific scripts and runner assumptions.
 Decision: Keep the required CI workflow Windows-only for now. Add macOS and Linux jobs only after a cross-platform tool installation strategy exists for CMake, LLVM tools, and cppcheck.
 Consequences: Non-Windows CI remains a feasible follow-up, not a current required gate. Documentation must not imply macOS or Linux CI coverage until those jobs exist.
+
+## 2026-07-12: Record Supported Toolchain Versions In A Data Manifest
+
+Date: 2026-07-12
+Status: Accepted
+Context: Contributors and automation need one machine-readable definition of supported development-tool versions without conflating them with CMake's project-file minimum or immediately enforcing installed binaries. The initial Windows ranges are grounded in the successful PR #16 environment and the [Windows runner image manifest](https://github.com/actions/runner-images/blob/win25-vs2026/20260628.158/images/windows/Windows2025-VS2026-Readme.md); the MSVC floor follows [CMake's documented compiler support for module dependency scanning](https://cmake.org/cmake/help/v3.30/manual/cmake-cxxmodules.7.html).
+Decision: Store schema version 1 of the policy in `config/toolchain.psd1`. Pin clang-format and clang-tidy to LLVM 19.1.7 and cppcheck to 2.21.0. LLVM 18.1.8 was rejected after local validation because clang-tidy could not process the STL headers shipped with supported MSVC 19.44; those headers require Clang 19 or newer. Support inclusive ranges CMake 4.3.4-4.4.0, Ninja 1.12.1-1.13.2, and MSVC 19.34.0.0-19.51.99999.99999. Keep CMake 3.28 as the project-file minimum; MSVC 19.34 corresponds to Visual Studio 2022 17.4 and the minimum compiler baseline for the selected CMake module workflow.
+Consequences: Scripts and future CI checks can consume one validated policy through `Import-ToolchainPolicy`. Exact entries use only `Version`; range entries use inclusive `MinVersion` and `MaxVersion`. Policy changes must update the manifest and documentation together, pass the local gate and Windows CI, and must not widen a supported range without successful verification. Installed-tool version gating remains separate work.

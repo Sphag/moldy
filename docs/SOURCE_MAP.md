@@ -121,7 +121,7 @@ Current checks verify that:
 - `scripts/configure.ps1`: configures the CMake build directory and handles single-config versus multi-config generators.
 - `scripts/build.ps1`: configures, then builds the project for the requested configuration.
 - `scripts/test.ps1`: configures, builds `core_tests`, then runs CTest with failure output enabled.
-- `scripts/check.ps1`: runs configure, format, and lint once, then builds and tests Debug and Release by default.
+- `scripts/check.ps1`: validates the toolchain policy, then runs configure, format, and lint once before building and testing Debug and Release by default.
 - `scripts/format.ps1`: checks C++ formatting with `clang-format`; pass `-Fix` to apply formatting.
 - `scripts/lint.ps1`: runs `clang-tidy` and `cppcheck` over source files, excluding generated build trees.
 - `scripts/install-tools.ps1`: checks required tool availability and health, rejects broken tool binaries, and provides an explicit Windows install path.
