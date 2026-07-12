@@ -181,3 +181,43 @@ Status: Accepted
 Context: Contributors and automation need one machine-readable definition of supported development-tool versions without conflating them with CMake's project-file minimum or immediately enforcing installed binaries. The initial Windows ranges are grounded in the successful PR #16 environment and the [Windows runner image manifest](https://github.com/actions/runner-images/blob/win25-vs2026/20260628.158/images/windows/Windows2025-VS2026-Readme.md); the MSVC floor follows [CMake's documented compiler support for module dependency scanning](https://cmake.org/cmake/help/v3.30/manual/cmake-cxxmodules.7.html).
 Decision: Store schema version 1 of the policy in `config/toolchain.psd1`. Pin clang-format and clang-tidy to LLVM 19.1.7 and cppcheck to 2.21.0. LLVM 18.1.8 was rejected after local validation because clang-tidy could not process the STL headers shipped with supported MSVC 19.44; those headers require Clang 19 or newer. Support inclusive ranges CMake 4.3.4-4.4.0, Ninja 1.12.1-1.13.2, and MSVC 19.34.0.0-19.51.99999.99999. Keep CMake 3.28 as the project-file minimum; MSVC 19.34 corresponds to Visual Studio 2022 17.4 and the minimum compiler baseline for the selected CMake module workflow.
 Consequences: Scripts and future CI checks can consume one validated policy through `Import-ToolchainPolicy`. Exact entries use only `Version`; range entries use inclusive `MinVersion` and `MaxVersion`. Policy changes must update the manifest and documentation together, pass the local gate and Windows CI, and must not widen a supported range without successful verification. Installed-tool version gating remains separate work.
+
+## 2026-07-13: Organize The Roadmap As Four GitHub Tracks
+
+Date: 2026-07-13
+Status: Accepted
+Context: Generic phases no longer express the approved implementation outcomes, dependency gates, or historical groundwork.
+Decision: Organize work under four GitHub track issues and matching milestones: Core Foundations, Rendered Editor Viewport, Editable Persistent Scene, and Advanced Graphics Foundations. GitHub Issues remain canonical; local roadmap and task files summarize outcomes and active links only.
+Consequences: Every task has one track label, one matching milestone, relevant area labels, and explicit issue dependencies. Closed groundwork remains closed in Core Foundations. Nested umbrella #17 owns its #18-#21 checklist and is linked only once from Track 0.
+
+## 2026-07-13: Gate The First Viewport On Minimal Core Contracts
+
+Date: 2026-07-13
+Status: Accepted
+Context: Requiring all diagnostics work before rendering would serialize unrelated work, while starting rendering without stable math, allocation, and instrumentation contracts would create avoidable rework.
+Decision: Gate Track 1 on completion of math tasks #27-#31, allocator contracts #32, and base trace contracts #36. Allow the remaining memory, trace, crash, sanitizer, GPU diagnostic, and editor diagnostic work to proceed in parallel according to issue dependencies.
+Consequences: Track ordering expresses minimum safe prerequisites rather than requiring an entire milestone to close before the next track begins. #15 must finish planning before later trace or crash work relies on asynchronous logging behavior.
+
+## 2026-07-13: Keep Public Contracts Project-Owned And Integrations Behind Adapters
+
+Date: 2026-07-13
+Status: Accepted
+Context: The roadmap names rendering, editor, ECS, serialization, tracing, and vendor diagnostic libraries, but their types and policies must not define public architecture.
+Decision: Own math, allocation, diagnostics, RHI, scene, serialization, and editor contracts in the repository. Keep D3D12MA, DXC, Dear ImGui, EnTT, nlohmann/json, ImGuizmo, Tracy, NVIDIA Aftermath, and AMD GPU Detective behind narrow adapters.
+Consequences: Optional integrations can be enabled, replaced, or omitted without changing consumer contracts. Naming an integration in the roadmap does not approve adding a dependency; dependency, version, licensing, acquisition, and build decisions still require explicit approval during the implementation task.
+
+## 2026-07-13: Use D3D12 And WARP For The First Rendered Viewport
+
+Date: 2026-07-13
+Status: Accepted
+Context: The first rendered editor viewport needs one concrete, testable implementation while the repository continues to target Windows, macOS, and Linux desktop.
+Decision: Implement the first host with Win32 and the first rendering backend with D3D12. Use WARP for repeatable contract and smoke coverage where hardware-specific behavior is not required. Keep platform and RHI contracts backend-neutral.
+Consequences: The first viewport is Windows-first without selecting permanent implementations for macOS or Linux. A future rendering backend requires the evidence and portability criteria tracked by #91 rather than speculative abstraction work now.
+
+## 2026-07-13: Separate Scene Source From Runtime Cache
+
+Date: 2026-07-13
+Status: Accepted
+Context: Editable source needs readable diffs and migrations, while runtime reconstruction needs validated deterministic data.
+Decision: Use a versioned JSON scene source format and compile it into a separate versioned deterministic binary cache. Perform scene open and reconstruction transactionally, preserve stable entity identities, and verify semantic round trips and migrations.
+Consequences: Source files remain reviewable, cache invalidation is explicit, runtime loading does not depend on JSON library types, and editor save failures must preserve the previous durable source.

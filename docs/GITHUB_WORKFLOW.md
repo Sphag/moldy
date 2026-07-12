@@ -107,18 +107,28 @@ Invoke-RestMethod -Uri 'https://api.github.com/repos/Sphag/moldy/actions/runs?pe
 
 ## Issue Tracking
 
-GitHub Issues are the canonical backlog for actionable work. `tasks/current.md` and `tasks/backlog.md` are lightweight local session notes for current focus, recently completed work, and links to active issues.
+GitHub Issues are the canonical source for actionable work, dependencies, acceptance criteria, ordering, and completion state. `docs/ROADMAP.md` summarizes track outcomes and gates; `tasks/current.md` and `tasks/backlog.md` contain only lightweight links.
 
-The Phase 2 issue migration is complete. Do not duplicate full issue descriptions in local task files; update the issue instead and link to it from local notes when useful.
+The roadmap is organized by four track issues:
 
-Created issue set:
+- [#23 Core Math, Memory, and Debuggability Foundations](https://github.com/Sphag/moldy/issues/23)
+- [#24 First Rendered Editor Viewport](https://github.com/Sphag/moldy/issues/24)
+- [#25 Editable and Persistent Scene](https://github.com/Sphag/moldy/issues/25)
+- [#26 Advanced Graphics Foundations](https://github.com/Sphag/moldy/issues/26)
 
-- [#1 Remote Windows CI loop verification](https://github.com/Sphag/moldy/issues/1).
-- [#2 GitHub Issues migration and local task-file slimming](https://github.com/Sphag/moldy/issues/2).
-- [#3 macOS and Linux CI runner feasibility](https://github.com/Sphag/moldy/issues/3).
-- [#4 Core logging primitives](https://github.com/Sphag/moldy/issues/4).
-- [#5 Core time utilities](https://github.com/Sphag/moldy/issues/5).
-- [#6 Application lifecycle primitives](https://github.com/Sphag/moldy/issues/6).
+Each track has a matching milestone and `track:*` label. Every task issue must have exactly one track label, the matching milestone, and any relevant independent `area:*` labels. Track issues contain outcomes, close conditions, ordered linked checklists, and a separate completed-groundwork section; they do not copy task descriptions.
+
+Closed groundwork remains closed and is assigned to the applicable milestone so milestone history includes completed work. Do not reopen completed issues to make roadmap progress appear sequential.
+
+Nested umbrella issues own their child checklists. Track #23 links [#17](https://github.com/Sphag/moldy/issues/17) once; #17 alone maintains the ordered #18-#21 checklist. Do not duplicate nested children in a track checklist because the two progress views can diverge.
+
+When roadmap state changes:
+
+1. Update the task issue and its dependency links first.
+2. Update the owning track checklist if an issue is added, removed, or reordered.
+3. Keep its milestone and single track label aligned.
+4. Update local roadmap or task files only when track outcomes, gates, or active links change.
+5. Preserve completed-groundwork provenance separately from future work.
 
 ## CI Tool Bootstrap
 
