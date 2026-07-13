@@ -221,3 +221,20 @@ Status: Accepted
 Context: Editable source needs readable diffs and migrations, while runtime reconstruction needs validated deterministic data.
 Decision: Use a versioned JSON scene source format and compile it into a separate versioned deterministic binary cache. Perform scene open and reconstruction transactionally, preserve stable entity identities, and verify semantic round trips and migrations.
 Consequences: Source files remain reviewable, cache invalidation is explicit, runtime loading does not depend on JSON library types, and editor save failures must preserve the previous durable source.
+
+## 2026-07-13: Establish Backend-Neutral Math Conventions And Precision Policy
+
+Date: 2026-07-13
+Status: Accepted
+Context: Vector, quaternion, matrix, and geometry APIs need one stable interpretation before their implementation.
+Rendering backends have different clip-space and packing requirements, which must not leak into project-owned math
+contracts.
+Decision: Define the canonical policy in `docs/MATH_CONVENTIONS.md`: right-handed world coordinates with Y up and
+camera forward along negative Z; meters and radians in public APIs; 4 by 4 column-major matrices operating on column
+vectors; `float` as the initial public scalar; explicit numerical tolerances; homogeneous position and direction
+semantics; and right-hand-rule positive rotations. Defer clip-space, depth range, shader packing, and backend
+conversion rules to RHI and backend-adapter work. Add a dependency-free CTest executable that verifies 32-bit `float`
+and IEC 60559 behavior, without introducing math value types.
+Consequences: The policy is binding for the future math sequence and RHI adapters. The current repository gains no
+production math module, public math API, third-party math dependency, or rendering backend requirement. Future
+operations must document their own tolerance choices rather than adopting a global epsilon.

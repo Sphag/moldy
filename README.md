@@ -6,7 +6,7 @@
 
 Moldy is a C++23/CMake codebase for a cross-platform desktop game engine project.
 
-The current repository state is a small, core-first scaffold: a `core` static library, a smoke executable, a plain C++ test executable, and scripted local workflow entry points. Renderer, editor, asset pipeline, platform layer, and concrete engine systems are not implemented yet.
+The current repository state is a small, core-first scaffold: a `core` static library, a smoke executable, plain C++ test executables, and scripted local workflow entry points. Renderer, editor, asset pipeline, platform layer, and concrete engine systems are not implemented yet.
 
 ## Current State
 
@@ -15,6 +15,7 @@ This repository currently provides infrastructure for building and checking a sm
 - `core`: a platform-neutral static library with the current `moldy.core` C++ module API.
 - `smoke`: a minimal executable that links the core library and reports build information.
 - `core_tests`: a plain C++ executable registered with CTest.
+- `math_policy_tests`: a dependency-free CTest executable for the initial `float` toolchain assumptions.
 - `scripts/`: PowerShell entry points for configure, build, test, format, lint, and full local checks.
 
 The repository does not yet contain renderer, editor, asset pipeline, platform layer, runtime system, or concrete 2D/3D engine implementation.
@@ -103,6 +104,7 @@ Remove only generated, ignored build or temporary directories that are no longer
 - [Scripts](scripts/README.md)
 - [Code Quality](docs/CODE_QUALITY.md)
 - [Core Diagnostics Runtime](docs/CORE_DIAGNOSTICS.md)
+- [Math Conventions](docs/MATH_CONVENTIONS.md)
 - [C++ Style](docs/CPP_STYLE.md)
 - [Testing](docs/TESTING.md)
 - [Roadmap](docs/ROADMAP.md)
@@ -113,6 +115,7 @@ Remove only generated, ignored build or temporary directories that are no longer
 - `src/core/`: current platform-neutral `core` library module.
 - `apps/smoke/`: executable used to verify the library links and reports build information.
 - `tests/core/`: plain C++ executable tests for the current core API.
+- `tests/math_policy/`: dependency-free math-policy toolchain checks.
 - `scripts/`: PowerShell workflow entry points.
 - `docs/`: project brief, decisions, source map, testing, style, and workflow documents.
 - `tasks/`: current and future task notes.
