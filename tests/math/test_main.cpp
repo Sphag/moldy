@@ -114,8 +114,7 @@ void test_color(TestContext& context)
 
     const math::rgb linear_red{1.0F, 0.0F, 0.0F};
     const math::color opaque_red{linear_red};
-    context.expect(
-        opaque_red.linear == linear_red && opaque_red.a == 1.0F, "color composes linear RGB with alpha.");
+    context.expect(opaque_red.linear == linear_red && opaque_red.a == 1.0F, "color composes linear RGB with alpha.");
 
     const math::hsv hsv = math::rgb_to_hsv(math::rgb{1.0F, 0.0F, 0.0F});
     context.expect(hsv == math::hsv{0.0F, 1.0F, 1.0F}, "Linear RGB converts red to HSV.");
