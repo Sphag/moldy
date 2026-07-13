@@ -59,7 +59,9 @@ desktop.ini
 
 # Local AI-agent state
 .codex/
-.agents/
+.agents/*
+!.agents/skills/
+!.agents/skills/**
 
 # Archived generated image variants
 /docs/assets/icons/archive-ignored/

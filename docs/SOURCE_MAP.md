@@ -9,6 +9,7 @@ This document maps the current repository scaffold. Keep it factual and update i
 - `apps/smoke/`: small executable used to verify that the core library links and reports build information.
 - `tests/core/`: plain C++ executable tests for the current core API.
 - `scripts/`: PowerShell entry points for configure, build, test, check, format, lint, tool setup, and benchmark placeholder flows.
+- `.agents/skills/`: tracked, portable foundational Agent Skills; other `.agents` local state remains ignored.
 - `.github/pull_request_template.md`: compact pull request description template for agents and humans.
 - `.github/workflows/`: GitHub Actions workflow definitions for pushed branch and pull request validation.
 - `docs/`: project workflow, AI tooling status and adoption, GitHub workflow, quality, style, testing, decisions, architecture, core diagnostics, and source navigation documents.
@@ -129,6 +130,7 @@ Current checks verify that:
 - `scripts/build.ps1`: configures, then builds the project for the requested configuration.
 - `scripts/test.ps1`: configures, builds `core_tests`, then runs CTest with failure output enabled.
 - `scripts/check.ps1`: validates the toolchain policy, then runs configure, format, and lint once before building and testing Debug and Release by default.
+- `scripts/test-agent-skills.ps1`: dependency-free validation and smoke coverage for the repository-owned Agent Skills format and safety contract.
 - `scripts/format.ps1`: checks C++ formatting with `clang-format`; pass `-Fix` to apply formatting.
 - `scripts/lint.ps1`: runs `clang-tidy` and `cppcheck` over source files, excluding generated build trees.
 - `scripts/install-tools.ps1`: checks required tool availability and health, rejects broken tool binaries, and provides an explicit Windows install path.
