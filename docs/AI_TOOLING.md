@@ -30,7 +30,7 @@ There are no `Approved Optional` capabilities in this snapshot. Capabilities mov
 | --- | --- | --- |
 | Repository instructions | `Available` | `AGENTS.md` supplies durable repository rules. The closest applicable instructions and the user's current request control behavior. |
 | GitHub workflow | `Available` | Issues are the canonical backlog, and authenticated GitHub tooling can read or update repository collaboration data when the task authorizes it. Dependencies, commits, branches, pushes, and pull requests retain their explicit approval gates. |
-| Repository PowerShell entry points | `Available` | Existing scripts under `scripts/` provide supported configure, build, test, format, lint, toolchain-check, benchmark-placeholder, and full-check paths. Their checked-in parameters and documentation define the contract. |
+| Repository PowerShell entry points | `Available` | Scripts under `scripts/` provide supported configure, build, test, format, lint, toolchain-check, deterministic AI workflow support, benchmark-placeholder, and full-check paths. Their checked-in parameters and documentation define the contract. |
 | Foundational Agent Skills | `Available` | The ten portable skills in `.agents/skills/` use the open Agent Skills format. They compose repository policy, preserve explicit approval gates, and are validated by `scripts/test-agent-skills.ps1`; Codex is the initial verified host. |
 
 `scripts/check.ps1` is the default full local quality gate. An agent may report that a command is unavailable or blocked, but may not silently substitute an unverified result.
@@ -142,16 +142,16 @@ Candidate existence or upstream maturity does not establish repository trust. Re
 | `scripts/format.ps1` | Check formatting; rewrite only with its explicit fix option. |
 | `scripts/lint.ps1` | Run selected static-analysis tools over scoped source files. |
 | `scripts/check.ps1` | Enforce toolchain policy and run the full local configure, quality, build, and test gate. |
+| `scripts/doctor.ps1` | Report local repository and supported-toolchain readiness without installing tools. |
+| `scripts/context.ps1` | Emit bounded, scoped, redacted tracked-file context with stable text or JSON output. |
+| `scripts/check-changed.ps1` | Run only proven focused checks for documentation or Agent Skills changes; otherwise explicitly defer to `check.ps1`. |
+| `scripts/collect-diagnostics.ps1` | Collect deterministic local failure evidence into an explicit ignored artifact directory without network writes. |
 | `scripts/bench.ps1` | Report the current benchmark-placeholder state; it does not yet provide performance evidence. |
 
 ### Planned Scripts
 
 | Script | Status and issue | Contract |
 | --- | --- | --- |
-| `scripts/doctor.ps1` | `Evaluate`, [#96](https://github.com/Sphag/moldy/issues/96) | Report repository and supported-toolchain readiness without installing tools. |
-| `scripts/context.ps1` | `Evaluate`, [#96](https://github.com/Sphag/moldy/issues/96) | Emit bounded, scoped, redactable repository context with stable machine-readable fields. |
-| `scripts/check-changed.ps1` | `Evaluate`, [#96](https://github.com/Sphag/moldy/issues/96) | Select proven focused checks for changed paths and fall back explicitly to `scripts/check.ps1` when coverage is uncertain. |
-| `scripts/collect-diagnostics.ps1` | `Evaluate`, [#96](https://github.com/Sphag/moldy/issues/96) | Collect deterministic local failure evidence into a scoped, reviewable, redactable artifact without network writes. |
 | `scripts/renderdoc-check.ps1` | `Evaluate`, Track 1 [#99](https://github.com/Sphag/moldy/issues/99) | Inspect an approved offline capture and run deterministic assertions only after MCP admission succeeds. |
 | `scripts/scene-roundtrip.ps1` | `Evaluate`, Track 2 [#100](https://github.com/Sphag/moldy/issues/100) | Compare approved source, cache, migration, and recovery fixtures without mutating originals. |
 | `scripts/bench.ps1` machine-readable baselines | `Evaluate`, Track 3 [#101](https://github.com/Sphag/moldy/issues/101) | Add versioned baseline output and explicit threshold comparison after timing contracts exist. |

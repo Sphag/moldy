@@ -42,6 +42,10 @@ Invoke-CheckStep -Name "Agent Skills" -Action {
     & (Join-Path $scriptDir "test-agent-skills.ps1")
 }
 
+Invoke-CheckStep -Name "AI workflow scripts" -Action {
+    & (Join-Path $scriptDir "test-ai-workflow.ps1")
+}
+
 Invoke-CheckStep -Name "tool availability" -Action {
     & (Join-Path $scriptDir "install-tools.ps1") -Check
 }
