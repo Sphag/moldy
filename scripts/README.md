@@ -4,7 +4,7 @@ PowerShell scripts in this directory are the repository's current local workflow
 
 - `configure.ps1`: configures the CMake build directory.
 - `build.ps1`: configures, then builds the requested configuration.
-- `test.ps1`: configures, builds `core_tests`, then runs CTest.
+- `test.ps1`: configures, builds `core_tests` and `math_policy_tests`, then runs CTest.
 - `check.ps1`: validates the toolchain policy, then runs configure, format, and lint once before building and testing `Debug` and `Release` by default. Pass `-Configuration` with one or more values to select a different set.
 - `format.ps1`: checks C++ formatting with `clang-format`; pass `-Fix` to apply formatting.
 - `lint.ps1`: runs `clang-tidy` and `cppcheck`, excluding generated build trees. Generators with `compile_commands.json` get full clang-tidy coverage; Visual Studio-style generators use module-interface fallback coverage.

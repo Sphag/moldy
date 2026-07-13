@@ -70,3 +70,11 @@ target_link_libraries(core_tests PRIVATE project::core)
 configure_project_target(core_tests)
 
 add_test(NAME core_tests COMMAND core_tests)
+
+add_executable(math_policy_tests
+    tests/math_policy/test_main.cpp
+)
+
+configure_project_target(math_policy_tests)
+
+add_test(NAME math_policy_tests COMMAND math_policy_tests)

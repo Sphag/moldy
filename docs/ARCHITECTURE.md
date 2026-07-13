@@ -8,7 +8,9 @@ This is a living document. It describes current and planned boundaries. Planned 
 
 ## Planned Module Boundaries
 
-- `math`: Project-owned scalar policy, vectors, quaternions, matrices, transforms, and geometry. It remains independent of rendering and third-party math types.
+- `math`: Project-owned scalar policy, vectors, quaternions, matrices, transforms, and geometry. Its binding
+  conventions are defined in [Math Conventions](MATH_CONVENTIONS.md); it remains independent of rendering and
+  third-party math types.
 - `memory`: Allocator contracts, allocation tags, tracking, budgets, and leak reporting. Consumers depend on project-owned allocation contracts rather than a concrete allocator.
 - `diagnostics`: Trace events, breadcrumbs, captures, stacks, crash reports, sanitizers, and shared GPU diagnostic records. Tracy and vendor GPU tools are optional adapters.
 - `platform`: Desktop process, window, input, crash, and operating-system services. Win32 is the first planned host adapter; platform-neutral consumers do not expose Win32 types.
