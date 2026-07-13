@@ -79,6 +79,8 @@ Use [docs/AI_TOOLING.md](AI_TOOLING.md) as the capability inventory and adoption
 
 The foundational `spec`, `plan-eng-review`, `investigate`, `review`, `ship`, `ci-triage`, `dependency-review`, `checkpoint`, `health`, and `document-release` skills are `Available` under issue #95. Their portable instructions live in `.agents/skills/`; use only the skill whose trigger matches the task, and preserve its stated approval and failure boundaries. `scripts/test-agent-skills.ps1` validates their open-format metadata and safety contract. Roadmap-specific GPU capture, scene round-trip, benchmark, render-graph, and performance workflows remain unavailable until their owning track issues are complete.
 
+The deterministic local support scripts from issue #96 are `Available`: use `doctor.ps1` for readiness evidence, `context.ps1` only with explicit safe scope, `check-changed.ps1` only as a conservative selector that preserves `check.ps1` as the full gate, and `collect-diagnostics.ps1` only with an explicit ignored output directory. They do not authorize dependency installation, Git mutation, network writes, automatic fixes, or broader collection.
+
 ## Completion Standard
 
 Prefer `scripts/check.ps1` as the default local verification command once project tooling exists. If checks cannot run, report exactly why.

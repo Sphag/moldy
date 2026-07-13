@@ -37,6 +37,8 @@ The selected quality tools are `clang-format`, `clang-tidy`, and `cppcheck`. `sc
 
 Before probing the native toolchain, `scripts/check.ps1` also runs `scripts/test-agent-skills.ps1`. This dependency-free check validates the approved foundational skill set, their open-format metadata and safety boundaries, and smoke cases for valid content, missing prerequisites, denied approvals, and missing failure reporting.
 
+`scripts/check.ps1` next runs `scripts/test-ai-workflow.ps1`, also before native tool probing. The focused PowerShell tests cover normal JSON output, malformed and outside-repository paths, ignored and generated paths, unsupported encodings, redaction, the 64 KiB content bound, changed-check fallback selection, unsafe diagnostics output, partial diagnostics manifests, and missing-prerequisite classification. The tests create and remove only `temp/workflow-script-tests`, which is ignored.
+
 Pass one or more explicit configurations to narrow or extend a run:
 
 ```powershell
