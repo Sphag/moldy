@@ -13,9 +13,10 @@ Outcome: establish the math, allocation, tracing, crash, sanitizer, and GPU diag
 Existing active work precedes new track tasks:
 
 1. [#17 Pin and enforce the supported development toolchain](https://github.com/Sphag/moldy/issues/17) remains a nested umbrella. Its ordered #18-#21 checklist is maintained only in #17.
-2. [#15 Plan async logging queue](https://github.com/Sphag/moldy/issues/15) remains planning-only. Any implementation requires a separate issue.
+2. [#93 Establish repository AI-assisted engineering workflow](https://github.com/Sphag/moldy/issues/93) is a parallel nested umbrella. Its ordered #94-#98 checklist is maintained only in #93.
+3. [#15 Plan async logging queue](https://github.com/Sphag/moldy/issues/15) remains planning-only. Any implementation requires a separate issue.
 
-Track 1 may begin after the math sequence #27-#31 in [Track 0](https://github.com/Sphag/moldy/issues/23), allocator contracts [#32](https://github.com/Sphag/moldy/issues/32), and base trace contracts [#36](https://github.com/Sphag/moldy/issues/36) are complete. Memory tracking, richer tracing, crash tooling, sanitizers, GPU diagnostics, and editor diagnostic panels may then proceed in parallel according to their issue dependencies.
+Track 1 may begin after the math sequence #27-#31 in [Track 0](https://github.com/Sphag/moldy/issues/23), allocator contracts [#32](https://github.com/Sphag/moldy/issues/32), and base trace contracts [#36](https://github.com/Sphag/moldy/issues/36) are complete. The AI workflow umbrella is required to close Track 0 but is not part of this Track 1 start gate. Memory tracking, richer tracing, crash tooling, sanitizers, GPU diagnostics, editor diagnostic panels, and AI workflow children may proceed in parallel according to their issue dependencies.
 
 Closed issues #1-#6 and #10-#14 are retained in the milestone and listed as completed groundwork in #23. They provide provenance but do not determine the order of new tasks.
 

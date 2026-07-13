@@ -34,6 +34,15 @@ Do not initialize git unless the user explicitly requests it.
 - Follow existing project patterns once they exist.
 - If the requested work conflicts with these instructions, stop and clarify with the user.
 
+## AI Tooling Capability Status
+
+- `docs/AI_TOOLING.md` is the capability inventory and adoption source of truth.
+- Agents may rely only on capabilities marked `Available`.
+- Before using an `Approved Optional` capability, verify that the admitted version and configuration are present; otherwise use its documented fallback.
+- Capabilities marked `Evaluate`, `Deferred`, or `Rejected` must not be presented as installed or used as prerequisites.
+- Planning issues do not approve dependencies, MCP installation or configuration, architecture changes, or actions already covered by Cautious Mode.
+- No skill, script, hook, MCP server, or external integration may bypass repository approval gates.
+
 ## Code Quality
 
 - Code must be readable, consistently formatted, locally coherent, and aligned with existing project patterns.
