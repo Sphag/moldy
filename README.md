@@ -13,8 +13,10 @@ The current repository state is a small, core-first scaffold: a `core` static li
 This repository currently provides infrastructure for building and checking a small C++23 scaffold:
 
 - `core`: a platform-neutral static library with the current `moldy.core` C++ module API.
+- `math`: a standalone static library with dependency-free HLSL-named vectors, square matrices, and linear colors.
 - `smoke`: a minimal executable that links the core library and reports build information.
 - `core_tests`: a plain C++ executable registered with CTest.
+- `math_tests`: a plain C++ CTest executable for the math API.
 - `math_policy_tests`: a dependency-free CTest executable for the initial `float` toolchain assumptions.
 - `scripts/`: PowerShell entry points for configure, build, test, format, lint, and full local checks.
 
@@ -113,8 +115,10 @@ Remove only generated, ignored build or temporary directories that are no longer
 
 - `CMakeLists.txt`: top-level CMake project and target definitions.
 - `src/core/`: current platform-neutral `core` library module.
+- `src/math/`: standalone, dependency-free math library module.
 - `apps/smoke/`: executable used to verify the library links and reports build information.
 - `tests/core/`: plain C++ executable tests for the current core API.
+- `tests/math/`: plain C++ executable tests for the math vector API.
 - `tests/math_policy/`: dependency-free math-policy toolchain checks.
 - `scripts/`: PowerShell workflow entry points.
 - `docs/`: project brief, decisions, source map, testing, style, and workflow documents.

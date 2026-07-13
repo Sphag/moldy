@@ -1,13 +1,13 @@
 # Math Conventions And Precision Policy
 
-This document is the binding, backend-neutral contract for future project math APIs. It applies before vector,
-quaternion, matrix, transform, and geometry value types are introduced. It does not define those APIs.
+This document is the binding, backend-neutral contract for project math APIs. The current math slice implements scalar
+vectors, square matrices, and linear color values; quaternion, transform, and geometry APIs remain future work.
 
 ## Scope
 
 The initial math slice is dependency-free and project-owned. It has no third-party math dependency and no rendering
-backend dependency. Future implementations must follow this policy unless a later accepted decision explicitly
-supersedes it.
+backend dependency. `moldy.math` currently provides HLSL-named vectors, square matrices, and linear colors; future
+implementations must follow this policy unless a later accepted decision explicitly supersedes it.
 
 ## Coordinates And Units
 
@@ -43,6 +43,20 @@ supersedes it.
   documented input range. A comparison must not rely on an implicit project-wide epsilon.
 - A global default epsilon is intentionally not defined. Each future operation that compares computed floating-point
   values must choose and document its tolerance policy.
+- Current vectors, matrices, and colors use exact structural equality only. `normalize(...)` reports an exactly
+  zero-length float vector with an empty result instead of applying a tolerance.
+- Signed integer vector and matrix arithmetic has a no-overflow precondition. Unsigned vector and matrix arithmetic
+  follows the modulo behavior of `uint32_t`.
+
+## Colors
+
+- `math::color` stores normalized linear RGBA values using sRGB primaries. It does not perform implicit color-space
+  conversion.
+- `rgb_to_hsv` returns `hsv` and `rgb_to_hsl` returns `hsl`; their inverse functions accept the corresponding explicit
+  type and return linear RGB `float3`. Hue, saturation, lightness, and value components use the normalized range
+  `[0, 1]`; hue wraps cyclically.
+- `srgb_to_rgb` and `rgb_to_srgb` apply the standard sRGB transfer curve. The sRGB/HSV/HSL helper pairs explicitly
+  decode or encode through linear RGB.
 
 ## Deferred Backend Rules
 
@@ -54,4 +68,5 @@ the future D3D12 work. Backend requirements must not change the public math conv
 
 - [Architecture](ARCHITECTURE.md) describes the planned math boundary.
 - [Decisions](DECISIONS.md) records acceptance of this policy.
-- [Testing](TESTING.md) describes the focused toolchain-assumption test.
+- [Testing](TESTING.md) describes the focused toolchain-assumption and vector tests.
+- [`src/math/README.md`](../src/math/README.md) documents the current public vector API.

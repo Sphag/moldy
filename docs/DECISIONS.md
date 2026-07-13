@@ -238,3 +238,18 @@ and IEC 60559 behavior, without introducing math value types.
 Consequences: The policy is binding for the future math sequence and RHI adapters. The current repository gains no
 production math module, public math API, third-party math dependency, or rendering backend requirement. Future
 operations must document their own tolerance choices rather than adopting a global epsilon.
+
+## 2026-07-13: Use HLSL-Style Project-Owned Math Values
+
+Date: 2026-07-13
+Status: Accepted
+Context: The first math value types need concise names familiar to D3D12 and HLSL users while remaining standalone and
+usable on all target desktop platforms.
+Decision: Publish project-owned `floatN`, `intN`, and `uintN` vectors; matching square matrices; and a separate linear
+RGBA `color` type. Use free math functions and `swizzle<...>` rather than vector member functions or compiler-specific
+anonymous-struct swizzle proxies. Expose direct position, color, and UV component aliases through same-scalar union
+members. Keep RGB/HSL/HSV and sRGB conversions explicit free functions.
+Consequences: The public math API aligns with HLSL naming and keeps composed swizzles portable. Alias fields share
+storage, while full writable swizzles, quaternions, transforms, rectangular matrices, and rendering integration remain
+out of scope. Signed integer arithmetic requires callers to avoid overflow; unsigned operations use `uint32_t` modulo
+behavior.

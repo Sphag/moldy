@@ -6,8 +6,10 @@ This document maps the current repository scaffold. Keep it factual and update i
 
 - `CMakeLists.txt`: top-level CMake project, target definitions, compiler settings, module file set, and test registration.
 - `src/core/`: platform-neutral `core` library module source.
+- `src/math/`: standalone, dependency-free `math` library module source.
 - `apps/smoke/`: small executable used to verify that the core library links and reports build information.
 - `tests/core/`: plain C++ executable tests for the current core API.
+- `tests/math/`: plain C++ executable tests for the current math vector API.
 - `tests/math_policy/`: dependency-free toolchain-assumption test for the documented math policy.
 - `scripts/`: PowerShell entry points for configure, build, test, full and changed checks, formatting, linting, tool setup, deterministic AI workflow support, and benchmark placeholder flows.
 - `.agents/skills/`: tracked, portable foundational Agent Skills; other `.agents` local state remains ignored.
@@ -101,9 +103,15 @@ The current API is intentionally limited to build information, error/result valu
 
 ## Math Policy
 
-`docs/MATH_CONVENTIONS.md` is the binding, backend-neutral contract for the future math API. It establishes
-coordinate, unit, matrix, homogeneous-coordinate, rotation, precision, and comparison rules. It does not add a
-production math library, public math module, or value types.
+`docs/MATH_CONVENTIONS.md` is the binding, backend-neutral contract for the project math API. The current
+`moldy.math` module implements HLSL-named vectors, square matrices, and linear colors; quaternions, transforms, and
+geometry remain outside the implemented scope.
+
+## Math Library
+
+The `math` static library is defined from `src/math/math.cppm` and published to consumers as `project::math`. It
+exports the standalone `moldy.math` C++ module, which provides `floatN`, `intN`, and `uintN` vectors; matching square
+matrices; and linear RGBA colors. The module does not depend on `moldy.core`.
 
 ## Applications
 
@@ -116,6 +124,12 @@ The `core_tests` executable is defined from `tests/core/test_main.cpp`. It links
 The `math_policy_tests` executable is defined from `tests/math_policy/test_main.cpp`. It has no project or
 third-party dependency and is registered with CTest as `math_policy_tests`. It verifies the 32-bit `float` and IEC
 60559 assumptions behind the documented initial scalar policy.
+
+The `math_tests` executable is defined from `tests/math/test_main.cpp`. It links `project::math`, imports
+`moldy.math` independently of `moldy.core`, and is registered with CTest as `math_tests`.
+
+It verifies field aliases, free swizzles, vector and matrix arithmetic, generic constants, linear colors, and explicit
+RGB/HSL/HSV/sRGB conversions.
 
 Current checks verify that:
 
@@ -141,8 +155,8 @@ Current checks verify that:
 
 - `scripts/configure.ps1`: configures the CMake build directory and handles single-config versus multi-config generators.
 - `scripts/build.ps1`: configures, then builds the project for the requested configuration.
-- `scripts/test.ps1`: configures, builds `core_tests` and `math_policy_tests`, then runs CTest with failure output
-  enabled.
+- `scripts/test.ps1`: configures, builds `core_tests`, `math_tests`, and `math_policy_tests`, then runs CTest with
+  failure output enabled.
 - `scripts/check.ps1`: validates the toolchain policy, then runs configure, format, and lint once before building and testing Debug and Release by default.
 - `scripts/test-agent-skills.ps1`: dependency-free validation and smoke coverage for the repository-owned Agent Skills format and safety contract.
 - `scripts/test-ai-workflow.ps1`: dependency-free focused coverage for deterministic AI workflow script validation, fallback, redaction, output bounds, and partial collection behavior.
@@ -156,8 +170,11 @@ Current checks verify that:
 
 - `core`: static library built as C++23 with a public `CXX_MODULES` file set.
 - `project::core`: alias target for consumers of `core`.
+- `math`: standalone static library built as C++23 with a public `CXX_MODULES` file set.
+- `project::math`: alias target for consumers of `math`.
 - `smoke`: executable linked against `project::core`.
 - `core_tests`: executable linked against `project::core` and registered as the current CTest test.
+- `math_tests`: executable linked against `project::math` and registered as the current CTest test.
 - `math_policy_tests`: dependency-free executable that validates initial `float` toolchain assumptions and is
   registered with CTest.
 
