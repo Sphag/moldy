@@ -38,6 +38,10 @@ Invoke-CheckStep -Name "toolchain policy" -Action {
     & (Join-Path $scriptDir "test-toolchain-policy.ps1")
 }
 
+Invoke-CheckStep -Name "tool availability" -Action {
+    & (Join-Path $scriptDir "install-tools.ps1") -Check
+}
+
 Invoke-CheckStep -Name "configure" -Action {
     & (Join-Path $scriptDir "configure.ps1") -BuildDir $BuildDir -Configuration $Configuration[0]
 }

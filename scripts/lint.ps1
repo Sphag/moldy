@@ -53,6 +53,39 @@ $clangTidyFiles = @(
         Where-Object { $_.Extension.ToLowerInvariant() -in @(".cc", ".cpp", ".cxx", ".ixx", ".cppm") }
 )
 
+function Initialize-MsvcDeveloperEnvironment {
+    if ($env:OS -ne "Windows_NT" -or $env:INCLUDE) {
+        return
+    }
+
+    $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
+    if (-not (Test-Path -LiteralPath $vswhere -PathType Leaf)) {
+        return
+    }
+
+    $installationPath = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($installationPath)) {
+        return
+    }
+
+    $vsDevCmd = Join-Path $installationPath.Trim() "Common7\Tools\VsDevCmd.bat"
+    if (-not (Test-Path -LiteralPath $vsDevCmd -PathType Leaf)) {
+        return
+    }
+
+    Write-Host "Loading the MSVC developer environment for clang-tidy fallback."
+    $environmentLines = & cmd.exe /d /s /c "`"$vsDevCmd`" -no_logo -arch=x64 && set"
+    if ($LASTEXITCODE -ne 0) {
+        throw "VsDevCmd failed with exit code $LASTEXITCODE."
+    }
+
+    foreach ($line in $environmentLines) {
+        if ($line -match "^([^=]+)=(.*)$") {
+            [Environment]::SetEnvironmentVariable($matches[1], $matches[2], "Process")
+        }
+    }
+}
+
 if (Test-Path -LiteralPath $compileCommands) {
     Write-Host "Running clang-tidy on $($clangTidyFiles.Count) translation unit(s)."
     foreach ($sourceFile in $clangTidyFiles) {
@@ -67,6 +100,7 @@ else {
     Write-Host "compile_commands.json was not found in '$resolvedBuildDir'."
     Write-Host "Running clang-tidy fallback on $($moduleInterfaceFiles.Count) module interface file(s) with explicit C++23 args."
     Write-Host "Use a CMake generator that exports compile_commands.json for full clang-tidy coverage."
+    Initialize-MsvcDeveloperEnvironment
 
     foreach ($sourceFile in $moduleInterfaceFiles) {
         & $clangTidy.Source $sourceFile.FullName -- -std=c++23
