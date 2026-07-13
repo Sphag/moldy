@@ -22,14 +22,14 @@ Statuses describe repository support, not whether a product exists elsewhere.
 | `Deferred` | Potentially useful later, but current contracts, artifacts, maturity, or roadmap timing are insufficient. | Use the documented native or manual path and revisit only through a new decision. |
 | `Rejected` | Deliberately excluded because it duplicates trusted local capability or has an unacceptable trust-to-value ratio. | Do not install or route work through it without reopening the decision. |
 
-There are no `Approved Optional` capabilities in this snapshot. Capabilities move between statuses only when their issue records evidence, documentation, failure behavior, and rollback.
+The Microsoft Learn MCP is the single `Approved Optional` capability in this snapshot; its narrow, unconfigured boundary and fail-closed prerequisites are recorded in [MCP Admission Record](MCP_ADMISSION.md). Capabilities move between statuses only when their issue records evidence, documentation, failure behavior, and rollback.
 
 ## Current Guaranteed Capabilities
 
 | Capability | Status | Guaranteed boundary |
 | --- | --- | --- |
 | Repository instructions | `Available` | `AGENTS.md` supplies durable repository rules. The closest applicable instructions and the user's current request control behavior. |
-| GitHub workflow | `Available` | Issues are the canonical backlog, and authenticated GitHub tooling can read or update repository collaboration data when the task authorizes it. Dependencies, commits, branches, pushes, and pull requests retain their explicit approval gates. |
+| GitHub workflow | `Available` | Issues are the canonical backlog, and authenticated GitHub tooling may access repository collaboration data within its admitted boundary. Read operations are distinct from consequential GitHub writes; dependencies, commits, branches, pushes, pull requests, and other writes retain their explicit approval gates. See [MCP Admission Record](MCP_ADMISSION.md#current-github-integration). |
 | Repository PowerShell entry points | `Available` | Scripts under `scripts/` provide supported configure, build, test, format, lint, toolchain-check, deterministic AI workflow support, benchmark-placeholder, and full-check paths. Their checked-in parameters and documentation define the contract. |
 | Foundational Agent Skills | `Available` | The ten portable skills in `.agents/skills/` use the open Agent Skills format. They compose repository policy, preserve explicit approval gates, and are validated by `scripts/test-agent-skills.ps1`; Codex is the initial verified host. |
 
@@ -94,27 +94,16 @@ Skills compose `AGENTS.md`, `docs/AI_WORKFLOW.md`, and existing scripts. They do
 
 ## MCP Admission Policy
 
-An MCP server may move from `Evaluate` to `Approved Optional` or `Available` only after its issue records all of the following:
+[MCP Admission Record](MCP_ADMISSION.md) is the reusable evidence template and baseline decision record. It requires provenance, license, version/integrity, transport, permissions, data exposure, bounded smoke evidence, rollback, owner, and status; missing evidence fails closed. It also records the current GitHub integration and the narrow Microsoft Learn exception.
 
-1. Provenance: canonical source, maintainers, release process, and repository ownership.
-2. License: server, bundled runtime, SDK, and transitive license compatibility.
-3. Pinning: exact audited version or commit, integrity evidence, update owner, and review cadence.
-4. Permissions: every exposed resource and tool, read/write/process/debugger surface, and least-privilege defaults.
-5. Transport: local stdio preferred; loopback explicitly bound and authenticated where relevant; remote endpoints justified separately.
-6. Credentials: acquisition, storage, scoping, expiry, rotation, revocation, and log redaction.
-7. Data exposure: source, paths, environment, prompts, repository metadata, captures, dumps, symbols, and generated exports.
-8. Abuse resistance: prompt-injection boundaries, path traversal tests, arbitrary-command handling, output limits, and timeouts.
-9. Smoke test: pinned fixture, expected calls, denied calls, malformed input, unavailable server, and deterministic result checks.
-10. Rollback: disable procedure, configuration removal, process cleanup, artifact cleanup, and native fallback.
-
-Installation, dependency changes, credential changes, and repository configuration still require explicit approval at implementation time. Admission never grants blanket auto-approval to server tools.
+Installation, dependency changes, credential changes, host or repository configuration, and consequential server-tool invocations still require explicit approval at implementation time. Admission never grants blanket auto-approval to server tools.
 
 ## MCP Candidate Matrix
 
 | Candidate | Status | Intended boundary and decision |
 | --- | --- | --- |
-| Current GitHub integration | `Available` | Repository, issue, pull-request, and CI collaboration within authenticated permissions and repository approval gates. [#97](https://github.com/Sphag/moldy/issues/97) will record the current read/write boundary, smoke test, and rollback rather than replace a working integration. |
-| Microsoft Learn MCP | `Evaluate` | Read-only official documentation lookup for Win32, D3D12, DXC, and PIX through the Microsoft endpoint. [#97](https://github.com/Sphag/moldy/issues/97) must verify remote transport, returned links/content, output bounds, and fallback to official web documentation. |
+| Current GitHub integration | `Available` | Repository, issue, pull-request, and CI metadata access within authenticated permissions. Its observed read-only smoke evidence, data boundary, write approval gates, and host-level rollback are in [MCP Admission Record](MCP_ADMISSION.md#current-github-integration). |
+| Microsoft Learn MCP | `Approved Optional` | Public official-documentation search, fetch, and sample retrieval only, through the exact Streamable HTTP endpoint. It is unconfigured, requires explicit opt-in approval before configuration or smoke connection, and otherwise falls back to official web documentation. See [MCP Admission Record](MCP_ADMISSION.md#microsoft-learn-mcp). |
 | LLVM LLDB MCP | `Evaluate` | Prefer the official LLDB implementation after the supported LLVM toolchain includes it. [#98](https://github.com/Sphag/moldy/issues/98) starts with offline core/crash artifacts; its broad `lldb_command` surface prevents blanket approval. |
 | `mcp-windbg` | `Evaluate` | Community Windows CDB/WinDbg wrapper evaluated by [#98](https://github.com/Sphag/moldy/issues/98), beginning with offline dumps, scoped source/symbol paths, pinned code, redaction, and no arbitrary live-debug approval. |
 | Microsoft DebugMCP | `Evaluate` (optional candidate) | Local VS Code debugger integration evaluated by [#98](https://github.com/Sphag/moldy/issues/98). Loopback only; process launch/control and expression evaluation require narrow approval and are not the first-use case. |
@@ -166,7 +155,7 @@ Support scripts must use stable exit behavior, bounded output, path validation, 
 | [#94 Document AI tooling capabilities and adoption roadmap](https://github.com/Sphag/moldy/issues/94) | Track 0 | This capability inventory, blueprint, navigation, and linked roadmap metadata. |
 | [#95 Add foundational repository Agent Skills](https://github.com/Sphag/moldy/issues/95) | Track 0 | Foundational portable skills after the documentation contract. |
 | [#96 Add deterministic AI workflow support scripts](https://github.com/Sphag/moldy/issues/96) | Track 0 | Deterministic local context, changed-check, readiness, and diagnostic helpers. |
-| [#97 Establish MCP admission and baseline integrations](https://github.com/Sphag/moldy/issues/97) | Track 0 | Admission policy evidence, current GitHub boundary, and Microsoft Learn evaluation. |
+| [#97 Establish MCP admission and baseline integrations](https://github.com/Sphag/moldy/issues/97) | Track 0 | Admission record, current GitHub boundary, and the narrow Microsoft Learn `Approved Optional` exception. |
 | [#98 Evaluate native debugger and crash-analysis MCP integrations](https://github.com/Sphag/moldy/issues/98) | Track 0 | LLDB, WinDbg, and DebugMCP evaluation after toolchain, crash, dump, and symbol prerequisites. |
 | [#99 Add AI-assisted GPU capture and graphics-debugging workflow](https://github.com/Sphag/moldy/issues/99) | Track 1 | Final tooling slice after #66, based on the stable #63 fixture. |
 | [#100 Add AI-assisted scene determinism and migration triage workflow](https://github.com/Sphag/moldy/issues/100) | Track 2 | Final tooling slice after #80 and approved scene contracts. |
@@ -210,6 +199,8 @@ These choices preserve the useful workflow decomposition while keeping the repos
 - Verification: prefer deterministic repository scripts and versioned fixtures. Record toolchain, configuration, platform, hardware, driver, and artifact identity when results depend on them.
 - Failure behavior: fail closed on missing capabilities, denied permissions, version drift, unknown schemas, unsafe paths, incompatible artifacts, and incomplete evidence. Report skipped checks explicitly.
 - Rollback: every optional integration must have a documented disable path and a native or manual fallback before adoption.
+
+The integration-specific transport, sensitive-data, smoke, and rollback boundaries are maintained in [MCP Admission Record](MCP_ADMISSION.md).
 
 ## External Sources
 

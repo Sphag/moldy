@@ -69,13 +69,15 @@ Verification:
 
 ## Capability-Aware Routing
 
-Use [docs/AI_TOOLING.md](AI_TOOLING.md) as the capability inventory and adoption blueprint.
+Use [docs/AI_TOOLING.md](AI_TOOLING.md) as the capability inventory and adoption blueprint. Use [docs/MCP_ADMISSION.md](MCP_ADMISSION.md) for the MCP evidence record, admitted boundaries, and rollback instructions.
 
 1. Route work through repository instructions and `Available` scripts or integrations first.
 2. Before using an `Approved Optional` capability, verify its admitted version, configuration, permissions, and task-specific prerequisites. Use the documented fallback when it is absent.
 3. Treat `Evaluate` capabilities as plans, not installed tools. Work on them only through their implementation or evaluation issue.
 4. Do not use `Deferred` or `Rejected` capabilities unless a new decision explicitly changes their status.
 5. Preserve cautious-mode approvals regardless of capability status.
+
+`Approved Optional` does not authorize installation, configuration, connection, or tool use. For Microsoft Learn MCP specifically, verify the exact endpoint and admitted boundary, obtain separate explicit approval before host/client configuration or a smoke connection, and otherwise use official web documentation.
 
 The foundational `spec`, `plan-eng-review`, `investigate`, `review`, `ship`, `ci-triage`, `dependency-review`, `checkpoint`, `health`, and `document-release` skills are `Available` under issue #95. Their portable instructions live in `.agents/skills/`; use only the skill whose trigger matches the task, and preserve its stated approval and failure boundaries. `scripts/test-agent-skills.ps1` validates their open-format metadata and safety contract. Roadmap-specific GPU capture, scene round-trip, benchmark, render-graph, and performance workflows remain unavailable until their owning track issues are complete.
 
