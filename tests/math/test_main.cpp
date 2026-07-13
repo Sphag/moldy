@@ -112,35 +112,44 @@ void test_color(TestContext& context)
     context.expect(math::colors::red == math::color{1.0F, 0.0F, 0.0F, 1.0F},
                    "Named color constants are linear RGBA values.");
 
-    const math::rgb linear_red{1.0F, 0.0F, 0.0F};
-    const math::color opaque_red{linear_red};
-    context.expect(opaque_red.linear == linear_red && opaque_red.a == 1.0F, "color composes linear RGB with alpha.");
+    const math::color opaque_red{1.0F, 0.0F, 0.0F, 1.0F};
+    context.expect(opaque_red.r == 1.0F && opaque_red.g == 0.0F && opaque_red.b == 0.0F && opaque_red.a == 1.0F,
+                   "color stores RGBA channels directly.");
 
-    const math::hsv hsv = math::rgb_to_hsv(math::rgb{1.0F, 0.0F, 0.0F});
-    context.expect(hsv == math::hsv{0.0F, 1.0F, 1.0F}, "Linear RGB converts red to HSV.");
-    const math::hsl hsl = math::rgb_to_hsl(math::rgb{1.0F, 0.0F, 0.0F});
-    context.expect(hsl == math::hsl{0.0F, 1.0F, 0.5F}, "Linear RGB converts red to HSL.");
+    const math::color hsv = math::rgb_to_hsv(opaque_red);
+    context.expect(hsv == math::color{0.0F, 1.0F, 1.0F, 1.0F}, "Linear RGB converts red to HSV.");
+    const math::color hsl = math::rgb_to_hsl(opaque_red);
+    context.expect(hsl == math::color{0.0F, 1.0F, 0.5F, 1.0F}, "Linear RGB converts red to HSL.");
 
-    const math::rgb original{0.25F, 0.5F, 0.75F};
-    const math::rgb hsv_round_trip = math::hsv_to_rgb(math::rgb_to_hsv(original));
-    const math::rgb hsl_round_trip = math::hsl_to_rgb(math::rgb_to_hsl(original));
-    const math::rgb srgb_round_trip = math::rgb_to_srgb(math::srgb_to_rgb(math::rgb_to_srgb(original)));
+    const math::color original{0.25F, 0.5F, 0.75F, 0.8F};
+    const math::color hsv_round_trip = math::hsv_to_rgb(math::rgb_to_hsv(original));
+    const math::color hsl_round_trip = math::hsl_to_rgb(math::rgb_to_hsl(original));
+    const math::color srgb_round_trip = math::rgb_to_srgb(math::srgb_to_rgb(math::rgb_to_srgb(original)));
     constexpr float tolerance = 0.0001F;
     context.expect_near(hsv_round_trip.r, original.r, tolerance, "HSV round trip preserves red within test tolerance.");
     context.expect_near(hsv_round_trip.g, original.g, tolerance,
                         "HSV round trip preserves green within test tolerance.");
     context.expect_near(hsv_round_trip.b, original.b, tolerance,
                         "HSV round trip preserves blue within test tolerance.");
+    context.expect_near(hsv_round_trip.a, original.a, tolerance,
+                        "HSV round trip preserves alpha within test tolerance.");
     context.expect_near(hsl_round_trip.r, original.r, tolerance, "HSL round trip preserves red within test tolerance.");
     context.expect_near(hsl_round_trip.g, original.g, tolerance,
                         "HSL round trip preserves green within test tolerance.");
     context.expect_near(hsl_round_trip.b, original.b, tolerance,
                         "HSL round trip preserves blue within test tolerance.");
+    context.expect_near(hsl_round_trip.a, original.a, tolerance,
+                        "HSL round trip preserves alpha within test tolerance.");
     context.expect_near(srgb_round_trip.r, math::rgb_to_srgb(original).r, tolerance,
                         "sRGB transfer round trip preserves red within test tolerance.");
+    context.expect_near(srgb_round_trip.g, math::rgb_to_srgb(original).g, tolerance,
+                        "sRGB transfer round trip preserves green within test tolerance.");
+    context.expect_near(srgb_round_trip.b, math::rgb_to_srgb(original).b, tolerance,
+                        "sRGB transfer round trip preserves blue within test tolerance.");
+    context.expect_near(srgb_round_trip.a, original.a, tolerance,
+                        "sRGB transfer round trip preserves alpha within test tolerance.");
 }
 
-static_assert(std::is_trivially_copyable_v<math::rgb>);
 static_assert(std::is_trivially_copyable_v<math::color>);
 static_assert(std::is_trivially_copyable_v<math::float4>);
 static_assert(std::is_trivially_copyable_v<math::int4>);

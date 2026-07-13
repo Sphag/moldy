@@ -1,12 +1,12 @@
 # Math Conventions And Precision Policy
 
 This document is the binding, backend-neutral contract for project math APIs. The current math slice implements scalar
-vectors, square matrices, linear RGB values, and colors with alpha; quaternion, transform, and geometry APIs remain future work.
+vectors, square matrices, and a single color type for linear RGBA values; quaternion, transform, and geometry APIs remain future work.
 
 ## Scope
 
 The initial math slice is dependency-free and project-owned. It has no third-party math dependency and no rendering
-backend dependency. `moldy.math` currently provides HLSL-named vectors, square matrices, linear RGB values, and colors with alpha; future
+backend dependency. `moldy.math` currently provides HLSL-named vectors, square matrices, and a single color type for linear RGBA values; future
 implementations must follow this policy unless a later accepted decision explicitly supersedes it.
 
 ## Coordinates And Units
@@ -50,13 +50,9 @@ implementations must follow this policy unless a later accepted decision explici
 
 ## Colors
 
-- `math::rgb` stores normalized linear RGB values using sRGB primaries. `math::color` composes `rgb` with alpha; neither
-  type performs implicit color-space conversion.
-- `rgb_to_hsv` returns `hsv` and `rgb_to_hsl` returns `hsl`; their inverse functions accept the corresponding explicit
-  type and return linear `rgb`. Hue, saturation, lightness, and value components use the normalized range
-  `[0, 1]`; hue wraps cyclically.
-- `srgb_to_rgb` and `rgb_to_srgb` apply the standard sRGB transfer curve. The sRGB/HSV/HSL helper pairs explicitly
-  decode or encode through linear RGB.
+- `math::color` stores linear RGBA values. The RGB channels use sRGB primaries, and alpha is an independent passthrough channel.
+- `rgb_to_hsv`, `hsv_to_rgb`, `rgb_to_hsl`, `hsl_to_rgb`, `srgb_to_rgb`, and `rgb_to_srgb` operate on `math::color` and preserve alpha.
+- `srgb_to_rgb` and `rgb_to_srgb` apply the standard sRGB transfer curve to the RGB channels only.
 
 ## Deferred Backend Rules
 

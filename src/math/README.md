@@ -22,10 +22,10 @@ Vector and matrix arithmetic is provided by operators and free functions: `dot(.
 exactly zero float vector. Scalar division requires a non-zero scalar. Signed integer arithmetic must not overflow;
 unsigned arithmetic follows `uint32_t` modulo behavior.
 
-`zero<T>`, vector `one<T>`, and matrix `identity<T>` provide generic compile-time constants. `rgb` is a linear RGB
-value type, while `color` composes linear `rgb` with alpha; named colors are in `math::colors`. `hsv` and `hsl`
-explicitly represent hue/saturation/value and hue/saturation/lightness values. RGB-to-HSV/HSL and sRGB transfer
-functions are free functions. RGB uses sRGB primaries, and only `srgb_*` functions apply the sRGB transfer curve.
+`zero<T>`, vector `one<T>`, and matrix `identity<T>` provide generic compile-time constants. `color` is the
+project-owned RGBA value type; RGB, HSV, HSL, and sRGB conversions are explicit free functions that use `color` as the
+shared storage carrier and preserve alpha. Named colors live in `math::colors`. RGB channels use sRGB primaries, and
+only `srgb_*` functions apply the sRGB transfer curve.
 
 Quaternions, transforms, rectangular matrices, global comparison tolerances, rendering integration, and third-party
 math libraries are outside this module's current scope.
