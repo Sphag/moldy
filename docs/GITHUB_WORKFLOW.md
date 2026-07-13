@@ -38,7 +38,9 @@ Run the local quality gate before pushing when feasible:
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts\check.ps1 -BuildDir build-check
 ```
 
-In restricted sandbox sessions, CMake or MSBuild may fail with local file access errors while normal terminals work. Treat those as local environment blockers, not CI results.
+`scripts/check.ps1` verifies required local analysis tools before it configures or runs checks. On Windows, its `clang-tidy` fallback loads the installed MSVC developer environment when necessary so module interface analysis receives the standard-library include paths.
+
+In restricted sandbox sessions, CMake or MSBuild may fail with local file access errors while normal terminals work. Re-run the same command in a normal terminal or approved command context before treating that as a local environment blocker. A green remote CI result does not replace a failing reproducible local check.
 
 ## Remote CI Loop
 
@@ -54,6 +56,17 @@ Expected loop:
 6. Fix only the observed root cause.
 7. Re-run the relevant local check.
 8. Push the follow-up commit after explicit approval.
+
+## Pull Request Readiness
+
+Open or keep a pull request as a draft while scoped implementation, review, or verification work remains. An agent should mark it ready for review when all of these are true:
+
+- The requested scope is complete and the agent does not anticipate another follow-up from its own review.
+- `git diff --check` is clean and the local quality gate passes in a normal or approved command context.
+- Required GitHub Actions checks for the current head commit are successful.
+- The PR description is current and follows `.github/pull_request_template.md`.
+
+If the local quality gate fails, investigate and fix the root cause, then re-run it. Do not leave the PR in draft solely because remote CI is green, and do not mark it ready while a reproducible local check is failing.
 
 ## Pull Request Descriptions
 

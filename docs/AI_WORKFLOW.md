@@ -67,15 +67,17 @@ Verification:
 - Known checks that are intentionally skipped:
 ```
 
-## Skill Usage
+## Capability-Aware Routing
 
-- Use `plan-eng-review` for architecture planning and architecture review.
-- Use `investigate` for bugs, regressions, and root-cause work.
-- Use `review` for diff and code review before landing meaningful changes.
-- Use `health` for periodic quality checks.
-- Use `benchmark` once performance-sensitive systems exist.
-- Use `checkpoint` after long sessions or before switching context.
-- Use `document-release` after completed subsystems need documentation updates.
+Use [docs/AI_TOOLING.md](AI_TOOLING.md) as the capability inventory and adoption blueprint.
+
+1. Route work through repository instructions and `Available` scripts or integrations first.
+2. Before using an `Approved Optional` capability, verify its admitted version, configuration, permissions, and task-specific prerequisites. Use the documented fallback when it is absent.
+3. Treat `Evaluate` capabilities as plans, not installed tools. Work on them only through their implementation or evaluation issue.
+4. Do not use `Deferred` or `Rejected` capabilities unless a new decision explicitly changes their status.
+5. Preserve cautious-mode approvals regardless of capability status.
+
+The foundational `spec`, `plan-eng-review`, `investigate`, `review`, `ship`, `ci-triage`, `dependency-review`, `checkpoint`, `health`, and `document-release` skills are currently `Evaluate` under issue #95. Until they become available, follow the equivalent working loop in this document and use existing scripts directly. Roadmap-specific GPU capture, scene round-trip, benchmark, render-graph, and performance workflows are also unavailable until their owning track issues are complete.
 
 ## Completion Standard
 

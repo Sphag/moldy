@@ -97,6 +97,7 @@ Remove only generated, ignored build or temporary directories that are no longer
 - [Decisions](docs/DECISIONS.md)
 - [Source Map](docs/SOURCE_MAP.md)
 - [AI Workflow](docs/AI_WORKFLOW.md)
+- [AI Tooling](docs/AI_TOOLING.md)
 - [GitHub Workflow](docs/GITHUB_WORKFLOW.md)
 - [Scripts](scripts/README.md)
 - [Code Quality](docs/CODE_QUALITY.md)
