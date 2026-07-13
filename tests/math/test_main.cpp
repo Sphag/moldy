@@ -112,15 +112,20 @@ void test_color(TestContext& context)
     context.expect(math::colors::red == math::color{1.0F, 0.0F, 0.0F, 1.0F},
                    "Named color constants are linear RGBA values.");
 
-    const math::hsv hsv = math::rgb_to_hsv(math::float3{1.0F, 0.0F, 0.0F});
+    const math::rgb linear_red{1.0F, 0.0F, 0.0F};
+    const math::color opaque_red{linear_red};
+    context.expect(opaque_red.linear == linear_red && opaque_red.a == 1.0F,
+                   "color composes linear RGB with alpha.");
+
+    const math::hsv hsv = math::rgb_to_hsv(math::rgb{1.0F, 0.0F, 0.0F});
     context.expect(hsv == math::hsv{0.0F, 1.0F, 1.0F}, "Linear RGB converts red to HSV.");
-    const math::hsl hsl = math::rgb_to_hsl(math::float3{1.0F, 0.0F, 0.0F});
+    const math::hsl hsl = math::rgb_to_hsl(math::rgb{1.0F, 0.0F, 0.0F});
     context.expect(hsl == math::hsl{0.0F, 1.0F, 0.5F}, "Linear RGB converts red to HSL.");
 
-    const math::float3 original{0.25F, 0.5F, 0.75F};
-    const math::float3 hsv_round_trip = math::hsv_to_rgb(math::rgb_to_hsv(original));
-    const math::float3 hsl_round_trip = math::hsl_to_rgb(math::rgb_to_hsl(original));
-    const math::float3 srgb_round_trip = math::rgb_to_srgb(math::srgb_to_rgb(math::rgb_to_srgb(original)));
+    const math::rgb original{0.25F, 0.5F, 0.75F};
+    const math::rgb hsv_round_trip = math::hsv_to_rgb(math::rgb_to_hsv(original));
+    const math::rgb hsl_round_trip = math::hsl_to_rgb(math::rgb_to_hsl(original));
+    const math::rgb srgb_round_trip = math::rgb_to_srgb(math::srgb_to_rgb(math::rgb_to_srgb(original)));
     constexpr float tolerance = 0.0001F;
     context.expect_near(hsv_round_trip.r, original.r, tolerance, "HSV round trip preserves red within test tolerance.");
     context.expect_near(hsv_round_trip.g, original.g, tolerance,
@@ -136,6 +141,8 @@ void test_color(TestContext& context)
                         "sRGB transfer round trip preserves red within test tolerance.");
 }
 
+static_assert(std::is_trivially_copyable_v<math::rgb>);
+static_assert(std::is_trivially_copyable_v<math::color>);
 static_assert(std::is_trivially_copyable_v<math::float4>);
 static_assert(std::is_trivially_copyable_v<math::int4>);
 static_assert(std::is_trivially_copyable_v<math::uint4>);

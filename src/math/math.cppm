@@ -106,17 +106,26 @@ export {
     MOLDY_DEFINE_VECTOR3(uint3, uint);
     MOLDY_DEFINE_VECTOR4(uint4, uint);
 
-    // NOLINTBEGIN(readability-identifier-naming): HLSL-style public type name.
-    struct color
+    // NOLINTBEGIN(readability-identifier-naming): HLSL-style public type names.
+    struct rgb
     {
         float r{0.0F};
         float g{0.0F};
         float b{0.0F};
+
+        constexpr rgb() noexcept = default;
+        constexpr rgb(float red, float green, float blue) noexcept : r(red), g(green), b(blue) {}
+    };
+
+    struct color
+    {
+        rgb linear{};
         float a{0.0F};
 
         constexpr color() noexcept = default;
+        constexpr color(rgb linear_rgb, float alpha = 1.0F) noexcept : linear(linear_rgb), a(alpha) {}
         constexpr color(float red, float green, float blue, float alpha = 1.0F) noexcept
-            : r(red), g(green), b(blue), a(alpha)
+            : color(rgb{red, green, blue}, alpha)
         {
         }
     };
@@ -341,9 +350,14 @@ export {
         }
     }
 
+    [[nodiscard]] constexpr bool operator==(const rgb& left, const rgb& right) noexcept
+    {
+        return left.r == right.r && left.g == right.g && left.b == right.b;
+    }
+
     [[nodiscard]] constexpr bool operator==(const color& left, const color& right) noexcept
     {
-        return left.r == right.r && left.g == right.g && left.b == right.b && left.a == right.a;
+        return left.linear == right.linear && left.a == right.a;
     }
 
     [[nodiscard]] constexpr bool operator==(const hsv& left, const hsv& right) noexcept
@@ -680,7 +694,7 @@ export {
     inline constexpr color magenta{1.0F, 0.0F, 1.0F};
     } // namespace colors
 
-    [[nodiscard]] hsv rgb_to_hsv(const float3& rgb) noexcept
+    [[nodiscard]] hsv rgb_to_hsv(const rgb& rgb) noexcept
     {
         const float maximum = std::fmax(rgb.r, std::fmax(rgb.g, rgb.b));
         const float minimum = std::fmin(rgb.r, std::fmin(rgb.g, rgb.b));
@@ -713,7 +727,7 @@ export {
         return {hue, saturation, maximum};
     }
 
-    [[nodiscard]] float3 hsv_to_rgb(const hsv& hsv) noexcept
+    [[nodiscard]] rgb hsv_to_rgb(const hsv& hsv) noexcept
     {
         const float hue = hsv.h - std::floor(hsv.h);
         const float chroma = hsv.s * hsv.v;
@@ -745,7 +759,7 @@ export {
         return {chroma + match, match, intermediate + match};
     }
 
-    [[nodiscard]] hsl rgb_to_hsl(const float3& rgb) noexcept
+    [[nodiscard]] hsl rgb_to_hsl(const rgb& rgb) noexcept
     {
         const float maximum = std::fmax(rgb.r, std::fmax(rgb.g, rgb.b));
         const float minimum = std::fmin(rgb.r, std::fmin(rgb.g, rgb.b));
@@ -779,7 +793,7 @@ export {
         return {hue, saturation, lightness};
     }
 
-    [[nodiscard]] float3 hsl_to_rgb(const hsl& hsl) noexcept
+    [[nodiscard]] rgb hsl_to_rgb(const hsl& hsl) noexcept
     {
         const float hue = hsl.h - std::floor(hsl.h);
         const float chroma = (1.0F - std::fabs((2.0F * hsl.l) - 1.0F)) * hsl.s;
@@ -821,32 +835,32 @@ export {
         return value <= 0.0031308F ? value * 12.92F : (1.055F * std::pow(value, 1.0F / 2.4F)) - 0.055F;
     }
 
-    [[nodiscard]] float3 srgb_to_rgb(const float3& srgb) noexcept
+    [[nodiscard]] rgb srgb_to_rgb(const rgb& srgb) noexcept
     {
         return {srgb_to_rgb(srgb.r), srgb_to_rgb(srgb.g), srgb_to_rgb(srgb.b)};
     }
 
-    [[nodiscard]] float3 rgb_to_srgb(const float3& rgb) noexcept
+    [[nodiscard]] rgb rgb_to_srgb(const rgb& rgb) noexcept
     {
         return {rgb_to_srgb(rgb.r), rgb_to_srgb(rgb.g), rgb_to_srgb(rgb.b)};
     }
 
-    [[nodiscard]] hsv srgb_to_hsv(const float3& srgb) noexcept
+    [[nodiscard]] hsv srgb_to_hsv(const rgb& srgb) noexcept
     {
         return rgb_to_hsv(srgb_to_rgb(srgb));
     }
 
-    [[nodiscard]] float3 hsv_to_srgb(const hsv& hsv) noexcept
+    [[nodiscard]] rgb hsv_to_srgb(const hsv& hsv) noexcept
     {
         return rgb_to_srgb(hsv_to_rgb(hsv));
     }
 
-    [[nodiscard]] hsl srgb_to_hsl(const float3& srgb) noexcept
+    [[nodiscard]] hsl srgb_to_hsl(const rgb& srgb) noexcept
     {
         return rgb_to_hsl(srgb_to_rgb(srgb));
     }
 
-    [[nodiscard]] float3 hsl_to_srgb(const hsl& hsl) noexcept
+    [[nodiscard]] rgb hsl_to_srgb(const hsl& hsl) noexcept
     {
         return rgb_to_srgb(hsl_to_rgb(hsl));
     }
