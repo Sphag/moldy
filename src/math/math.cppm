@@ -119,7 +119,7 @@ export {
 
     struct color
     {
-        rgb linear{};
+        rgb linear;
         float a{0.0F};
 
         constexpr color() noexcept = default;
