@@ -11,6 +11,7 @@ PowerShell scripts in this directory are the repository's current local workflow
 - `install-tools.ps1`: checks selected local C++ quality tools, rejects unhealthy tool binaries, and provides an explicit Windows install path.
 - `toolchain-policy.ps1`: provides the side-effect-free `Import-ToolchainPolicy` validation helper for `config/toolchain.psd1`.
 - `test-toolchain-policy.ps1`: runs dependency-free focused tests for the toolchain policy schema and constraints.
+- `test-agent-skills.ps1`: validates the tracked foundational Agent Skills against the open-format metadata and repository safety contract, then runs dependency-free smoke cases.
 - `bench.ps1`: placeholder-pass script until benchmarks are configured.
 
 Scripts accept relative build directories from the repository root unless their parameters document otherwise. Keep this file current when script behavior, parameters, or expected checks change.
@@ -59,3 +60,13 @@ Run the focused schema tests with:
 ```
 
 The helper validates schema version 1, required tool entries, exact/range field rules, parseable versions, and ordered inclusive range bounds. `scripts/check.ps1` runs these focused tests before configure, so the local and CI quality gates continuously cover the policy validator. Installed binary version checks are not part of this helper.
+
+## Agent Skills Validation
+
+Validate the repository-owned foundational skills without installing a validator package:
+
+```powershell
+.\scripts\test-agent-skills.ps1
+```
+
+The script checks the approved skill-directory set, open-format `SKILL.md` frontmatter, matching names, required safety-contract sections, explicit denied-approval stop conditions, and failure reporting. Its built-in smoke cases cover a valid skill, a missing prerequisite section, a denied approval boundary, and missing failure reporting. `scripts/check.ps1` runs it before tool probing and CMake work.

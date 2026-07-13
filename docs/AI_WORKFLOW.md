@@ -77,7 +77,7 @@ Use [docs/AI_TOOLING.md](AI_TOOLING.md) as the capability inventory and adoption
 4. Do not use `Deferred` or `Rejected` capabilities unless a new decision explicitly changes their status.
 5. Preserve cautious-mode approvals regardless of capability status.
 
-The foundational `spec`, `plan-eng-review`, `investigate`, `review`, `ship`, `ci-triage`, `dependency-review`, `checkpoint`, `health`, and `document-release` skills are currently `Evaluate` under issue #95. Until they become available, follow the equivalent working loop in this document and use existing scripts directly. Roadmap-specific GPU capture, scene round-trip, benchmark, render-graph, and performance workflows are also unavailable until their owning track issues are complete.
+The foundational `spec`, `plan-eng-review`, `investigate`, `review`, `ship`, `ci-triage`, `dependency-review`, `checkpoint`, `health`, and `document-release` skills are `Available` under issue #95. Their portable instructions live in `.agents/skills/`; use only the skill whose trigger matches the task, and preserve its stated approval and failure boundaries. `scripts/test-agent-skills.ps1` validates their open-format metadata and safety contract. Roadmap-specific GPU capture, scene round-trip, benchmark, render-graph, and performance workflows remain unavailable until their owning track issues are complete.
 
 ## Completion Standard
 

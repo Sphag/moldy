@@ -35,6 +35,8 @@ Common output locations:
 
 The selected quality tools are `clang-format`, `clang-tidy`, and `cppcheck`. `scripts/check.ps1` first runs the focused toolchain-policy tests, runs the selected quality tools once, then builds and tests both `Debug` and `Release` by default. This covers policy validation, assertion-enabled behavior, and the compiled-out assertion paths in the normal quality gate.
 
+Before probing the native toolchain, `scripts/check.ps1` also runs `scripts/test-agent-skills.ps1`. This dependency-free check validates the approved foundational skill set, their open-format metadata and safety boundaries, and smoke cases for valid content, missing prerequisites, denied approvals, and missing failure reporting.
+
 Pass one or more explicit configurations to narrow or extend a run:
 
 ```powershell

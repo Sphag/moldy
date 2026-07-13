@@ -31,12 +31,13 @@ There are no `Approved Optional` capabilities in this snapshot. Capabilities mov
 | Repository instructions | `Available` | `AGENTS.md` supplies durable repository rules. The closest applicable instructions and the user's current request control behavior. |
 | GitHub workflow | `Available` | Issues are the canonical backlog, and authenticated GitHub tooling can read or update repository collaboration data when the task authorizes it. Dependencies, commits, branches, pushes, and pull requests retain their explicit approval gates. |
 | Repository PowerShell entry points | `Available` | Existing scripts under `scripts/` provide supported configure, build, test, format, lint, toolchain-check, benchmark-placeholder, and full-check paths. Their checked-in parameters and documentation define the contract. |
+| Foundational Agent Skills | `Available` | The ten portable skills in `.agents/skills/` use the open Agent Skills format. They compose repository policy, preserve explicit approval gates, and are validated by `scripts/test-agent-skills.ps1`; Codex is the initial verified host. |
 
 `scripts/check.ps1` is the default full local quality gate. An agent may report that a command is unavailable or blocked, but may not silently substitute an unverified result.
 
-## Agent Skills Blueprint
+## Agent Skills
 
-All proposed repository skills are `Evaluate`. They do not exist until their implementation issue lands and verification changes their status. Foundational skills are tracked by [#95](https://github.com/Sphag/moldy/issues/95) and use the [open Agent Skills format](https://agentskills.io/specification), with Codex as the first verified host.
+The foundational skills below are `Available` through [#95](https://github.com/Sphag/moldy/issues/95). They live in `.agents/skills/`, use the [open Agent Skills format](https://agentskills.io/specification), have no required host-specific metadata, and are validated without dependencies by `scripts/test-agent-skills.ps1`. Codex is the initial verified host. Roadmap-specific skills remain `Evaluate` until their owning issues meet their stated prerequisites.
 
 Every skill must declare:
 
