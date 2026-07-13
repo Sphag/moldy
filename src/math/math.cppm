@@ -123,7 +123,7 @@ export {
         float a{0.0F};
 
         constexpr color() noexcept = default;
-        constexpr color(rgb linear_rgb, float alpha = 1.0F) noexcept : linear(linear_rgb), a(alpha) {}
+        explicit constexpr color(rgb linear_rgb, float alpha = 1.0F) noexcept : linear(linear_rgb), a(alpha) {}
         constexpr color(float red, float green, float blue, float alpha = 1.0F) noexcept
             : color(rgb{red, green, blue}, alpha)
         {
