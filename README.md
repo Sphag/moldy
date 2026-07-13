@@ -98,6 +98,7 @@ Remove only generated, ignored build or temporary directories that are no longer
 - [Source Map](docs/SOURCE_MAP.md)
 - [AI Workflow](docs/AI_WORKFLOW.md)
 - [AI Tooling](docs/AI_TOOLING.md)
+- [MCP Admission Record](docs/MCP_ADMISSION.md)
 - [GitHub Workflow](docs/GITHUB_WORKFLOW.md)
 - [Scripts](scripts/README.md)
 - [Code Quality](docs/CODE_QUALITY.md)

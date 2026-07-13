@@ -12,7 +12,7 @@ This document maps the current repository scaffold. Keep it factual and update i
 - `.agents/skills/`: tracked, portable foundational Agent Skills; other `.agents` local state remains ignored.
 - `.github/pull_request_template.md`: compact pull request description template for agents and humans.
 - `.github/workflows/`: GitHub Actions workflow definitions for pushed branch and pull request validation.
-- `docs/`: project workflow, AI tooling status and adoption, GitHub workflow, quality, style, testing, decisions, architecture, core diagnostics, and source navigation documents.
+- `docs/`: project workflow, AI tooling status and adoption, MCP admission evidence, GitHub workflow, quality, style, testing, decisions, architecture, core diagnostics, and source navigation documents.
 - `tasks/`: task planning notes.
 - `build*/`: generated build trees. These are not source locations.
 
@@ -28,6 +28,7 @@ The first workflow intentionally mirrors the local `scripts/check.ps1` gate. mac
 - `AGENTS.md`: authoritative repository rules for AI agents.
 - `docs/AI_WORKFLOW.md`: cautious working loop, GitHub collaboration, documentation maintenance, and capability-aware routing.
 - `docs/AI_TOOLING.md`: status model, current capability inventory, implementation blueprints, MCP admission policy, security model, and roadmap mapping.
+- `docs/MCP_ADMISSION.md`: reusable MCP admission fields plus the current GitHub integration boundary and the Microsoft Learn opt-in exception.
 - `docs/GITHUB_WORKFLOW.md`: local pre-push checks and the remote pull request and CI feedback loop.
 
 ## CMake Project

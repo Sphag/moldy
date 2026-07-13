@@ -20,6 +20,8 @@ Check local GitHub CLI access from a normal terminal with:
 gh auth status
 ```
 
+The admitted read boundary, sensitive-data handling, observed smoke evidence, and host-level rollback for this integration are recorded in [MCP Admission Record](MCP_ADMISSION.md#current-github-integration). That record does not authorize GitHub writes.
+
 If `gh auth status` fails or reports invalid authentication inside a restricted agent sandbox, retry the same check from a normal terminal or approved command context before refreshing credentials. Restricted sessions may misreport authentication even when the keyring token is valid.
 
 Only refresh authentication if the normal terminal or approved command context still lacks the required account, host, or scopes:
