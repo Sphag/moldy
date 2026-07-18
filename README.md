@@ -6,14 +6,17 @@
 
 Moldy is a C++23/CMake codebase for a cross-platform desktop game engine project.
 
-The current repository state is a small, core-first scaffold: a `core` static library, a smoke executable, plain C++ test executables, and scripted local workflow entry points. Renderer, editor, asset pipeline, platform layer, and concrete engine systems are not implemented yet.
+The current repository state is a small, core-first scaffold: `core` and `math` static libraries, a smoke executable,
+plain C++ test executables, and scripted local workflow entry points. Renderer, editor, asset pipeline, platform layer,
+and concrete engine systems are not implemented yet.
 
 ## Current State
 
 This repository currently provides infrastructure for building and checking a small C++23 scaffold:
 
 - `core`: a platform-neutral static library with the current `moldy.core` C++ module API.
-- `math`: a standalone static library with dependency-free HLSL-named vectors, square matrices, and linear colors.
+- `math`: a standalone static library with dependency-free HLSL-named vectors, square matrices, a shared color
+  carrier, and explicit RGB/HSL/HSV/sRGB conversions.
 - `smoke`: a minimal executable that links the core library and reports build information.
 - `core_tests`: a plain C++ executable registered with CTest.
 - `math_tests`: a plain C++ CTest executable for the math API.
@@ -118,7 +121,7 @@ Remove only generated, ignored build or temporary directories that are no longer
 - `src/math/`: standalone, dependency-free math library module.
 - `apps/smoke/`: executable used to verify the library links and reports build information.
 - `tests/core/`: plain C++ executable tests for the current core API.
-- `tests/math/`: plain C++ executable tests for the math vector API.
+- `tests/math/`: plain C++ executable tests for the current math API.
 - `tests/math_policy/`: dependency-free math-policy toolchain checks.
 - `scripts/`: PowerShell workflow entry points.
 - `docs/`: project brief, decisions, source map, testing, style, and workflow documents.

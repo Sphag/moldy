@@ -6,7 +6,7 @@ This is a living document. It describes current and planned boundaries. Planned 
 
 - `core`: Platform-neutral foundations. The current public surface includes build information, explicit status/result values, logging, assertions, steady time, and application lifecycle primitives.
 - `math`: Standalone, dependency-free math values. The current public surface includes HLSL-named float, signed, and
-  unsigned vectors; square matrices; linear RGBA colors; and explicit color conversions.
+  unsigned vectors; square matrices; a shared color carrier; and explicit RGB/HSL/HSV/sRGB conversions.
 
 ## Planned Module Boundaries
 

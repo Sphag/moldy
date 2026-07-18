@@ -1,13 +1,14 @@
 # Math Conventions And Precision Policy
 
 This document is the binding, backend-neutral contract for project math APIs. The current math slice implements scalar
-vectors, square matrices, and a single color type for linear RGBA values; quaternion, transform, and geometry APIs remain future work.
+vectors, square matrices, and a shared carrier for RGB, sRGB, HSV, and HSL values; quaternion, transform, and geometry
+APIs remain future work.
 
 ## Scope
 
 The initial math slice is dependency-free and project-owned. It has no third-party math dependency and no rendering
-backend dependency. `moldy.math` currently provides HLSL-named vectors, square matrices, and a single color type for linear RGBA values; future
-implementations must follow this policy unless a later accepted decision explicitly supersedes it.
+backend dependency. `moldy.math` currently provides HLSL-named vectors, square matrices, and one shared color carrier;
+future implementations must follow this policy unless a later accepted decision explicitly supersedes it.
 
 ## Coordinates And Units
 

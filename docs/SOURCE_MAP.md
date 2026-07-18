@@ -104,14 +104,15 @@ The current API is intentionally limited to build information, error/result valu
 ## Math Policy
 
 `docs/MATH_CONVENTIONS.md` is the binding, backend-neutral contract for the project math API. The current
-`moldy.math` module implements HLSL-named vectors, square matrices, and linear colors; quaternions, transforms, and
-geometry remain outside the implemented scope.
+`moldy.math` module implements HLSL-named vectors, square matrices, a shared color carrier, and explicit conversions;
+quaternions, transforms, and geometry remain outside the implemented scope.
 
 ## Math Library
 
 The `math` static library is defined from `src/math/math.cppm` and published to consumers as `project::math`. It
 exports the standalone `moldy.math` C++ module, which provides `floatN`, `intN`, and `uintN` vectors; matching square
-matrices; and linear RGBA colors. The module does not depend on `moldy.core`.
+matrices; a shared color carrier; and explicit RGB/HSL/HSV/sRGB conversions. The module does not depend on
+`moldy.core`.
 
 ## Applications
 
@@ -128,8 +129,8 @@ third-party dependency and is registered with CTest as `math_policy_tests`. It v
 The `math_tests` executable is defined from `tests/math/test_main.cpp`. It links `project::math`, imports
 `moldy.math` independently of `moldy.core`, and is registered with CTest as `math_tests`.
 
-It verifies field aliases, free swizzles, vector and matrix arithmetic, generic constants, linear colors, and explicit
-RGB/HSL/HSV/sRGB conversions.
+It verifies field aliases, free swizzles, vector and matrix arithmetic, generic constants, the shared color carrier,
+and explicit RGB/HSL/HSV/sRGB conversions.
 
 Current checks verify that:
 

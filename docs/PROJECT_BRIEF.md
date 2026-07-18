@@ -8,7 +8,8 @@ Moldy.
 
 ## Current State
 
-Moldy is currently a C++23/CMake scaffold with a small `core` library, a smoke executable, plain executable tests, and PowerShell workflow scripts.
+Moldy is currently a C++23/CMake scaffold with small `core` and `math` libraries, a smoke executable, plain executable
+tests, and PowerShell workflow scripts.
 
 ## High-Level Goals
 
@@ -51,4 +52,3 @@ MIT License.
 - Asset pipeline
 - Scripting approach
 - Networking scope
-
