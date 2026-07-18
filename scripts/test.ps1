@@ -22,7 +22,7 @@ if ($configureExitCode -ne 0) {
     exit $configureExitCode
 }
 
-cmake --build $buildDir --config $Configuration --target core_tests math_policy_tests
+cmake --build $buildDir --config $Configuration --target core_tests math_tests math_policy_tests
 $buildExitCode = $LASTEXITCODE
 
 if ($buildExitCode -ne 0) {
