@@ -23,9 +23,10 @@ exactly zero float vector. Scalar division requires a non-zero scalar. Signed in
 unsigned arithmetic follows `uint32_t` modulo behavior.
 
 `zero<T>`, vector `one<T>`, and matrix `identity<T>` provide generic compile-time constants. `color` is the
-project-owned RGBA value type; RGB, HSV, HSL, and sRGB conversions are explicit free functions that use `color` as the
-shared storage carrier and preserve alpha. Named colors live in `math::colors`. RGB channels use sRGB primaries, and
-only `srgb_*` functions apply the sRGB transfer curve.
+project-owned carrier for every color representation: RGB and sRGB use `r/g/b`, HSV uses `r=h, g=s, b=v`, and HSL uses
+`r=h, g=s, b=l`. Components are normalized, hue wraps cyclically, and every conversion preserves alpha unchanged.
+Conversions are explicit free functions that take and return `color`. Named colors live in `math::colors`; their RGB
+channels use sRGB primaries, and only `srgb_*` functions apply the sRGB transfer curve.
 
 Quaternions, transforms, rectangular matrices, global comparison tolerances, rendering integration, and third-party
 math libraries are outside this module's current scope.

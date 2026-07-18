@@ -321,24 +321,9 @@ export {
         }
     }
 
-    [[nodiscard]] constexpr bool operator==(const rgb& left, const rgb& right) noexcept
-    {
-        return left.r == right.r && left.g == right.g && left.b == right.b;
-    }
-
     [[nodiscard]] constexpr bool operator==(const color& left, const color& right) noexcept
     {
-        return left.linear == right.linear && left.a == right.a;
-    }
-
-    [[nodiscard]] constexpr bool operator==(const hsv& left, const hsv& right) noexcept
-    {
-        return left.h == right.h && left.s == right.s && left.v == right.v;
-    }
-
-    [[nodiscard]] constexpr bool operator==(const hsl& left, const hsl& right) noexcept
-    {
-        return left.h == right.h && left.s == right.s && left.l == right.l;
+        return left.r == right.r && left.g == right.g && left.b == right.b && left.a == right.a;
     }
 
     template <detail::vector_type TVector>
@@ -774,26 +759,26 @@ export {
 
         if (sector < 1.0F)
         {
-            return {chroma + match, intermediate + match, match, hsv.a};
+            return {chroma + match, intermediate + match, match, hsl.a};
         }
         if (sector < 2.0F)
         {
-            return {intermediate + match, chroma + match, match, hsv.a};
+            return {intermediate + match, chroma + match, match, hsl.a};
         }
         if (sector < 3.0F)
         {
-            return {match, chroma + match, intermediate + match, hsv.a};
+            return {match, chroma + match, intermediate + match, hsl.a};
         }
         if (sector < 4.0F)
         {
-            return {match, intermediate + match, chroma + match, hsv.a};
+            return {match, intermediate + match, chroma + match, hsl.a};
         }
         if (sector < 5.0F)
         {
-            return {intermediate + match, match, chroma + match, hsv.a};
+            return {intermediate + match, match, chroma + match, hsl.a};
         }
 
-        return {chroma + match, match, intermediate + match, hsv.a};
+        return {chroma + match, match, intermediate + match, hsl.a};
     }
 
     [[nodiscard]] float srgb_to_rgb(float value) noexcept

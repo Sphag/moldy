@@ -50,8 +50,13 @@ implementations must follow this policy unless a later accepted decision explici
 
 ## Colors
 
-- `math::color` stores linear RGBA values. The RGB channels use sRGB primaries, and alpha is an independent passthrough channel.
-- `rgb_to_hsv`, `hsv_to_rgb`, `rgb_to_hsl`, `hsl_to_rgb`, `srgb_to_rgb`, and `rgb_to_srgb` operate on `math::color` and preserve alpha.
+- `math::color` is the shared carrier for every color representation. RGB and sRGB use `r/g/b`, HSV uses
+  `r=h, g=s, b=v`, and HSL uses `r=h, g=s, b=l`.
+- Color components are normalized, hue wraps cyclically, and alpha is an independent passthrough channel preserved
+  unchanged by every conversion.
+- `rgb_to_hsv`, `hsv_to_rgb`, `rgb_to_hsl`, `hsl_to_rgb`, `srgb_to_rgb`, and `rgb_to_srgb` take and return
+  `math::color`.
+- RGB channels use sRGB primaries when the carrier represents RGB or sRGB values.
 - `srgb_to_rgb` and `rgb_to_srgb` apply the standard sRGB transfer curve to the RGB channels only.
 
 ## Deferred Backend Rules
