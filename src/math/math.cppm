@@ -90,12 +90,14 @@ export module moldy.math;
         }                                                                                                              \
     }
 
-export {
+export
+{
     namespace math
     {
 
     using uint = std::uint32_t;
 
+    // NOLINTBEGIN(readability-identifier-naming): HLSL-style public type names.
     MOLDY_DEFINE_VECTOR2(float2, float);
     MOLDY_DEFINE_VECTOR3(float3, float);
     MOLDY_DEFINE_VECTOR4(float4, float);
@@ -106,7 +108,6 @@ export {
     MOLDY_DEFINE_VECTOR3(uint3, uint);
     MOLDY_DEFINE_VECTOR4(uint4, uint);
 
-    // NOLINTBEGIN(readability-identifier-naming): HLSL-style public type names.
     struct color
     {
         float r{0.0F};
