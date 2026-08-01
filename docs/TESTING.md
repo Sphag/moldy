@@ -10,8 +10,8 @@ Run the default test flow from the repository root:
 .\scripts\test.ps1
 ```
 
-The script configures the build directory when needed, builds the `core_tests` and `math_policy_tests` targets, and
-runs CTest with failure output enabled.
+The script configures the build directory when needed, builds the `core_tests`, `math_tests`, and `math_policy_tests`
+targets, and runs CTest with failure output enabled.
 
 ## Direct Execution
 
@@ -19,18 +19,25 @@ The generated test executable can also be run directly after building.
 
 Common output locations:
 
-- Single-config generators: `build\bin\core_tests.exe` and `build\bin\math_policy_tests.exe` on Windows, or
-  `build/bin/core_tests` and `build/bin/math_policy_tests` on Unix-like systems.
-- Multi-config generators: `build\bin\Debug\core_tests.exe` and `build\bin\Debug\math_policy_tests.exe` on
-  Windows, or `build/bin/Debug/core_tests` and `build/bin/Debug/math_policy_tests` on Unix-like systems.
+- Single-config generators: `build\bin\core_tests.exe`, `build\bin\math_tests.exe`, and
+  `build\bin\math_policy_tests.exe` on Windows, or their counterparts under `build/bin/` on Unix-like systems.
+- Multi-config generators: `build\bin\Debug\core_tests.exe`, `build\bin\Debug\math_tests.exe`, and
+  `build\bin\Debug\math_policy_tests.exe` on Windows, or their counterparts under `build/bin/Debug/` on Unix-like
+  systems.
 
 ## Math Policy Test
 
 `math_policy_tests` is a dependency-free executable. It verifies that the supported toolchain provides a 32-bit
 `float` and reports IEC 60559 floating-point behavior, the implementation assumptions for the initial math slice.
 It intentionally does not test vector, quaternion, matrix, or geometry APIs because those APIs are not introduced
-by the policy work. CTest runs it in every configured build type, including the default Debug and Release quality
-gate.
+by the policy work. CTest runs it in every configured build type, including the default Debug and Release quality gate.
+
+## Math Test
+
+`math_tests` imports `moldy.math` without importing or linking `moldy.core`. It covers HLSL-named float, signed, and
+unsigned vectors; field aliases; free swizzles; arithmetic; dot and cross products; optional normalization; square
+matrix multiplication; generic constants; colors; and RGB/HSL/HSV/sRGB conversions. It also verifies that zero vectors
+return an empty normalized result and that equality does not introduce an implicit tolerance.
 
 ## Intended Quality Gate
 

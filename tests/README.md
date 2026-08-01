@@ -12,6 +12,12 @@
 supported initial scalar assumptions: a 32-bit `float` and IEC 60559 floating-point behavior. It does not expose
 math value types or a math module.
 
+## `math_tests`
+
+`tests/math/test_main.cpp` builds the `math_tests` executable. It links `project::math`, imports `moldy.math`, and
+covers HLSL-named vectors, square matrices, generic constants, the shared color carrier, explicit
+RGB/HSL/HSV/sRGB conversions, round trips, and alpha preservation.
+
 Run the current scripted test flow with:
 
 ```powershell

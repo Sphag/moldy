@@ -55,6 +55,19 @@ target_compile_definitions(core
 
 configure_project_target(core)
 
+add_library(math STATIC)
+add_library(project::math ALIAS math)
+
+target_sources(math
+    PUBLIC
+        FILE_SET CXX_MODULES
+        BASE_DIRS src/math
+        FILES
+            src/math/math.cppm
+)
+
+configure_project_target(math)
+
 add_executable(smoke
     apps/smoke/main.cpp
 )
@@ -70,6 +83,15 @@ target_link_libraries(core_tests PRIVATE project::core)
 configure_project_target(core_tests)
 
 add_test(NAME core_tests COMMAND core_tests)
+
+add_executable(math_tests
+    tests/math/test_main.cpp
+)
+
+target_link_libraries(math_tests PRIVATE project::math)
+configure_project_target(math_tests)
+
+add_test(NAME math_tests COMMAND math_tests)
 
 add_executable(math_policy_tests
     tests/math_policy/test_main.cpp

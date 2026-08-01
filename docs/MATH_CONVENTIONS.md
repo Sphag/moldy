@@ -1,13 +1,14 @@
 # Math Conventions And Precision Policy
 
-This document is the binding, backend-neutral contract for future project math APIs. It applies before vector,
-quaternion, matrix, transform, and geometry value types are introduced. It does not define those APIs.
+This document is the binding, backend-neutral contract for project math APIs. The current math slice implements scalar
+vectors, square matrices, and a shared carrier for RGB, sRGB, HSV, and HSL values; quaternion, transform, and geometry
+APIs remain future work.
 
 ## Scope
 
 The initial math slice is dependency-free and project-owned. It has no third-party math dependency and no rendering
-backend dependency. Future implementations must follow this policy unless a later accepted decision explicitly
-supersedes it.
+backend dependency. `moldy.math` currently provides HLSL-named vectors, square matrices, and one shared color carrier;
+future implementations must follow this policy unless a later accepted decision explicitly supersedes it.
 
 ## Coordinates And Units
 
@@ -43,6 +44,21 @@ supersedes it.
   documented input range. A comparison must not rely on an implicit project-wide epsilon.
 - A global default epsilon is intentionally not defined. Each future operation that compares computed floating-point
   values must choose and document its tolerance policy.
+- Current vectors, matrices, and colors use exact structural equality only. `normalize(...)` reports an exactly
+  zero-length float vector with an empty result instead of applying a tolerance.
+- Signed integer vector and matrix arithmetic has a no-overflow precondition. Unsigned vector and matrix arithmetic
+  follows the modulo behavior of `uint32_t`.
+
+## Colors
+
+- `math::color` is the shared carrier for every color representation. RGB and sRGB use `r/g/b`, HSV uses
+  `r=h, g=s, b=v`, and HSL uses `r=h, g=s, b=l`.
+- Color components are normalized, hue wraps cyclically, and alpha is an independent passthrough channel preserved
+  unchanged by every conversion.
+- `rgb_to_hsv`, `hsv_to_rgb`, `rgb_to_hsl`, `hsl_to_rgb`, `srgb_to_rgb`, and `rgb_to_srgb` take and return
+  `math::color`.
+- RGB channels use sRGB primaries when the carrier represents RGB or sRGB values.
+- `srgb_to_rgb` and `rgb_to_srgb` apply the standard sRGB transfer curve to the RGB channels only.
 
 ## Deferred Backend Rules
 
@@ -54,4 +70,5 @@ the future D3D12 work. Backend requirements must not change the public math conv
 
 - [Architecture](ARCHITECTURE.md) describes the planned math boundary.
 - [Decisions](DECISIONS.md) records acceptance of this policy.
-- [Testing](TESTING.md) describes the focused toolchain-assumption test.
+- [Testing](TESTING.md) describes the focused toolchain-assumption and vector tests.
+- [`src/math/README.md`](../src/math/README.md) documents the current public vector and color API.
