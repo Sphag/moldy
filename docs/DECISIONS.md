@@ -250,6 +250,22 @@ type for RGBA storage. Use free math functions and `swizzle<...>` rather than ve
 compiler-specific anonymous-struct swizzle proxies. Expose direct position, color, and UV component aliases through
 same-scalar union members. Keep RGB/HSL/HSV and sRGB conversions explicit free functions on `color`.
 Consequences: The public math API aligns with HLSL naming and keeps composed swizzles portable. Alias fields share
-storage, while full writable swizzles, quaternions, transforms, rectangular matrices, and rendering integration remain
-out of scope. Signed integer arithmetic requires callers to avoid overflow; unsigned operations use `uint32_t` modulo
+storage, while full writable swizzles, transforms, rectangular matrices, and rendering integration remain out of
+scope. Signed integer arithmetic requires callers to avoid overflow; unsigned operations use `uint32_t` modulo
 behavior.
+
+## 2026-08-01: Use Configurable Compile-Time Math Preconditions
+
+Date: 2026-08-01
+Status: Accepted
+Context: Quaternion normalization, inversion, rotation, and matrix conversion introduce invalid-input preconditions,
+while `moldy.math` must remain buildable without `moldy.core`.
+Decision: Route math preconditions through the private two-argument `MOLDY_MATH_ASSERT` macro selected when the
+library is built. Use core assertions by default in this repository, provide a standard standalone fallback, and allow
+a required custom header to define the macro. Add project-owned Hamilton quaternions, right-handed axis-angle and
+vector rotation, and proper-rotation `float3x3` conversions with caller-supplied tolerances and a canonical quaternion
+sign.
+Consequences: Repository builds share core diagnostics without exposing core types through the math API. Standalone
+and custom builds have no core include, module import, or link requirement. Precondition handling is fixed for the
+compiled module target, zero inputs and invalid rotation matrices are contract violations, and callers continue to
+choose numerical tolerances explicitly. The math module remains third-party-free and platform-neutral.

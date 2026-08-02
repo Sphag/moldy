@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+#include <numbers>
 #include <string_view>
 #include <type_traits>
 
@@ -23,6 +24,30 @@ public:
     void expect_near(float actual, float expected, float tolerance, std::string_view message)
     {
         expect(std::fabs(actual - expected) <= tolerance, message);
+    }
+
+    void expect_near(const math::float3& actual, const math::float3& expected, float tolerance,
+                     std::string_view message)
+    {
+        expect(std::fabs(actual.x - expected.x) <= tolerance && std::fabs(actual.y - expected.y) <= tolerance &&
+                   std::fabs(actual.z - expected.z) <= tolerance,
+               message);
+    }
+
+    void expect_near(const math::quaternion& actual, const math::quaternion& expected, float tolerance,
+                     std::string_view message)
+    {
+        expect(std::fabs(actual.x - expected.x) <= tolerance && std::fabs(actual.y - expected.y) <= tolerance &&
+                   std::fabs(actual.z - expected.z) <= tolerance && std::fabs(actual.w - expected.w) <= tolerance,
+               message);
+    }
+
+    void expect_near(const math::float3x3& actual, const math::float3x3& expected, float tolerance,
+                     std::string_view message)
+    {
+        expect_near(actual.c0, expected.c0, tolerance, message);
+        expect_near(actual.c1, expected.c1, tolerance, message);
+        expect_near(actual.c2, expected.c2, tolerance, message);
     }
 
     [[nodiscard]] int failures() const noexcept
@@ -50,11 +75,8 @@ void test_float_vectors(TestContext& context)
     context.expect(math::swizzle<1, 0>(vector2) == math::float2{4.0F, 3.0F},
                    "float2 free swizzle reorders components.");
 
-    const auto normalized2 = math::normalize(vector2);
-    context.expect(normalized2.has_value(), "Non-zero float2 normalizes.");
-    context.expect(normalized2.has_value() && *normalized2 == math::float2{0.6F, 0.8F},
+    context.expect(math::normalize(vector2) == math::float2{0.6F, 0.8F},
                    "float2 normalization has expected components.");
-    context.expect(!math::normalize(math::float2{}).has_value(), "Zero float2 has no normalized value.");
 
     const math::float3 vector3{1.0F, 2.0F, 3.0F};
     context.expect(vector3.r == 1.0F && vector3.g == 2.0F && vector3.b == 3.0F,
@@ -105,6 +127,82 @@ void test_matrices(TestContext& context)
                    "Unsigned matrix identity preserves vectors.");
 }
 
+void test_quaternions(TestContext& context)
+{
+    constexpr float tolerance = 0.0001F;
+    constexpr float half_pi = std::numbers::pi_v<float> * 0.5F;
+
+    context.expect(math::identity<math::quaternion> == math::quaternion{0.0F, 0.0F, 0.0F, 1.0F},
+                   "Quaternion identity has a zero vector part and unit scalar part.");
+    context.expect(math::normalize(math::quaternion{0.0F, 0.0F, 0.0F, 2.0F}) == math::identity<math::quaternion>,
+                   "Quaternion normalization returns a direct normalized value.");
+    context.expect(math::dot(math::quaternion{1.0F, 2.0F, 3.0F, 4.0F}, math::quaternion{1.0F, 2.0F, 3.0F, 4.0F}) ==
+                       30.0F,
+                   "Quaternion dot product is exact for known components.");
+    context.expect(math::length_squared(math::quaternion{1.0F, 2.0F, 3.0F, 4.0F}) == 30.0F,
+                   "Quaternion squared length uses all four components.");
+    context.expect(math::inverse(math::quaternion{0.0F, 0.0F, 0.0F, 2.0F}) == math::quaternion{0.0F, 0.0F, 0.0F, 0.5F},
+                   "Quaternion inverse accounts for non-unit length.");
+    context.expect(math::conjugate(math::quaternion{1.0F, -2.0F, 3.0F, -4.0F}) ==
+                       math::quaternion{-1.0F, 2.0F, -3.0F, -4.0F},
+                   "Quaternion conjugation negates only the vector part.");
+
+    const math::quaternion z_quarter_turn = math::quaternion_from_axis_angle(math::float3{0.0F, 0.0F, 2.0F}, half_pi);
+    context.expect_near(math::length(z_quarter_turn), 1.0F, tolerance,
+                        "Axis-angle construction normalizes the input axis.");
+    context.expect_near(math::rotate(z_quarter_turn, math::float3{1.0F, 0.0F, 0.0F}), math::float3{0.0F, 1.0F, 0.0F},
+                        tolerance, "A positive 90-degree Z rotation follows the right-hand rule.");
+
+    const math::quaternion y_half_turn =
+        math::quaternion_from_axis_angle(math::float3{0.0F, 1.0F, 0.0F}, std::numbers::pi_v<float>);
+    context.expect_near(math::rotate(y_half_turn, math::float3{1.0F, 0.0F, 0.0F}), math::float3{-1.0F, 0.0F, 0.0F},
+                        tolerance, "A positive 180-degree Y rotation reverses the X axis.");
+
+    const math::quaternion inverse_rotation = math::inverse(z_quarter_turn);
+    context.expect_near(z_quarter_turn * inverse_rotation, math::identity<math::quaternion>, tolerance,
+                        "A quaternion multiplied by its inverse produces identity.");
+    context.expect_near(math::rotate(inverse_rotation, math::rotate(z_quarter_turn, math::float3{0.25F, -0.5F, 1.0F})),
+                        math::float3{0.25F, -0.5F, 1.0F}, tolerance, "Inverse rotation restores the original vector.");
+
+    const math::quaternion x_quarter_turn = math::quaternion_from_axis_angle(math::float3{1.0F, 0.0F, 0.0F}, half_pi);
+    const math::float3 basis_x{1.0F, 0.0F, 0.0F};
+    const math::float3 x_after_z_then_x = math::rotate(x_quarter_turn * z_quarter_turn, basis_x);
+    const math::float3 x_after_x_then_z = math::rotate(z_quarter_turn * x_quarter_turn, basis_x);
+    context.expect_near(x_after_z_then_x, math::float3{0.0F, 0.0F, 1.0F}, tolerance,
+                        "Quaternion A * B applies B before A.");
+    context.expect_near(x_after_x_then_z, math::float3{0.0F, 1.0F, 0.0F}, tolerance,
+                        "Quaternion composition is non-commutative.");
+
+    const math::float3x3 x_matrix = math::quaternion_to_float3x3(x_quarter_turn);
+    const math::float3x3 z_matrix = math::quaternion_to_float3x3(z_quarter_turn);
+    context.expect_near(math::quaternion_to_float3x3(x_quarter_turn * z_quarter_turn), x_matrix * z_matrix, tolerance,
+                        "Quaternion and matrix composition use the same right-to-left contract.");
+    context.expect_near(z_matrix * math::float3{0.5F, -1.0F, 2.0F},
+                        math::rotate(z_quarter_turn, math::float3{0.5F, -1.0F, 2.0F}), tolerance,
+                        "Quaternion and float3x3 vector rotations are equivalent.");
+
+    const math::quaternion source = math::normalize(math::quaternion{0.2F, -0.3F, 0.4F, -0.5F});
+    const math::float3x3 source_matrix = math::quaternion_to_float3x3(source);
+    const math::quaternion round_trip = math::float3x3_to_quaternion(source_matrix, 0.00001F, 0.00001F);
+    context.expect_near(round_trip, math::quaternion{-source.x, -source.y, -source.z, -source.w}, tolerance,
+                        "Matrix conversion normalizes and canonicalizes the quaternion sign.");
+    context.expect(round_trip.w >= 0.0F, "The canonical quaternion sign makes a non-zero scalar part positive.");
+
+    const math::quaternion opposite_sign{-source.x, -source.y, -source.z, -source.w};
+    context.expect_near(math::quaternion_to_float3x3(opposite_sign), source_matrix, tolerance,
+                        "Opposite quaternion signs produce the same rotation matrix.");
+
+    const math::float3x3 x_half_turn{{1.0F, 0.0F, 0.0F}, {0.0F, -1.0F, 0.0F}, {0.0F, 0.0F, -1.0F}};
+    context.expect(math::float3x3_to_quaternion(x_half_turn, 0.0F, 0.0F) == math::quaternion{1.0F, 0.0F, 0.0F, 0.0F},
+                   "A 180-degree matrix uses the first non-zero component for canonical sign.");
+
+    math::float3x3 perturbed_rotation = z_matrix;
+    perturbed_rotation.c0.x += 0.0001F;
+    const math::quaternion tolerated = math::float3x3_to_quaternion(perturbed_rotation, 0.001F, 0.001F);
+    context.expect_near(math::length(tolerated), 1.0F, tolerance,
+                        "Matrix conversion accepts caller-selected absolute and relative tolerances.");
+}
+
 void test_color(TestContext& context)
 {
     context.expect(math::colors::transparent == math::color{0.0F, 0.0F, 0.0F, 0.0F},
@@ -151,6 +249,7 @@ void test_color(TestContext& context)
 }
 
 static_assert(std::is_trivially_copyable_v<math::color>);
+static_assert(std::is_trivially_copyable_v<math::quaternion>);
 static_assert(std::is_trivially_copyable_v<math::float4>);
 static_assert(std::is_trivially_copyable_v<math::int4>);
 static_assert(std::is_trivially_copyable_v<math::uint4>);
@@ -163,6 +262,7 @@ int main()
     test_float_vectors(context);
     test_integer_vectors(context);
     test_matrices(context);
+    test_quaternions(context);
     test_color(context);
 
     if (context.failures() != 0)

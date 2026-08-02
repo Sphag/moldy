@@ -4,10 +4,35 @@ module;
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
-#include <optional>
 #include <type_traits>
 
+#if defined(MOLDY_MATH_ASSERT_BACKEND_CORE)
+#include <moldy/core_macros.hpp>
+#elif defined(MOLDY_MATH_ASSERT_BACKEND_STANDALONE)
+#include <cstdio>
+#include <cstdlib>
+#elif defined(MOLDY_MATH_ASSERT_BACKEND_CUSTOM)
+#include MOLDY_MATH_ASSERT_HEADER
+#ifndef MOLDY_MATH_ASSERT
+#error "MOLDY_MATH_ASSERT_HEADER must define MOLDY_MATH_ASSERT(expression, message)."
+#endif
+#else
+#error "A moldy.math assertion backend must be selected by CMake."
+#endif
+
 export module moldy.math;
+
+#if defined(MOLDY_MATH_ASSERT_BACKEND_CORE)
+import moldy.core;
+#define MOLDY_MATH_ASSERT(expression, message) MOLDY_ASSERT_MSG((expression), "%s", (message))
+#elif defined(MOLDY_MATH_ASSERT_BACKEND_STANDALONE)
+#if defined(MOLDY_MATH_ENABLE_ASSERTS)
+#define MOLDY_MATH_ASSERT(expression, message)                                                                         \
+    ((expression) ? (void)0 : (std::fputs((message), stderr), std::fputc('\n', stderr), std::abort()))
+#else
+#define MOLDY_MATH_ASSERT(expression, message) ((void)0)
+#endif
+#endif
 
 #define MOLDY_DEFINE_VECTOR2(TypeName, ScalarType)                                                                     \
     struct TypeName                                                                                                    \
@@ -120,6 +145,20 @@ export {
         constexpr color() noexcept = default;
         constexpr color(float red, float green, float blue, float alpha = 1.0F) noexcept
             : r(red), g(green), b(blue), a(alpha)
+        {
+        }
+    };
+
+    struct quaternion
+    {
+        float x{0.0F};
+        float y{0.0F};
+        float z{0.0F};
+        float w{0.0F};
+
+        constexpr quaternion() noexcept = default;
+        constexpr quaternion(float x_value, float y_value, float z_value, float w_value) noexcept
+            : x(x_value), y(y_value), z(z_value), w(w_value)
         {
         }
     };
@@ -279,6 +318,9 @@ export {
 
     template <matrix_type TMatrix> using matrix_scalar_t = typename matrix_traits<TMatrix>::scalar_type;
 
+    template <typename TValue>
+    concept identity_type = matrix_type<TValue> || std::same_as<TValue, quaternion>;
+
     template <matrix_type TMatrix> [[nodiscard]] constexpr auto column(const TMatrix& value, std::size_t index) noexcept
     {
         if constexpr (matrix_traits<TMatrix>::dimension == 2)
@@ -327,6 +369,11 @@ export {
     [[nodiscard]] constexpr bool operator==(const color& left, const color& right) noexcept
     {
         return left.r == right.r && left.g == right.g && left.b == right.b && left.a == right.a;
+    }
+
+    [[nodiscard]] constexpr bool operator==(const quaternion& left, const quaternion& right) noexcept
+    {
+        return left.x == right.x && left.y == right.y && left.z == right.z && left.w == right.w;
     }
 
     template <detail::vector_type TVector>
@@ -402,10 +449,11 @@ export {
         return vector * scalar;
     }
 
-    // Precondition: scalar is non-zero.
     template <detail::vector_type TVector>
     [[nodiscard]] constexpr TVector operator/(const TVector& vector, detail::vector_scalar_t<TVector> scalar) noexcept
     {
+        MOLDY_MATH_ASSERT(scalar != detail::vector_scalar_t<TVector>{}, "Vector division requires a non-zero scalar.");
+
         if constexpr (detail::vector_traits<TVector>::dimension == 2)
         {
             return {vector.x / scalar, vector.y / scalar};
@@ -459,15 +507,80 @@ export {
 
     template <detail::vector_type TVector>
         requires std::same_as<detail::vector_scalar_t<TVector>, float>
-    [[nodiscard]] std::optional<TVector> normalize(const TVector& vector) noexcept
+    [[nodiscard]] TVector normalize(const TVector& vector) noexcept
     {
         const float vector_length = length(vector);
-        if (vector_length == 0.0F)
-        {
-            return std::nullopt;
-        }
+        MOLDY_MATH_ASSERT(vector_length != 0.0F, "Vector normalization requires a non-zero length.");
 
         return vector / vector_length;
+    }
+
+    [[nodiscard]] constexpr quaternion operator*(const quaternion& left, const quaternion& right) noexcept
+    {
+        return {(left.w * right.x) + (left.x * right.w) + (left.y * right.z) - (left.z * right.y),
+                (left.w * right.y) - (left.x * right.z) + (left.y * right.w) + (left.z * right.x),
+                (left.w * right.z) + (left.x * right.y) - (left.y * right.x) + (left.z * right.w),
+                (left.w * right.w) - (left.x * right.x) - (left.y * right.y) - (left.z * right.z)};
+    }
+
+    [[nodiscard]] constexpr float dot(const quaternion& left, const quaternion& right) noexcept
+    {
+        return (left.x * right.x) + (left.y * right.y) + (left.z * right.z) + (left.w * right.w);
+    }
+
+    [[nodiscard]] constexpr float length_squared(const quaternion& value) noexcept
+    {
+        return dot(value, value);
+    }
+
+    [[nodiscard]] float length(const quaternion& value) noexcept
+    {
+        return std::sqrt(length_squared(value));
+    }
+
+    [[nodiscard]] quaternion normalize(const quaternion& value) noexcept
+    {
+        const float quaternion_length = length(value);
+        MOLDY_MATH_ASSERT(quaternion_length != 0.0F, "Quaternion normalization requires a non-zero length.");
+        return {value.x / quaternion_length, value.y / quaternion_length, value.z / quaternion_length,
+                value.w / quaternion_length};
+    }
+
+    [[nodiscard]] constexpr quaternion conjugate(const quaternion& value) noexcept
+    {
+        return {-value.x, -value.y, -value.z, value.w};
+    }
+
+    [[nodiscard]] quaternion inverse(const quaternion& value) noexcept
+    {
+        const float squared_length = length_squared(value);
+        MOLDY_MATH_ASSERT(squared_length != 0.0F, "Quaternion inversion requires a non-zero length.");
+        const quaternion conjugated = conjugate(value);
+        return {conjugated.x / squared_length, conjugated.y / squared_length, conjugated.z / squared_length,
+                conjugated.w / squared_length};
+    }
+
+    [[nodiscard]] float3 rotate(const quaternion& rotation, const float3& vector) noexcept
+    {
+        const float squared_length = length_squared(rotation);
+        MOLDY_MATH_ASSERT(squared_length != 0.0F, "Vector rotation requires a non-zero quaternion.");
+
+        const quaternion conjugated = conjugate(rotation);
+        const quaternion inverse_rotation{conjugated.x / squared_length, conjugated.y / squared_length,
+                                          conjugated.z / squared_length, conjugated.w / squared_length};
+        const quaternion rotated = rotation * quaternion{vector.x, vector.y, vector.z, 0.0F} * inverse_rotation;
+        return {rotated.x, rotated.y, rotated.z};
+    }
+
+    [[nodiscard]] quaternion quaternion_from_axis_angle(const float3& axis, float radians) noexcept
+    {
+        const float axis_length = length(axis);
+        MOLDY_MATH_ASSERT(axis_length != 0.0F, "Axis-angle construction requires a non-zero axis.");
+
+        const float3 normalized_axis = axis / axis_length;
+        const float half_angle = radians * 0.5F;
+        const float sine = std::sin(half_angle);
+        return {normalized_axis.x * sine, normalized_axis.y * sine, normalized_axis.z * sine, std::cos(half_angle)};
     }
 
     template <std::size_t... TIndices, detail::vector_type TVector>
@@ -592,6 +705,109 @@ export {
         }
     }
 
+    [[nodiscard]] float3x3 quaternion_to_float3x3(const quaternion& value) noexcept
+    {
+        const float quaternion_length = length(value);
+        MOLDY_MATH_ASSERT(quaternion_length != 0.0F, "Quaternion-to-matrix conversion requires a non-zero quaternion.");
+
+        const quaternion rotation{value.x / quaternion_length, value.y / quaternion_length, value.z / quaternion_length,
+                                  value.w / quaternion_length};
+        const float xx = rotation.x * rotation.x;
+        const float yy = rotation.y * rotation.y;
+        const float zz = rotation.z * rotation.z;
+        const float xy = rotation.x * rotation.y;
+        const float xz = rotation.x * rotation.z;
+        const float yz = rotation.y * rotation.z;
+        const float xw = rotation.x * rotation.w;
+        const float yw = rotation.y * rotation.w;
+        const float zw = rotation.z * rotation.w;
+
+        return {{1.0F - (2.0F * (yy + zz)), 2.0F * (xy + zw), 2.0F * (xz - yw)},
+                {2.0F * (xy - zw), 1.0F - (2.0F * (xx + zz)), 2.0F * (yz + xw)},
+                {2.0F * (xz + yw), 2.0F * (yz - xw), 1.0F - (2.0F * (xx + yy))}};
+    }
+
+    namespace detail
+    {
+
+    [[nodiscard]] bool within_tolerance(float actual, float expected, float absolute_tolerance,
+                                        float relative_tolerance) noexcept
+    {
+        const float difference = std::fabs(actual - expected);
+        const float scale = std::fmax(std::fabs(actual), std::fabs(expected));
+        return difference <= absolute_tolerance + (relative_tolerance * scale);
+    }
+
+    [[nodiscard]] constexpr float determinant(const float3x3& value) noexcept
+    {
+        return dot(value.c0, cross(value.c1, value.c2));
+    }
+
+    [[nodiscard]] bool is_proper_rotation_matrix(const float3x3& value, float absolute_tolerance,
+                                                 float relative_tolerance) noexcept
+    {
+        const float value_determinant = determinant(value);
+        return within_tolerance(dot(value.c0, value.c0), 1.0F, absolute_tolerance, relative_tolerance) &&
+               within_tolerance(dot(value.c1, value.c1), 1.0F, absolute_tolerance, relative_tolerance) &&
+               within_tolerance(dot(value.c2, value.c2), 1.0F, absolute_tolerance, relative_tolerance) &&
+               within_tolerance(dot(value.c0, value.c1), 0.0F, absolute_tolerance, relative_tolerance) &&
+               within_tolerance(dot(value.c0, value.c2), 0.0F, absolute_tolerance, relative_tolerance) &&
+               within_tolerance(dot(value.c1, value.c2), 0.0F, absolute_tolerance, relative_tolerance) &&
+               value_determinant > 0.0F &&
+               within_tolerance(value_determinant, 1.0F, absolute_tolerance, relative_tolerance);
+    }
+
+    [[nodiscard]] constexpr quaternion canonicalize_sign(const quaternion& value) noexcept
+    {
+        const bool negate =
+            value.w < 0.0F ||
+            (value.w == 0.0F &&
+             (value.x < 0.0F || (value.x == 0.0F && (value.y < 0.0F || (value.y == 0.0F && value.z < 0.0F)))));
+        return negate ? quaternion{-value.x, -value.y, -value.z, -value.w} : value;
+    }
+
+    } // namespace detail
+
+    [[nodiscard]] quaternion float3x3_to_quaternion(const float3x3& value, float absolute_tolerance,
+                                                    float relative_tolerance) noexcept
+    {
+        MOLDY_MATH_ASSERT(absolute_tolerance >= 0.0F, "Matrix-to-quaternion absolute tolerance must be non-negative.");
+        MOLDY_MATH_ASSERT(relative_tolerance >= 0.0F, "Matrix-to-quaternion relative tolerance must be non-negative.");
+        MOLDY_MATH_ASSERT(detail::is_proper_rotation_matrix(value, absolute_tolerance, relative_tolerance),
+                          "Matrix-to-quaternion conversion requires a proper orthonormal rotation matrix.");
+        (void)absolute_tolerance;
+        (void)relative_tolerance;
+
+        quaternion result;
+        const float trace = value.c0.x + value.c1.y + value.c2.z;
+        if (trace > 0.0F)
+        {
+            const float scale = 2.0F * std::sqrt(trace + 1.0F);
+            result = {(value.c1.z - value.c2.y) / scale, (value.c2.x - value.c0.z) / scale,
+                      (value.c0.y - value.c1.x) / scale, 0.25F * scale};
+        }
+        else if (value.c0.x > value.c1.y && value.c0.x > value.c2.z)
+        {
+            const float scale = 2.0F * std::sqrt(1.0F + value.c0.x - value.c1.y - value.c2.z);
+            result = {0.25F * scale, (value.c1.x + value.c0.y) / scale, (value.c2.x + value.c0.z) / scale,
+                      (value.c1.z - value.c2.y) / scale};
+        }
+        else if (value.c1.y > value.c2.z)
+        {
+            const float scale = 2.0F * std::sqrt(1.0F + value.c1.y - value.c0.x - value.c2.z);
+            result = {(value.c1.x + value.c0.y) / scale, 0.25F * scale, (value.c2.y + value.c1.z) / scale,
+                      (value.c2.x - value.c0.z) / scale};
+        }
+        else
+        {
+            const float scale = 2.0F * std::sqrt(1.0F + value.c2.z - value.c0.x - value.c1.y);
+            result = {(value.c2.x + value.c0.z) / scale, (value.c2.y + value.c1.z) / scale, 0.25F * scale,
+                      (value.c0.y - value.c1.x) / scale};
+        }
+
+        return detail::canonicalize_sign(normalize(result));
+    }
+
     namespace detail
     {
 
@@ -612,25 +828,32 @@ export {
         }
     }
 
-    template <matrix_type TMatrix> [[nodiscard]] constexpr TMatrix make_identity() noexcept
+    template <identity_type TValue> [[nodiscard]] constexpr TValue make_identity() noexcept
     {
-        using scalar_type = matrix_scalar_t<TMatrix>;
-        if constexpr (matrix_traits<TMatrix>::dimension == 2)
+        if constexpr (std::same_as<TValue, quaternion>)
         {
-            return {{scalar_type{1}, scalar_type{}}, {scalar_type{}, scalar_type{1}}};
-        }
-        else if constexpr (matrix_traits<TMatrix>::dimension == 3)
-        {
-            return {{scalar_type{1}, scalar_type{}, scalar_type{}},
-                    {scalar_type{}, scalar_type{1}, scalar_type{}},
-                    {scalar_type{}, scalar_type{}, scalar_type{1}}};
+            return {0.0F, 0.0F, 0.0F, 1.0F};
         }
         else
         {
-            return {{scalar_type{1}, scalar_type{}, scalar_type{}, scalar_type{}},
-                    {scalar_type{}, scalar_type{1}, scalar_type{}, scalar_type{}},
-                    {scalar_type{}, scalar_type{}, scalar_type{1}, scalar_type{}},
-                    {scalar_type{}, scalar_type{}, scalar_type{}, scalar_type{1}}};
+            using scalar_type = matrix_scalar_t<TValue>;
+            if constexpr (matrix_traits<TValue>::dimension == 2)
+            {
+                return {{scalar_type{1}, scalar_type{}}, {scalar_type{}, scalar_type{1}}};
+            }
+            else if constexpr (matrix_traits<TValue>::dimension == 3)
+            {
+                return {{scalar_type{1}, scalar_type{}, scalar_type{}},
+                        {scalar_type{}, scalar_type{1}, scalar_type{}},
+                        {scalar_type{}, scalar_type{}, scalar_type{1}}};
+            }
+            else
+            {
+                return {{scalar_type{1}, scalar_type{}, scalar_type{}, scalar_type{}},
+                        {scalar_type{}, scalar_type{1}, scalar_type{}, scalar_type{}},
+                        {scalar_type{}, scalar_type{}, scalar_type{1}, scalar_type{}},
+                        {scalar_type{}, scalar_type{}, scalar_type{}, scalar_type{1}}};
+            }
         }
     }
 
@@ -638,7 +861,7 @@ export {
 
     template <typename TValue> inline constexpr TValue zero{};
     template <detail::vector_type TValue> inline constexpr TValue one = detail::make_one<TValue>();
-    template <detail::matrix_type TValue> inline constexpr TValue identity = detail::make_identity<TValue>();
+    template <detail::identity_type TValue> inline constexpr TValue identity = detail::make_identity<TValue>();
 
     namespace colors
     {
@@ -833,3 +1056,4 @@ export {
 #undef MOLDY_DEFINE_VECTOR_TRAITS
 #undef MOLDY_DEFINE_VECTOR_CONSTANTS
 #undef MOLDY_DEFINE_IDENTITY
+#undef MOLDY_MATH_ASSERT

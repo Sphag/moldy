@@ -102,8 +102,14 @@ else {
     Write-Host "Use a CMake generator that exports compile_commands.json for full clang-tidy coverage."
     Initialize-MsvcDeveloperEnvironment
 
+    $mathModulePath = [System.IO.Path]::GetFullPath((Join-Path $repoRoot "src/math/math.cppm"))
     foreach ($sourceFile in $moduleInterfaceFiles) {
-        & $clangTidy.Source $sourceFile.FullName -- -std=c++23
+        $fallbackCompilerArguments = @("-std=c++23")
+        if ([System.IO.Path]::GetFullPath($sourceFile.FullName) -eq $mathModulePath) {
+            $fallbackCompilerArguments += "-DMOLDY_MATH_ASSERT_BACKEND_STANDALONE"
+        }
+
+        & $clangTidy.Source $sourceFile.FullName -- @fallbackCompilerArguments
         if ($LASTEXITCODE -ne 0) {
             exit $LASTEXITCODE
         }
@@ -117,6 +123,7 @@ $cppcheckArgs = @(
     "--inline-suppr",
     "--language=c++",
     "--std=c++23",
+    "-DMOLDY_MATH_ASSERT_BACKEND_STANDALONE",
     "--suppressions-list=$repoRoot\.cppcheck-suppressions"
 )
 
