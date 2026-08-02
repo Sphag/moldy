@@ -1,14 +1,15 @@
 # Math Conventions And Precision Policy
 
 This document is the binding, backend-neutral contract for project math APIs. The current math slice implements scalar
-vectors, square matrices, and a shared carrier for RGB, sRGB, HSV, and HSL values; quaternion, transform, and geometry
+vectors, square matrices, quaternions, and a shared carrier for RGB, sRGB, HSV, and HSL values; transform and geometry
 APIs remain future work.
 
 ## Scope
 
 The initial math slice is dependency-free and project-owned. It has no third-party math dependency and no rendering
-backend dependency. `moldy.math` currently provides HLSL-named vectors, square matrices, and one shared color carrier;
-future implementations must follow this policy unless a later accepted decision explicitly supersedes it.
+backend dependency. `moldy.math` currently provides HLSL-named vectors, square matrices, quaternions, and one shared
+color carrier; future implementations must follow this policy unless a later accepted decision explicitly supersedes
+it.
 
 ## Coordinates And Units
 
@@ -34,6 +35,21 @@ future implementations must follow this policy unless a later accepted decision 
 - Positive rotations follow the right-hand rule: curl the fingers of the right hand in the positive rotation
   direction while the thumb points along the positive rotation axis.
 
+## Quaternions And Rotation Matrices
+
+- `math::quaternion` is a strong type with vector traits, so it shares vector operations without being interchangeable
+  with `math::float4`. It stores the vector part in `x/y/z` and scalar part in `w`. Its identity is `(0, 0, 0, 1)`.
+- `hamilton_product(A, B)` computes quaternion composition and matches matrices: it applies `B` first, then `A`.
+- Axis-angle construction accepts radians and normalizes a non-zero axis.
+- Quaternion vector rotation accepts a non-zero quaternion and is equivalent to multiplying by the matrix returned by
+  `quaternion_to_float3x3(...)`.
+- Quaternion-to-matrix conversion normalizes its non-zero input.
+- Matrix-to-quaternion conversion accepts only a proper orthonormal `float3x3` rotation matrix. The caller supplies
+  both absolute and relative tolerances; no implicit epsilon is used. The determinant must remain positive regardless
+  of the selected tolerances, so reflections are never rotations.
+- Matrix-to-quaternion conversion returns a normalized quaternion with a canonical sign. A non-zero `w` is positive;
+  when `w` is exactly zero, the first non-zero component in `x/y/z` is positive.
+
 ## Scalar And Comparison Policy
 
 - The initial public scalar type is `float`. Supported toolchains must provide a 32-bit `float` with IEC 60559
@@ -44,10 +60,23 @@ future implementations must follow this policy unless a later accepted decision 
   documented input range. A comparison must not rely on an implicit project-wide epsilon.
 - A global default epsilon is intentionally not defined. Each future operation that compares computed floating-point
   values must choose and document its tolerance policy.
-- Current vectors, matrices, and colors use exact structural equality only. `normalize(...)` reports an exactly
-  zero-length float vector with an empty result instead of applying a tolerance.
+- Current vectors, matrices, quaternions, and colors use exact structural equality only. `normalize(...)` returns a
+  normalized value directly and requires non-zero length rather than applying a tolerance.
 - Signed integer vector and matrix arithmetic has a no-overflow precondition. Unsigned vector and matrix arithmetic
   follows the modulo behavior of `uint32_t`.
+
+## Preconditions And Assertions
+
+- Zero scalar divisors, zero-length normalization, zero axis-angle axes, zero quaternions used for inversion or
+  rotation, and invalid rotation matrices are precondition violations.
+- These preconditions use `MOLDY_MATH_ASSERT(expression, message)`, selected when `math` is built. The repository
+  default privately maps it to core assertions. `standalone` and `custom` build policies remain available without a
+  core include, module import, or link dependency.
+- The standalone backend reports and aborts in Debug and RelWithDebInfo and compiles out in Release, matching the
+  repository's enabled-assertion configurations.
+- The assertion macro and backend header are implementation details and are not exported through `moldy.math`.
+- Exhaustive finite-value validation, color-domain assertions, and signed-overflow instrumentation remain outside the
+  current slice.
 
 ## Colors
 

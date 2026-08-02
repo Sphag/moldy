@@ -22,7 +22,13 @@ if ($configureExitCode -ne 0) {
     exit $configureExitCode
 }
 
-cmake --build $buildDir --config $Configuration --target core_tests math_tests math_policy_tests
+$cacheText = Get-Content -LiteralPath (Join-Path $buildDir "CMakeCache.txt") -Raw
+$testTargets = @("core_tests", "math_tests", "math_assertion_tests", "math_policy_tests")
+if ($cacheText -match "(?m)^MOLDY_MATH_BUILD_CUSTOM_ASSERT_FIXTURE:BOOL=ON$") {
+    $testTargets += "math_custom_assert_tests"
+}
+
+cmake --build $buildDir --config $Configuration --target $testTargets
 $buildExitCode = $LASTEXITCODE
 
 if ($buildExitCode -ne 0) {

@@ -9,7 +9,9 @@ This document maps the current repository scaffold. Keep it factual and update i
 - `src/math/`: standalone, dependency-free `math` library module source.
 - `apps/smoke/`: small executable used to verify that the core library links and reports build information.
 - `tests/core/`: plain C++ executable tests for the current core API.
-- `tests/math/`: plain C++ executable tests for the current math vector API.
+- `tests/math/`: plain C++ executable tests for the current math value and rotation API.
+- `tests/math_assertions/`: subprocess driver for assertion-backed math preconditions.
+- `tests/math_custom_assert/`: focused custom assertion header, link backend, and invocation test.
 - `tests/math_policy/`: dependency-free toolchain-assumption test for the documented math policy.
 - `scripts/`: PowerShell entry points for configure, build, test, full and changed checks, formatting, linting, tool setup, deterministic AI workflow support, and benchmark placeholder flows.
 - `.agents/skills/`: tracked, portable foundational Agent Skills; other `.agents` local state remains ignored.
@@ -104,15 +106,16 @@ The current API is intentionally limited to build information, error/result valu
 ## Math Policy
 
 `docs/MATH_CONVENTIONS.md` is the binding, backend-neutral contract for the project math API. The current
-`moldy.math` module implements HLSL-named vectors, square matrices, a shared color carrier, and explicit conversions;
-quaternions, transforms, and geometry remain outside the implemented scope.
+`moldy.math` module implements HLSL-named vectors, square matrices, quaternions, rotation conversions, a shared color
+carrier, and explicit color conversions; transforms and geometry remain outside the implemented scope.
 
 ## Math Library
 
 The `math` static library is defined from `src/math/math.cppm` and published to consumers as `project::math`. It
-exports the standalone `moldy.math` C++ module, which provides `floatN`, `intN`, and `uintN` vectors; matching square
-matrices; a shared color carrier; and explicit RGB/HSL/HSV/sRGB conversions. The module does not depend on
-`moldy.core`.
+exports the `moldy.math` C++ module, which provides `floatN`, `intN`, and `uintN` vectors; matching square matrices;
+quaternions and rotation conversions; a shared color carrier; and explicit RGB/HSL/HSV/sRGB conversions. Its public
+API does not expose core. The repository-default `core` assertion backend privately imports and links `moldy.core`;
+`standalone` and `custom` configurations compile `math` without a core include, import, or link dependency.
 
 ## Applications
 
@@ -127,10 +130,23 @@ third-party dependency and is registered with CTest as `math_policy_tests`. It v
 60559 assumptions behind the documented initial scalar policy.
 
 The `math_tests` executable is defined from `tests/math/test_main.cpp`. It links `project::math`, imports
-`moldy.math` independently of `moldy.core`, and is registered with CTest as `math_tests`.
+`moldy.math` without importing `moldy.core`, and is registered with CTest as `math_tests`.
 
 It verifies field aliases, free swizzles, vector and matrix arithmetic, generic constants, the shared color carrier,
-and explicit RGB/HSL/HSV/sRGB conversions.
+explicit RGB/HSL/HSV/sRGB conversions, quaternion operations, right-handed rotation composition, matrix equivalence,
+round trips, canonical sign, and caller-selected matrix validation tolerances.
+
+The `math_assertion_tests` executable is defined from `tests/math_assertions/test_main.cpp`. It links a private
+`math_assertion_fixture` build of the module that uses `tests/math_assertions/mock_assert.hpp` instead of a production
+assertion backend. Each registered case launches the same executable as a child process and passes only when that mock
+backend returns its deterministic failure status. This isolates expected failures for zero divisors, zero lengths, zero
+axes, zero quaternions, non-orthonormal matrices, and reflections without invoking a debug break, abort handler, or
+interactive crash dialog. The cases run in every configuration.
+
+When `MOLDY_MATH_BUILD_CUSTOM_ASSERT_FIXTURE=ON`, `tests/math_custom_assert/` defines the
+`math_custom_assert_fixture_backend` static library and `math_custom_assert_tests` executable. The fixture proves that
+a custom two-argument `MOLDY_MATH_ASSERT` header can call a separately linked backend and receives the expected
+precondition message.
 
 Current checks verify that:
 
@@ -156,14 +172,16 @@ Current checks verify that:
 
 - `scripts/configure.ps1`: configures the CMake build directory and handles single-config versus multi-config generators.
 - `scripts/build.ps1`: configures, then builds the project for the requested configuration.
-- `scripts/test.ps1`: configures, builds `core_tests`, `math_tests`, and `math_policy_tests`, then runs CTest with
-  failure output enabled.
+- `scripts/test.ps1`: configures, builds `core_tests`, `math_tests`, `math_assertion_tests`, and `math_policy_tests`,
+  plus the custom fixture when enabled, then runs CTest with failure output enabled.
 - `scripts/check.ps1`: validates the toolchain policy, then runs configure, format, and lint once before building and testing Debug and Release by default.
 - `scripts/test-agent-skills.ps1`: dependency-free validation and smoke coverage for the repository-owned Agent Skills format and safety contract.
 - `scripts/test-ai-workflow.ps1`: dependency-free focused coverage for deterministic AI workflow script validation, fallback, redaction, output bounds, and partial collection behavior.
 - `scripts/doctor.ps1`, `scripts/context.ps1`, `scripts/check-changed.ps1`, and `scripts/collect-diagnostics.ps1`: local readiness, scoped context, conservative changed-check selection, and explicit diagnostics collection helpers; `scripts/workflow-common.ps1` is their shared internal support.
 - `scripts/format.ps1`: checks C++ formatting with `clang-format`; pass `-Fix` to apply formatting.
-- `scripts/lint.ps1`: runs `clang-tidy` and `cppcheck` over source files, excluding generated build trees.
+- `scripts/lint.ps1`: runs `clang-tidy` and `cppcheck` over source files, excluding generated build trees. It analyzes
+  `moldy.math` with the standalone assertion define in the explicit module-interface fallback and the cppcheck pass,
+  avoiding impossible combinations of mutually exclusive backends when compile commands are unavailable.
 - `scripts/install-tools.ps1`: checks required tool availability and health, rejects broken tool binaries, and provides an explicit Windows install path.
 - `scripts/bench.ps1`: reports placeholder-pass status because benchmarks are not configured yet.
 
@@ -171,11 +189,18 @@ Current checks verify that:
 
 - `core`: static library built as C++23 with a public `CXX_MODULES` file set.
 - `project::core`: alias target for consumers of `core`.
-- `math`: standalone static library built as C++23 with a public `CXX_MODULES` file set.
+- `math`: third-party-free static library built as C++23 with a public `CXX_MODULES` file set and a private
+  compile-time assertion backend.
 - `project::math`: alias target for consumers of `math`.
 - `smoke`: executable linked against `project::core`.
 - `core_tests`: executable linked against `project::core` and registered as the current CTest test.
 - `math_tests`: executable linked against `project::math` and registered as the current CTest test.
+- `math_assertion_fixture_backend` and `math_assertion_fixture`: test-only mock assertion backend and isolated module
+  build used by the precondition tests.
+- `math_assertion_tests`: executable linked against `math_assertion_fixture`; registered once per assertion
+  precondition as deterministic subprocess CTest cases.
+- `math_custom_assert_fixture_backend` and `math_custom_assert_tests`: focused targets created only when the custom
+  assertion fixture is enabled.
 - `math_policy_tests`: dependency-free executable that validates initial `float` toolchain assumptions and is
   registered with CTest.
 
@@ -187,5 +212,9 @@ The `core` target receives these private compile definitions from CMake:
 - `CORE_COMPILER_ID`: generated from `CMAKE_CXX_COMPILER_ID`.
 
 The `core` target also publishes `MOLDY_ENABLE_ASSERTS` for `Debug` and `RelWithDebInfo`. `RelWithDebInfo` is the optimized-with-asserts configuration used for focused diagnostics checks.
+
+`MOLDY_MATH_ASSERT_BACKEND` accepts `core`, `standalone`, or `custom` and defaults to `core`. The custom mode also
+requires `MOLDY_MATH_ASSERT_HEADER`. Both settings affect compilation of the library rather than consumers of an
+already compiled module. Unsupported backend values and a missing custom header fail during CMake configuration.
 
 Runtime outputs are directed to `${CMAKE_BINARY_DIR}/bin`. Multi-config generators place configuration-specific executables under paths such as `build/bin/Debug/` or `build/bin/Release/`.

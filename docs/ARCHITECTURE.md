@@ -5,14 +5,16 @@ This is a living document. It describes current and planned boundaries. Planned 
 ## Current Modules
 
 - `core`: Platform-neutral foundations. The current public surface includes build information, explicit status/result values, logging, assertions, steady time, and application lifecycle primitives.
-- `math`: Standalone, dependency-free math values. The current public surface includes HLSL-named float, signed, and
-  unsigned vectors; square matrices; a shared color carrier; and explicit RGB/HSL/HSV/sRGB conversions.
+- `math`: Project-owned, third-party-free, platform-neutral math values. The current public surface includes
+  HLSL-named float, signed, and unsigned vectors; square matrices; quaternions and rotation conversions; a shared color
+  carrier; and explicit RGB/HSL/HSV/sRGB conversions. Its precondition backend is private: repository builds use core
+  assertions by default, while standalone and custom builds have no core dependency.
 
 ## Planned Module Boundaries
 
-- `math`: Project-owned quaternions, transforms, and geometry, extending the current vector, matrix, and color slice.
-  Its binding conventions are defined in [Math Conventions](MATH_CONVENTIONS.md); it remains independent of rendering
-  and third-party math types.
+- `math`: Project-owned transforms and geometry, extending the current vector, matrix, quaternion, and color slice. Its
+  binding conventions are defined in [Math Conventions](MATH_CONVENTIONS.md); it remains independent of rendering and
+  third-party math types.
 - `memory`: Allocator contracts, allocation tags, tracking, budgets, and leak reporting. Consumers depend on project-owned allocation contracts rather than a concrete allocator.
 - `diagnostics`: Trace events, breadcrumbs, captures, stacks, crash reports, sanitizers, and shared GPU diagnostic records. Tracy and vendor GPU tools are optional adapters.
 - `platform`: Desktop process, window, input, crash, and operating-system services. Win32 is the first planned host adapter; platform-neutral consumers do not expose Win32 types.
@@ -28,6 +30,8 @@ This is a living document. It describes current and planned boundaries. Planned 
 ## Dependency Direction
 
 - `math`, core allocation contracts, and base trace contracts are foundations for later tracks.
+- The `math` public API does not depend on core. Linking core for the repository-default assertion backend is a private
+  build policy, not a public module dependency; isolated builds select the standalone or custom backend.
 - `platform` and backend adapters may depend on platform-neutral contracts; platform-neutral modules must not depend on Win32 or D3D12 types.
 - `rhi-d3d12` implements `rhi`; `render` consumes `rhi` and must not bypass it for ordinary rendering work.
 - `scene` owns semantic data. `serialization` translates scene source and cache formats, while `editor` performs validated scene operations through scene contracts.
