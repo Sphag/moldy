@@ -37,9 +37,9 @@ it.
 
 ## Quaternions And Rotation Matrices
 
-- `math::quaternion` stores the vector part in `x/y/z` and scalar part in `w`. Its identity is `(0, 0, 0, 1)`.
-- Quaternion multiplication is the Hamilton product. Composition matches matrices: `A * B` applies `B` first, then
-  `A`.
+- `math::quaternion` is a strong type with vector traits, so it shares vector operations without being interchangeable
+  with `math::float4`. It stores the vector part in `x/y/z` and scalar part in `w`. Its identity is `(0, 0, 0, 1)`.
+- `hamilton_product(A, B)` computes quaternion composition and matches matrices: it applies `B` first, then `A`.
 - Axis-angle construction accepts radians and normalizes a non-zero axis.
 - Quaternion vector rotation accepts a non-zero quaternion and is equivalent to multiplying by the matrix returned by
   `quaternion_to_float3x3(...)`.

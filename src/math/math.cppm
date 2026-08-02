@@ -162,6 +162,7 @@ export {
         {
         }
     };
+
     // NOLINTEND(readability-identifier-naming)
 
     namespace detail
@@ -185,6 +186,7 @@ export {
     MOLDY_DEFINE_VECTOR_TRAITS(uint2, uint, 2);
     MOLDY_DEFINE_VECTOR_TRAITS(uint3, uint, 3);
     MOLDY_DEFINE_VECTOR_TRAITS(uint4, uint, 4);
+    MOLDY_DEFINE_VECTOR_TRAITS(quaternion, float, 4);
 
     template <typename TScalar, std::size_t TDimension> struct vector_for;
     template <> struct vector_for<float, 2>
@@ -371,11 +373,6 @@ export {
         return left.r == right.r && left.g == right.g && left.b == right.b && left.a == right.a;
     }
 
-    [[nodiscard]] constexpr bool operator==(const quaternion& left, const quaternion& right) noexcept
-    {
-        return left.x == right.x && left.y == right.y && left.z == right.z && left.w == right.w;
-    }
-
     template <detail::vector_type TVector>
     [[nodiscard]] constexpr TVector operator+(const TVector& left, const TVector& right) noexcept
     {
@@ -515,35 +512,12 @@ export {
         return vector / vector_length;
     }
 
-    [[nodiscard]] constexpr quaternion operator*(const quaternion& left, const quaternion& right) noexcept
+    [[nodiscard]] constexpr quaternion hamilton_product(const quaternion& left, const quaternion& right) noexcept
     {
         return {(left.w * right.x) + (left.x * right.w) + (left.y * right.z) - (left.z * right.y),
                 (left.w * right.y) - (left.x * right.z) + (left.y * right.w) + (left.z * right.x),
                 (left.w * right.z) + (left.x * right.y) - (left.y * right.x) + (left.z * right.w),
                 (left.w * right.w) - (left.x * right.x) - (left.y * right.y) - (left.z * right.z)};
-    }
-
-    [[nodiscard]] constexpr float dot(const quaternion& left, const quaternion& right) noexcept
-    {
-        return (left.x * right.x) + (left.y * right.y) + (left.z * right.z) + (left.w * right.w);
-    }
-
-    [[nodiscard]] constexpr float length_squared(const quaternion& value) noexcept
-    {
-        return dot(value, value);
-    }
-
-    [[nodiscard]] float length(const quaternion& value) noexcept
-    {
-        return std::sqrt(length_squared(value));
-    }
-
-    [[nodiscard]] quaternion normalize(const quaternion& value) noexcept
-    {
-        const float quaternion_length = length(value);
-        MOLDY_MATH_ASSERT(quaternion_length != 0.0F, "Quaternion normalization requires a non-zero length.");
-        return {value.x / quaternion_length, value.y / quaternion_length, value.z / quaternion_length,
-                value.w / quaternion_length};
     }
 
     [[nodiscard]] constexpr quaternion conjugate(const quaternion& value) noexcept
@@ -555,9 +529,7 @@ export {
     {
         const float squared_length = length_squared(value);
         MOLDY_MATH_ASSERT(squared_length != 0.0F, "Quaternion inversion requires a non-zero length.");
-        const quaternion conjugated = conjugate(value);
-        return {conjugated.x / squared_length, conjugated.y / squared_length, conjugated.z / squared_length,
-                conjugated.w / squared_length};
+        return conjugate(value) / squared_length;
     }
 
     [[nodiscard]] float3 rotate(const quaternion& rotation, const float3& vector) noexcept
@@ -565,10 +537,9 @@ export {
         const float squared_length = length_squared(rotation);
         MOLDY_MATH_ASSERT(squared_length != 0.0F, "Vector rotation requires a non-zero quaternion.");
 
-        const quaternion conjugated = conjugate(rotation);
-        const quaternion inverse_rotation{conjugated.x / squared_length, conjugated.y / squared_length,
-                                          conjugated.z / squared_length, conjugated.w / squared_length};
-        const quaternion rotated = rotation * quaternion{vector.x, vector.y, vector.z, 0.0F} * inverse_rotation;
+        const quaternion inverse_rotation = conjugate(rotation) / squared_length;
+        const quaternion rotated = hamilton_product(
+            hamilton_product(rotation, quaternion{vector.x, vector.y, vector.z, 0.0F}), inverse_rotation);
         return {rotated.x, rotated.y, rotated.z};
     }
 
@@ -710,8 +681,7 @@ export {
         const float quaternion_length = length(value);
         MOLDY_MATH_ASSERT(quaternion_length != 0.0F, "Quaternion-to-matrix conversion requires a non-zero quaternion.");
 
-        const quaternion rotation{value.x / quaternion_length, value.y / quaternion_length, value.z / quaternion_length,
-                                  value.w / quaternion_length};
+        const quaternion rotation = value / quaternion_length;
         const float xx = rotation.x * rotation.x;
         const float yy = rotation.y * rotation.y;
         const float zz = rotation.z * rotation.z;
@@ -763,7 +733,7 @@ export {
             value.w < 0.0F ||
             (value.w == 0.0F &&
              (value.x < 0.0F || (value.x == 0.0F && (value.y < 0.0F || (value.y == 0.0F && value.z < 0.0F)))));
-        return negate ? quaternion{-value.x, -value.y, -value.z, -value.w} : value;
+        return negate ? -value : value;
     }
 
     } // namespace detail

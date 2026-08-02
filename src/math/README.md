@@ -13,7 +13,7 @@ import moldy.math;
 
 The API follows HLSL type naming: `float2` through `float4`, `int2` through `int4`, `uint2` through `uint4`, and the
 matching square matrices from `float2x2` through `uint4x4`. Matrix columns are public `c0` through `c3` values.
-`quaternion` stores its vector part in `x/y/z` and scalar part in `w`.
+`quaternion` is a strong type that stores its vector part in `x/y/z` and scalar part in `w`.
 
 Vectors expose the position fields `xyzw`, color aliases `rgba`, and texture-coordinate aliases `uv` where the
 component exists. These aliases share component storage. Compose or reorder components with the free
@@ -24,10 +24,11 @@ Vector and matrix arithmetic is provided by operators and free functions: `dot(.
 zero length is an assertion-backed precondition violation. Scalar division likewise requires a non-zero scalar.
 Signed integer arithmetic must not overflow; unsigned arithmetic follows `uint32_t` modulo behavior.
 
-Quaternion multiplication is the Hamilton product. `A * B` applies `B` first and then `A`, matching matrix
-composition. `dot(...)`, `length_squared(...)`, `length(...)`, `normalize(...)`, `conjugate(...)`, `inverse(...)`, and
-`rotate(...)` provide the basic rotation operations. `quaternion_from_axis_angle(...)` accepts radians and a non-zero
-axis. Positive rotations follow the right-hand rule.
+Through its vector traits, `quaternion` reuses vector equality, arithmetic, swizzles, `dot(...)`, `length_squared(...)`,
+`length(...)`, and `normalize(...)` without becoming interchangeable with `float4`. `hamilton_product(A, B)` applies
+`B` first and then `A`, matching matrix composition. `conjugate(...)`, `inverse(...)`, and `rotate(...)` provide the
+remaining basic rotation operations. `quaternion_from_axis_angle(...)` accepts radians and a non-zero axis. Positive
+rotations follow the right-hand rule.
 
 `quaternion_to_float3x3(...)` accepts any non-zero quaternion and normalizes it before conversion.
 `float3x3_to_quaternion(...)` requires explicit absolute and relative tolerances and accepts only a proper

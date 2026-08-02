@@ -38,9 +38,10 @@ build type, including the default Debug and Release quality gate.
 
 `math_tests` imports `moldy.math` without importing `moldy.core`. It covers HLSL-named float, signed, and unsigned
 vectors; field aliases; free swizzles; arithmetic; direct normalization; square matrix multiplication; generic
-constants; colors; RGB/HSL/HSV/sRGB conversions; quaternion identity, normalization, inverse, vector rotation,
-right-handed 90-degree and 180-degree cases, non-commutative composition, quaternion/matrix equivalence, conversion
-round trips, canonical sign, and explicit matrix tolerances. Equality remains exact and structural.
+constants; colors; RGB/HSL/HSV/sRGB conversions; quaternion strong typing, shared vector operations, identity,
+normalization, inverse, vector rotation, explicit Hamilton products, right-handed 90-degree and 180-degree cases,
+non-commutative composition, quaternion/matrix equivalence, conversion round trips, canonical sign, and explicit matrix
+tolerances. Equality remains exact and structural.
 
 ## Math Assertion Tests
 

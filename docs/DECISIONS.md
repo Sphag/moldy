@@ -262,9 +262,10 @@ Context: Quaternion normalization, inversion, rotation, and matrix conversion in
 while `moldy.math` must remain buildable without `moldy.core`.
 Decision: Route math preconditions through the private two-argument `MOLDY_MATH_ASSERT` macro selected when the
 library is built. Use core assertions by default in this repository, provide a standard standalone fallback, and allow
-a required custom header to define the macro. Add project-owned Hamilton quaternions, right-handed axis-angle and
-vector rotation, and proper-rotation `float3x3` conversions with caller-supplied tolerances and a canonical quaternion
-sign.
+a required custom header to define the macro. Publish `quaternion` as a strong type with vector traits so it shares
+generic vector operations without becoming interchangeable with `float4`. Add an explicit Hamilton-product operation,
+right-handed axis-angle and vector rotation, and proper-rotation `float3x3` conversions with caller-supplied tolerances
+and a canonical quaternion sign.
 Consequences: Repository builds share core diagnostics without exposing core types through the math API. Standalone
 and custom builds have no core include, module import, or link requirement. Precondition handling is fixed for the
 compiled module target, zero inputs and invalid rotation matrices are contract violations, and callers continue to

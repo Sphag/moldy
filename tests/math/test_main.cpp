@@ -141,6 +141,12 @@ void test_quaternions(TestContext& context)
                    "Quaternion dot product is exact for known components.");
     context.expect(math::length_squared(math::quaternion{1.0F, 2.0F, 3.0F, 4.0F}) == 30.0F,
                    "Quaternion squared length uses all four components.");
+    const math::quaternion vector_value{1.0F, 2.0F, 3.0F, 4.0F};
+    context.expect((vector_value + math::quaternion{4.0F, 3.0F, 2.0F, 1.0F}) ==
+                       math::quaternion{5.0F, 5.0F, 5.0F, 5.0F},
+                   "Quaternion vector traits reuse vector addition.");
+    context.expect(math::swizzle<3, 0>(vector_value) == math::float2{4.0F, 1.0F},
+                   "Quaternion vector traits reuse vector swizzles.");
     context.expect(math::inverse(math::quaternion{0.0F, 0.0F, 0.0F, 2.0F}) == math::quaternion{0.0F, 0.0F, 0.0F, 0.5F},
                    "Quaternion inverse accounts for non-unit length.");
     context.expect(math::conjugate(math::quaternion{1.0F, -2.0F, 3.0F, -4.0F}) ==
@@ -159,23 +165,24 @@ void test_quaternions(TestContext& context)
                         tolerance, "A positive 180-degree Y rotation reverses the X axis.");
 
     const math::quaternion inverse_rotation = math::inverse(z_quarter_turn);
-    context.expect_near(z_quarter_turn * inverse_rotation, math::identity<math::quaternion>, tolerance,
-                        "A quaternion multiplied by its inverse produces identity.");
+    context.expect_near(math::hamilton_product(z_quarter_turn, inverse_rotation), math::identity<math::quaternion>,
+                        tolerance, "A quaternion multiplied by its inverse produces identity.");
     context.expect_near(math::rotate(inverse_rotation, math::rotate(z_quarter_turn, math::float3{0.25F, -0.5F, 1.0F})),
                         math::float3{0.25F, -0.5F, 1.0F}, tolerance, "Inverse rotation restores the original vector.");
 
     const math::quaternion x_quarter_turn = math::quaternion_from_axis_angle(math::float3{1.0F, 0.0F, 0.0F}, half_pi);
     const math::float3 basis_x{1.0F, 0.0F, 0.0F};
-    const math::float3 x_after_z_then_x = math::rotate(x_quarter_turn * z_quarter_turn, basis_x);
-    const math::float3 x_after_x_then_z = math::rotate(z_quarter_turn * x_quarter_turn, basis_x);
+    const math::float3 x_after_z_then_x = math::rotate(math::hamilton_product(x_quarter_turn, z_quarter_turn), basis_x);
+    const math::float3 x_after_x_then_z = math::rotate(math::hamilton_product(z_quarter_turn, x_quarter_turn), basis_x);
     context.expect_near(x_after_z_then_x, math::float3{0.0F, 0.0F, 1.0F}, tolerance,
-                        "Quaternion A * B applies B before A.");
+                        "hamilton_product(A, B) applies B before A.");
     context.expect_near(x_after_x_then_z, math::float3{0.0F, 1.0F, 0.0F}, tolerance,
                         "Quaternion composition is non-commutative.");
 
     const math::float3x3 x_matrix = math::quaternion_to_float3x3(x_quarter_turn);
     const math::float3x3 z_matrix = math::quaternion_to_float3x3(z_quarter_turn);
-    context.expect_near(math::quaternion_to_float3x3(x_quarter_turn * z_quarter_turn), x_matrix * z_matrix, tolerance,
+    context.expect_near(math::quaternion_to_float3x3(math::hamilton_product(x_quarter_turn, z_quarter_turn)),
+                        x_matrix * z_matrix, tolerance,
                         "Quaternion and matrix composition use the same right-to-left contract.");
     context.expect_near(z_matrix * math::float3{0.5F, -1.0F, 2.0F},
                         math::rotate(z_quarter_turn, math::float3{0.5F, -1.0F, 2.0F}), tolerance,
@@ -249,6 +256,7 @@ void test_color(TestContext& context)
 }
 
 static_assert(std::is_trivially_copyable_v<math::color>);
+static_assert(!std::is_same_v<math::quaternion, math::float4>);
 static_assert(std::is_trivially_copyable_v<math::quaternion>);
 static_assert(std::is_trivially_copyable_v<math::float4>);
 static_assert(std::is_trivially_copyable_v<math::int4>);
