@@ -82,10 +82,9 @@ function Test-WorkflowIgnoredPath {
 function Test-WorkflowTrackedPath {
     param([string]$RepositoryRoot, [string]$RelativePath)
 
-    & git -C $RepositoryRoot ls-files --error-unmatch -- $RelativePath *> $null
-    if ($LASTEXITCODE -eq 0) { return $true }
-    if ($LASTEXITCODE -eq 1) { return $false }
-    throw "Git could not evaluate tracked state for '$RelativePath'."
+    $trackedPaths = @(& git -C $RepositoryRoot ls-files -- $RelativePath)
+    if ($LASTEXITCODE -ne 0) { throw "Git could not evaluate tracked state for '$RelativePath'." }
+    return $trackedPaths.Count -gt 0
 }
 
 function Get-WorkflowTextFile {
