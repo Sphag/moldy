@@ -23,6 +23,7 @@ Agents must ask before:
 - Performing broad refactors.
 - Running destructive actions.
 - Creating commits, branches, pull requests, or other git history changes.
+- Configuring or installing MCP servers.
 
 Do not initialize git unless the user explicitly requests it.
 

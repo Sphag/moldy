@@ -7,6 +7,11 @@ description: Assess a proposed third-party dependency or tool and provide eviden
 
 Use when a task proposes adding or updating a third-party dependency or tool. Do not use the assessment as approval to install, pin, vendor, or change a lockfile.
 
+**Example triggers:**
+- Proposing a new MCP integration candidate
+- Evaluating an upstream version upgrade with license changes
+- Assessing a dependency whose provenance evidence is stale or contradictory
+
 ## Inputs
 
 - Source, license, exact version, lock or pin, transitive surface, permissions, and alternatives.
