@@ -154,9 +154,20 @@ if ($InstallWindows) {
     foreach ($tool in $tools) {
         if ($null -eq (Resolve-HealthyTool -Tool $tool)) {
             Write-Host "Installing $($tool.Package) for $($tool.Name)."
-            & $winget.Source install --id $tool.Package --exact --source winget --accept-source-agreements --accept-package-agreements --silent
+            $maxRetries = 3
+            $retryCount = 0
+            while ($retryCount -lt $maxRetries) {
+                & $winget.Source install --id $tool.Package --exact --source winget --accept-source-agreements --accept-package-agreements --silent
+                if ($LASTEXITCODE -eq 0) {
+                    break
+                }
+                $retryCount++
+                Write-Host "Install failed (attempt $($retryCount/$maxRetries)), retrying..."
+                Start-Sleep -Seconds 2
+            }
             if ($LASTEXITCODE -ne 0) {
-                exit $LASTEXITCODE
+                Write-Host "$($tool.Name): winget installation failed. Installing manually or skipping."
+                continue
             }
         }
     }

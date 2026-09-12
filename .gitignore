@@ -65,3 +65,6 @@ desktop.ini
 
 # Archived generated image variants
 /docs/assets/icons/archive-ignored/
+
+# Local plans and task tracking
+/plans/

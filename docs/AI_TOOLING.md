@@ -94,7 +94,7 @@ Skills compose `AGENTS.md`, `docs/AI_WORKFLOW.md`, and existing scripts. They do
 
 ## MCP Admission Policy
 
-[MCP Admission Record](MCP_ADMISSION.md) is the reusable evidence template and baseline decision record. It requires provenance, license, version/integrity, transport, permissions, data exposure, bounded smoke evidence, rollback, owner, and status; missing evidence fails closed. It also records the current GitHub integration and the narrow Microsoft Learn exception.
+[MCP Admission Record](MCP_ADMISSION.md) is the authoritative source for MCP admission decisions. It defines detailed criteria (provenance, license, version/integrity, transport, permissions, data exposure, smoke evidence, rollback, approval boundary), records baseline integrations, and documents the nomination→review→decision→record workflow. Missing or stale evidence fails closed: do not configure or invoke.
 
 Installation, dependency changes, credential changes, host or repository configuration, and consequential server-tool invocations still require explicit approval at implementation time. Admission never grants blanket auto-approval to server tools.
 
